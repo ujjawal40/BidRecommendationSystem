@@ -1,18 +1,18 @@
 {
   "Feature Engineering Summary": {
-    "Total New Features": 58,
+    "Total New Features": 54,
     "Original Columns": 69,
-    "Final Columns": 127,
+    "Final Columns": 123,
     "Dataset Rows": 114503
   },
   "Feature Categories": {
-    "Rolling/Time Series": 8,
+    "Rolling/Time Series": 7,
     "Lag Features": 4,
     "Cumulative": 2,
     "Aggregation": 17,
     "Interaction": 4,
     "Encoding": 14,
-    "Ratio": 5,
+    "Ratio": 1,
     "Temporal": 4,
     "Other": 8
   },
@@ -24,8 +24,7 @@
       "rolling_avg_fee_segment",
       "rolling_bid_count_office",
       "rolling_win_rate_office",
-      "rolling_std_fee_office",
-      "fee_ratio_to_rolling_office"
+      "rolling_std_fee_office"
     ],
     "Lag Features": [
       "prev_fee_same_client",
@@ -79,10 +78,6 @@
       "BidCompanyType_encoded"
     ],
     "Ratio": [
-      "fee_deviation_from_office_avg",
-      "fee_ratio_to_rolling_office",
-      "fee_ratio_to_proptype",
-      "client_fee_ratio_to_market",
       "targettime_ratio_to_proptype"
     ],
     "Temporal": [
