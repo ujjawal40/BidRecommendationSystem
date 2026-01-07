@@ -1,0 +1,66 @@
+================================================================================
+FEATURE-ENGINEERED DATASET - COLUMN LIST
+================================================================================
+
+Total Features: 58
+
+New Features Created:
+--------------------------------------------------------------------------------
+  1. rolling_avg_fee_office
+  2. rolling_avg_fee_proptype
+  3. rolling_avg_fee_state
+  4. rolling_avg_fee_segment
+  5. rolling_bid_count_office
+  6. rolling_win_rate_office
+  7. rolling_std_fee_office
+  8. prev_fee_same_client
+  9. prev_won_same_client
+ 10. days_since_last_bid_client
+ 11. same_proptype_as_last_client
+ 12. total_bids_to_client
+ 13. total_wins_with_client
+ 14. win_rate_with_client
+ 15. avg_historical_fee_client
+ 16. office_avg_fee
+ 17. office_std_fee
+ 18. office_win_rate
+ 19. propertytype_avg_fee
+ 20. propertytype_std_fee
+ 21. propertytype_win_rate
+ 22. state_avg_fee
+ 23. state_std_fee
+ 24. state_win_rate
+ 25. segment_avg_fee
+ 26. segment_std_fee
+ 27. segment_win_rate
+ 28. client_avg_fee
+ 29. client_std_fee
+ 30. client_win_rate
+ 31. building_size_numeric
+ 32. targettime_x_size
+ 33. distance_x_volume
+ 34. client_relationship_strength
+ 35. market_competitiveness
+ 36. fee_deviation_from_office_avg
+ 37. Bid_Property_Type_frequency
+ 38. PropertyState_frequency
+ 39. OfficeLocation_frequency
+ 40. BusinessSegment_frequency
+ 41. BidCompanyType_frequency
+ 42. MarketOrientation_frequency
+ 43. Bid_Property_Type_encoded
+ 44. Bid_SubProperty_Type_encoded
+ 45. PropertyState_encoded
+ 46. PropertyCity_encoded
+ 47. OfficeLocation_encoded
+ 48. BusinessSegment_encoded
+ 49. BidCompanyName_encoded
+ 50. BidCompanyType_encoded
+ 51. days_since_start
+ 52. quarterly_avg_fee
+ 53. is_peak_season
+ 54. is_weekday
+ 55. fee_ratio_to_rolling_office
+ 56. fee_ratio_to_proptype
+ 57. client_fee_ratio_to_market
+ 58. targettime_ratio_to_proptype

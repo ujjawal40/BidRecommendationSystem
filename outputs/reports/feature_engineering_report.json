@@ -1,0 +1,105 @@
+{
+  "Feature Engineering Summary": {
+    "Total New Features": 58,
+    "Original Columns": 69,
+    "Final Columns": 127,
+    "Dataset Rows": 114503
+  },
+  "Feature Categories": {
+    "Rolling/Time Series": 8,
+    "Lag Features": 4,
+    "Cumulative": 2,
+    "Aggregation": 17,
+    "Interaction": 4,
+    "Encoding": 14,
+    "Ratio": 5,
+    "Temporal": 4,
+    "Other": 8
+  },
+  "Detailed_Feature_List": {
+    "Rolling/Time Series": [
+      "rolling_avg_fee_office",
+      "rolling_avg_fee_proptype",
+      "rolling_avg_fee_state",
+      "rolling_avg_fee_segment",
+      "rolling_bid_count_office",
+      "rolling_win_rate_office",
+      "rolling_std_fee_office",
+      "fee_ratio_to_rolling_office"
+    ],
+    "Lag Features": [
+      "prev_fee_same_client",
+      "prev_won_same_client",
+      "days_since_last_bid_client",
+      "days_since_start"
+    ],
+    "Cumulative": [
+      "total_bids_to_client",
+      "total_wins_with_client"
+    ],
+    "Aggregation": [
+      "rolling_avg_fee_office",
+      "rolling_avg_fee_proptype",
+      "rolling_avg_fee_state",
+      "rolling_avg_fee_segment",
+      "rolling_std_fee_office",
+      "avg_historical_fee_client",
+      "office_avg_fee",
+      "office_std_fee",
+      "propertytype_avg_fee",
+      "propertytype_std_fee",
+      "state_avg_fee",
+      "state_std_fee",
+      "segment_avg_fee",
+      "segment_std_fee",
+      "client_avg_fee",
+      "client_std_fee",
+      "quarterly_avg_fee"
+    ],
+    "Interaction": [
+      "targettime_x_size",
+      "distance_x_volume",
+      "client_relationship_strength",
+      "market_competitiveness"
+    ],
+    "Encoding": [
+      "Bid_Property_Type_frequency",
+      "PropertyState_frequency",
+      "OfficeLocation_frequency",
+      "BusinessSegment_frequency",
+      "BidCompanyType_frequency",
+      "MarketOrientation_frequency",
+      "Bid_Property_Type_encoded",
+      "Bid_SubProperty_Type_encoded",
+      "PropertyState_encoded",
+      "PropertyCity_encoded",
+      "OfficeLocation_encoded",
+      "BusinessSegment_encoded",
+      "BidCompanyName_encoded",
+      "BidCompanyType_encoded"
+    ],
+    "Ratio": [
+      "fee_deviation_from_office_avg",
+      "fee_ratio_to_rolling_office",
+      "fee_ratio_to_proptype",
+      "client_fee_ratio_to_market",
+      "targettime_ratio_to_proptype"
+    ],
+    "Temporal": [
+      "days_since_start",
+      "quarterly_avg_fee",
+      "is_peak_season",
+      "is_weekday"
+    ],
+    "Other": [
+      "same_proptype_as_last_client",
+      "win_rate_with_client",
+      "office_win_rate",
+      "propertytype_win_rate",
+      "state_win_rate",
+      "segment_win_rate",
+      "client_win_rate",
+      "building_size_numeric"
+    ]
+  }
+}

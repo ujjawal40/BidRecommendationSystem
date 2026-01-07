@@ -1,0 +1,6 @@
+Metric,Value
+Total Rows,166372.0
+Unique BidIds,124780.0
+BidIds with Duplicates,20121.0
+Total Duplicate Rows,61713.0
+Avg Rows per Duplicate BidId,3.067094080811093

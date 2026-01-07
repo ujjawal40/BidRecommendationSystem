@@ -1,0 +1,50 @@
+{
+  "Dataset Overview": {
+    "Total Rows": 166372,
+    "Total Columns": 60,
+    "Date Range Start": "2018-01-02 00:00:00",
+    "Date Range End": "2025-12-20 00:00:00",
+    "Years Covered": "2018 - 2025"
+  },
+  "Target Variable (BidFee)": {
+    "Missing Count": 3072,
+    "Missing Percent": "1.85%",
+    "Mean": "$4,334.58",
+    "Median": "$3,000.00",
+    "Std Dev": "$248,855.84",
+    "Min": "$0.00",
+    "Max": "$100,000,000.00"
+  },
+  "Bid Status Distribution": {
+    "Won": 83809,
+    "Lost": 66744,
+    "Placed": 7203,
+    "Active": 6320,
+    "Declined": 1548,
+    "Approved": 748
+  },
+  "Critical Driver (TargetTime)": {
+    "Missing Count": 36644,
+    "Missing Percent": "22.03%",
+    "Mean (days)": "23.94",
+    "Median (days)": "21.00"
+  },
+  "Top Property Types": {
+    "Multifamily": 37437,
+    "Retail": 34670,
+    "Office": 24384,
+    "Industrial": 23261,
+    "Land": 14356
+  },
+  "Top States": {
+    "Illinois": 41790,
+    "Florida": 22965,
+    "Texas": 10945,
+    "Ohio": 8881,
+    "Missouri": 6993
+  },
+  "Data Quality": {
+    "Columns with Missing Data": 48,
+    "Duplicate BidIds": 41592
+  }
+}

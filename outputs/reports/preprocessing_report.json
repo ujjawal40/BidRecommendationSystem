@@ -1,0 +1,31 @@
+{
+  "Preprocessing Summary": {
+    "Input File": "/Users/ujjawaldwivedi/Desktop/BidRecommendationSystem/data/processed/BidData_cleaned.csv",
+    "Output File": "/Users/ujjawaldwivedi/Desktop/BidRecommendationSystem/data/processed/BidData_processed.csv",
+    "Processing Date": "2026-01-03 23:28:54"
+  },
+  "Row Transformations": {
+    "Initial Rows": 166372,
+    "After Deduplication": 124780,
+    "After Status Filtering": 116657,
+    "After BidFee Filter": 114503,
+    "Final Rows": 114503,
+    "Total Rows Removed": 51869,
+    "Retention Rate": "68.82%"
+  },
+  "Specific Transformations": {
+    "Duplicate Rows Removed": 41592,
+    "Rows Filtered Out (Status)": 8123,
+    "Rows Missing BidFee Removed": 2154,
+    "BidFee Values Capped": 1140,
+    "BidFee Cap Value": "$15,000.00",
+    "TargetTime Values Imputed": 22315
+  },
+  "Final Data Quality": {
+    "Total Columns": 68,
+    "Numerical Columns": 36,
+    "Categorical Columns": 30,
+    "DateTime Columns": 2,
+    "Win Rate": "43.34%"
+  }
+}
