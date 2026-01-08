@@ -1,0 +1,15 @@
+Selected Features (12) - Method: lgb_top
+================================================================================
+
+1. segment_avg_fee
+2. state_avg_fee
+3. segment_win_rate
+4. segment_std_fee
+5. client_avg_fee
+6. office_avg_fee
+7. rolling_avg_fee_segment
+8. TargetTime
+9. client_std_fee
+10. BusinessSegment_frequency
+11. propertytype_avg_fee
+12. PropertyState_frequency

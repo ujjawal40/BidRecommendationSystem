@@ -1,0 +1,86 @@
+{
+  "model_type": "LightGBM (Feature Selected)",
+  "phase": "1A - Bid Fee Prediction",
+  "target_variable": "BidFee",
+  "feature_selection": {
+    "method": "lgb_top",
+    "original_features": 84,
+    "selected_features": 12,
+    "reduction_pct": 85.71428571428572
+  },
+  "selected_features": [
+    "segment_avg_fee",
+    "state_avg_fee",
+    "segment_win_rate",
+    "segment_std_fee",
+    "client_avg_fee",
+    "office_avg_fee",
+    "rolling_avg_fee_segment",
+    "TargetTime",
+    "client_std_fee",
+    "BusinessSegment_frequency",
+    "propertytype_avg_fee",
+    "PropertyState_frequency"
+  ],
+  "best_iteration": 994,
+  "metrics": {
+    "train_rmse": 99.54464606840368,
+    "test_rmse": 263.22593602384853,
+    "test_mae": 77.82744780600432,
+    "test_r2": 0.9851415260882097,
+    "overfitting_ratio": 2.644300285551959
+  },
+  "baseline_comparison": {
+    "baseline_overfitting": 3.6040340961379624,
+    "final_overfitting": 2.644300285551959,
+    "improvement_pct": 26.629432047117486
+  },
+  "all_methods": [
+    {
+      "method": "lgb_top",
+      "n_features": 12,
+      "train_rmse": 99.54464606840368,
+      "test_rmse": 263.22593602384853,
+      "test_mae": 77.82744780600432,
+      "test_r2": 0.9851415260882097,
+      "overfitting_ratio": 2.644300285551959
+    },
+    {
+      "method": "lgb_95pct",
+      "n_features": 12,
+      "train_rmse": 99.54464606840368,
+      "test_rmse": 263.22593602384853,
+      "test_mae": 77.82744780600432,
+      "test_r2": 0.9851415260882097,
+      "overfitting_ratio": 2.644300285551959
+    },
+    {
+      "method": "shap_top",
+      "n_features": 14,
+      "train_rmse": 96.48221557623971,
+      "test_rmse": 263.4386252076648,
+      "test_mae": 71.6689359747236,
+      "test_r2": 0.9851175047969326,
+      "overfitting_ratio": 2.7304371446517735
+    },
+    {
+      "method": "shap_90pct",
+      "n_features": 14,
+      "train_rmse": 96.48221557623971,
+      "test_rmse": 263.4386252076648,
+      "test_mae": 71.6689359747236,
+      "test_r2": 0.9851175047969326,
+      "overfitting_ratio": 2.7304371446517735
+    },
+    {
+      "method": "consensus",
+      "n_features": 14,
+      "train_rmse": 93.50666864560326,
+      "test_rmse": 267.44963200225345,
+      "test_mae": 71.76220873610747,
+      "test_r2": 0.9846608654129326,
+      "overfitting_ratio": 2.8602198738991125
+    }
+  ],
+  "training_date": "2026-01-07 23:50:25"
+}
