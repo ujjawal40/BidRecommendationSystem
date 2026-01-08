@@ -1,0 +1,58 @@
+{
+  "model_type": "LightGBM (Recent Data 2023-2025)",
+  "phase": "1A - Bid Fee Prediction",
+  "target_variable": "BidFee",
+  "num_features": 12,
+  "selected_features": [
+    "segment_avg_fee",
+    "state_avg_fee",
+    "segment_win_rate",
+    "segment_std_fee",
+    "client_avg_fee",
+    "office_avg_fee",
+    "rolling_avg_fee_segment",
+    "TargetTime",
+    "client_std_fee",
+    "BusinessSegment_frequency",
+    "propertytype_avg_fee",
+    "PropertyState_frequency"
+  ],
+  "data_range": {
+    "start_date": "2023-01-03",
+    "end_date": "2025-12-19",
+    "total_samples": 52308,
+    "train_samples": 41846,
+    "test_samples": 10462
+  },
+  "best_iteration": 991,
+  "parameters": {
+    "objective": "regression",
+    "metric": "rmse",
+    "boosting_type": "gbdt",
+    "num_leaves": 31,
+    "learning_rate": 0.05,
+    "feature_fraction": 0.8,
+    "bagging_fraction": 0.8,
+    "bagging_freq": 5,
+    "reg_alpha": 0.1,
+    "reg_lambda": 0.1,
+    "random_state": 42,
+    "verbose": -1
+  },
+  "metrics": {
+    "train_rmse": 94.9459354063761,
+    "test_rmse": 238.0301126275946,
+    "test_mae": 70.45115892450504,
+    "test_r2": 0.9874782592099778,
+    "overfitting_ratio": 2.5070068730041677
+  },
+  "comparison_to_all_data": {
+    "all_data_test_rmse": 263.22593602384853,
+    "recent_data_test_rmse": 238.0301126275946,
+    "test_rmse_improvement_pct": 9.571938000049949,
+    "all_data_overfitting": 2.644300285551959,
+    "recent_data_overfitting": 2.5070068730041677,
+    "overfitting_improvement_pct": 5.19205074015008
+  },
+  "training_date": "2026-01-08 01:53:01"
+}
