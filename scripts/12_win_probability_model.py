@@ -67,7 +67,7 @@ print(f"  Date range: {df_recent[DATE_COLUMN].min()} to {df_recent[DATE_COLUMN].
 
 # Prepare features and target
 X = df_recent[SELECTED_FEATURES].fillna(0).values
-y = df_recent['Win'].values  # Binary: 1 = Won, 0 = Lost
+y = df_recent['Won'].values  # Binary: 1 = Won, 0 = Lost
 
 # Class distribution
 win_rate = y.mean()
@@ -276,7 +276,7 @@ model.save_model(str(model_path))
 metadata_save = {
     "model_type": "LightGBM Binary Classifier",
     "phase": "1B - Win Probability Prediction",
-    "target_variable": "Win",
+    "target_variable": "Won",
     "num_features": len(SELECTED_FEATURES),
     "selected_features": SELECTED_FEATURES,
     "data_range": {
