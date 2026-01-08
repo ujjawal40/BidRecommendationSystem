@@ -1,0 +1,123 @@
+{
+  "model_type": "LightGBM Binary Classifier",
+  "phase": "1B - Win Probability Prediction",
+  "target_variable": "Won",
+  "num_features": 12,
+  "selected_features": [
+    "segment_avg_fee",
+    "state_avg_fee",
+    "segment_win_rate",
+    "segment_std_fee",
+    "client_avg_fee",
+    "office_avg_fee",
+    "rolling_avg_fee_segment",
+    "TargetTime",
+    "client_std_fee",
+    "BusinessSegment_frequency",
+    "propertytype_avg_fee",
+    "PropertyState_frequency"
+  ],
+  "data_range": {
+    "start_date": "2023-01-03",
+    "end_date": "2025-12-19",
+    "total_samples": 52308,
+    "train_samples": 41846,
+    "test_samples": 10462
+  },
+  "class_distribution": {
+    "train_win_rate": 0.4952205706638627,
+    "test_win_rate": 0.4560313515580195,
+    "is_balanced": true,
+    "scale_pos_weight": 1.0
+  },
+  "best_iteration": 40,
+  "parameters": {
+    "objective": "binary",
+    "metric": [
+      "binary_logloss",
+      "auc"
+    ],
+    "boosting_type": "gbdt",
+    "num_leaves": 31,
+    "learning_rate": 0.05,
+    "feature_fraction": 0.8,
+    "bagging_fraction": 0.8,
+    "bagging_freq": 5,
+    "scale_pos_weight": 1.0,
+    "reg_alpha": 0.1,
+    "reg_lambda": 0.1,
+    "random_state": 42,
+    "verbose": -1
+  },
+  "metrics": {
+    "train": {
+      "accuracy": 0.9998805142665965,
+      "auc_roc": 0.9999998515072909
+    },
+    "test": {
+      "accuracy": 0.9997132479449437,
+      "precision": 0.9993715961457897,
+      "recall": 1.0,
+      "f1_score": 0.9996856993190153,
+      "auc_roc": 1.0,
+      "average_precision": 1.0
+    },
+    "confusion_matrix": {
+      "true_negatives": 5688,
+      "false_positives": 3,
+      "false_negatives": 0,
+      "true_positives": 4771
+    }
+  },
+  "feature_importance": [
+    {
+      "feature": "segment_win_rate",
+      "importance": 379854.2318303585
+    },
+    {
+      "feature": "office_avg_fee",
+      "importance": 8172.680412858725
+    },
+    {
+      "feature": "TargetTime",
+      "importance": 5289.843502037227
+    },
+    {
+      "feature": "PropertyState_frequency",
+      "importance": 4665.015186309814
+    },
+    {
+      "feature": "segment_std_fee",
+      "importance": 4536.994906425476
+    },
+    {
+      "feature": "state_avg_fee",
+      "importance": 3073.5988409370184
+    },
+    {
+      "feature": "segment_avg_fee",
+      "importance": 2847.8907261034474
+    },
+    {
+      "feature": "propertytype_avg_fee",
+      "importance": 2172.383600580506
+    },
+    {
+      "feature": "client_std_fee",
+      "importance": 473.0166895389557
+    },
+    {
+      "feature": "rolling_avg_fee_segment",
+      "importance": 428.3276901245117
+    },
+    {
+      "feature": "client_avg_fee",
+      "importance": 321.081332936883
+    },
+    {
+      "feature": "BusinessSegment_frequency",
+      "importance": 157.67859935760498
+    }
+  ],
+  "training_date": "2026-01-08 02:03:01"
+}
