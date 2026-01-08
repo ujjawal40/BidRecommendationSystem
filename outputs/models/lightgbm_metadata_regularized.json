@@ -1,0 +1,52 @@
+{
+  "model_type": "LightGBM (Regularization Optimized)",
+  "phase": "1A - Bid Fee Prediction",
+  "target_variable": "BidFee",
+  "num_features": 12,
+  "selected_features": [
+    "segment_avg_fee",
+    "state_avg_fee",
+    "segment_win_rate",
+    "segment_std_fee",
+    "client_avg_fee",
+    "office_avg_fee",
+    "rolling_avg_fee_segment",
+    "TargetTime",
+    "client_std_fee",
+    "BusinessSegment_frequency",
+    "propertytype_avg_fee",
+    "PropertyState_frequency"
+  ],
+  "best_iteration": 1997,
+  "best_parameters": {
+    "reg_alpha": 1.1100151638774813,
+    "reg_lambda": 1.028279800531494,
+    "min_child_samples": 159,
+    "min_child_weight": 0.030872209024698897,
+    "num_leaves": 31,
+    "max_depth": 7,
+    "learning_rate": 0.0458965633327004,
+    "feature_fraction": 0.5003029538631262,
+    "bagging_fraction": 0.522757495836796,
+    "bagging_freq": 5
+  },
+  "metrics": {
+    "train_rmse": 228.20131137367133,
+    "test_rmse": 404.75778755208376,
+    "test_mae": 139.00389839229956,
+    "test_r2": 0.9648676439585493,
+    "overfitting_ratio": 1.7736873864379668
+  },
+  "baseline_comparison": {
+    "baseline_overfitting": 2.644300285551959,
+    "final_overfitting": 1.7736873864379668,
+    "improvement_pct": 32.92413134283137
+  },
+  "optimization_config": {
+    "n_trials": 50,
+    "n_cv_folds": 3,
+    "focus": "regularization to reduce overfitting"
+  },
+  "training_date": "2026-01-08 01:21:34",
+  "production_ready": false
+}
