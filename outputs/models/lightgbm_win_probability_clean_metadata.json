@@ -1,0 +1,111 @@
+{
+  "model_type": "LightGBM Binary Classifier (No Leakage)",
+  "phase": "1B - Win Probability Prediction",
+  "target_variable": "Won",
+  "num_features": 11,
+  "selected_features": [
+    "segment_avg_fee",
+    "state_avg_fee",
+    "segment_std_fee",
+    "client_avg_fee",
+    "office_avg_fee",
+    "TargetTime",
+    "client_std_fee",
+    "BusinessSegment_frequency",
+    "propertytype_avg_fee",
+    "PropertyState_frequency",
+    "rolling_avg_fee_segment"
+  ],
+  "removed_leaky_features": [
+    "segment_win_rate"
+  ],
+  "data_range": {
+    "start_date": "2023-01-03",
+    "end_date": "2025-12-19",
+    "total_samples": 52308,
+    "train_samples": 41846,
+    "test_samples": 10462
+  },
+  "best_iteration": 411,
+  "parameters": {
+    "objective": "binary",
+    "metric": [
+      "binary_logloss",
+      "auc"
+    ],
+    "boosting_type": "gbdt",
+    "num_leaves": 31,
+    "learning_rate": 0.05,
+    "feature_fraction": 0.8,
+    "bagging_fraction": 0.8,
+    "bagging_freq": 5,
+    "reg_alpha": 0.1,
+    "reg_lambda": 0.1,
+    "random_state": 42,
+    "verbose": -1
+  },
+  "metrics": {
+    "test": {
+      "accuracy": 0.7714586121200535,
+      "precision": 0.7805280528052805,
+      "recall": 0.6939844896248166,
+      "f1_score": 0.7347165205813825,
+      "auc_roc": 0.8484585217143006
+    },
+    "confusion_matrix": {
+      "true_negatives": 4760,
+      "false_positives": 931,
+      "false_negatives": 1460,
+      "true_positives": 3311
+    }
+  },
+  "feature_importance": [
+    {
+      "feature": "office_avg_fee",
+      "importance": 72549.03075933456
+    },
+    {
+      "feature": "TargetTime",
+      "importance": 33960.53486478329
+    },
+    {
+      "feature": "state_avg_fee",
+      "importance": 21836.605110168457
+    },
+    {
+      "feature": "PropertyState_frequency",
+      "importance": 20728.69504761696
+    },
+    {
+      "feature": "propertytype_avg_fee",
+      "importance": 16723.35196208954
+    },
+    {
+      "feature": "client_std_fee",
+      "importance": 16437.247845172882
+    },
+    {
+      "feature": "client_avg_fee",
+      "importance": 15355.60512471199
+    },
+    {
+      "feature": "segment_std_fee",
+      "importance": 13277.575697541237
+    },
+    {
+      "feature": "segment_avg_fee",
+      "importance": 11099.69424700737
+    },
+    {
+      "feature": "BusinessSegment_frequency",
+      "importance": 9383.51969408989
+    },
+    {
+      "feature": "rolling_avg_fee_segment",
+      "importance": 8703.974664330482
+    }
+  ],
+  "training_date": "2026-01-08 21:39:38",
+  "production_ready": true,
+  "leakage_fixed": true
+}
