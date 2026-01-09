@@ -1,0 +1,81 @@
+{
+  "timestamp": "2026-01-08 22:35:13",
+  "data_range": {
+    "start_date": "2023-01-03",
+    "end_date": "2025-12-19",
+    "train_samples": 41846,
+    "test_samples": 10462
+  },
+  "baseline": {
+    "train_rmse": 94.9459354063761,
+    "test_rmse": 238.0301126275946,
+    "test_r2": 0.9874782592099778,
+    "overfitting_ratio": 2.5070068730041677
+  },
+  "bagging": {
+    "n_models": 10,
+    "train_metrics": {
+      "rmse": 184.2988857458046,
+      "mae": 59.1070056355576,
+      "r2": 0.992667852790418
+    },
+    "test_metrics": {
+      "rmse": 272.51612892070074,
+      "mae": 72.19219283167966,
+      "r2": 0.9835870998486779
+    },
+    "overfitting_ratio": 1.4786640072071315
+  },
+  "stacking": {
+    "base_models": [
+      "LightGBM",
+      "Random Forest",
+      "Gradient Boosting"
+    ],
+    "meta_model": "Ridge",
+    "meta_weights": {
+      "lightgbm": 0.9079071748600506,
+      "random_forest": 0.06853890395667624,
+      "gradient_boosting": 0.040191086942492134
+    },
+    "train_metrics": {
+      "rmse": 186.6683866453227,
+      "mae": 72.17723317209325,
+      "r2": 0.9924781043427978
+    },
+    "test_metrics": {
+      "rmse": 263.27867606411445,
+      "mae": 84.52573959339938,
+      "r2": 0.9846809344026046
+    },
+    "overfitting_ratio": 1.410408483169431
+  },
+  "blending": {
+    "base_models": [
+      "LightGBM",
+      "Random Forest",
+      "Gradient Boosting"
+    ],
+    "optimal_weights": {
+      "lightgbm": 0.9,
+      "random_forest": 0.0,
+      "gradient_boosting": 0.09999999999999998
+    },
+    "train_metrics": {
+      "rmse": 191.47053665434268,
+      "mae": 73.39224865252982,
+      "r2": 0.9920861162612545
+    },
+    "test_metrics": {
+      "rmse": 264.2051446026065,
+      "mae": 86.13845965379812,
+      "r2": 0.9845729301827544
+    },
+    "overfitting_ratio": 1.3798736307903596
+  },
+  "best_method": {
+    "name": "Stacking",
+    "test_rmse": 263.27867606411445,
+    "test_r2": 0.9846809344026046
+  }
+}
