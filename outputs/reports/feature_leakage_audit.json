@@ -1,0 +1,130 @@
+{
+  "audit_date": "2026-01-08",
+  "original_features": [
+    "segment_avg_fee",
+    "state_avg_fee",
+    "segment_win_rate",
+    "segment_std_fee",
+    "client_avg_fee",
+    "office_avg_fee",
+    "rolling_avg_fee_segment",
+    "TargetTime",
+    "client_std_fee",
+    "BusinessSegment_frequency",
+    "propertytype_avg_fee",
+    "PropertyState_frequency"
+  ],
+  "leaky_features": [
+    "segment_win_rate"
+  ],
+  "suspicious_features": [
+    "rolling_avg_fee_segment"
+  ],
+  "safe_features": [
+    "segment_avg_fee",
+    "state_avg_fee",
+    "segment_std_fee",
+    "client_avg_fee",
+    "office_avg_fee",
+    "TargetTime",
+    "client_std_fee",
+    "BusinessSegment_frequency",
+    "propertytype_avg_fee",
+    "PropertyState_frequency"
+  ],
+  "recommended_for_classification": [
+    "segment_avg_fee",
+    "state_avg_fee",
+    "segment_std_fee",
+    "client_avg_fee",
+    "office_avg_fee",
+    "TargetTime",
+    "client_std_fee",
+    "BusinessSegment_frequency",
+    "propertytype_avg_fee",
+    "PropertyState_frequency",
+    "rolling_avg_fee_segment"
+  ],
+  "feature_audit_details": {
+    "segment_win_rate": {
+      "status": "LEAKY",
+      "reason": "Calculated from historical wins INCLUDING current bid",
+      "available_at_prediction": false
+    },
+    "office_win_rate": {
+      "status": "LEAKY",
+      "reason": "Calculated from historical wins INCLUDING current bid",
+      "available_at_prediction": false
+    },
+    "client_win_rate": {
+      "status": "LEAKY",
+      "reason": "Calculated from historical wins INCLUDING current bid",
+      "available_at_prediction": false
+    },
+    "propertytype_win_rate": {
+      "status": "LEAKY",
+      "reason": "Calculated from historical wins INCLUDING current bid",
+      "available_at_prediction": false
+    },
+    "state_win_rate": {
+      "status": "LEAKY",
+      "reason": "Calculated from historical wins INCLUDING current bid",
+      "available_at_prediction": false
+    },
+    "rolling_avg_fee_segment": {
+      "status": "SUSPICIOUS",
+      "reason": "Uses historical BidFee (target variable) but with .shift()",
+      "available_at_prediction": true
+    },
+    "segment_avg_fee": {
+      "status": "SAFE",
+      "reason": "Historical average fee (not win rate), leave-one-out",
+      "available_at_prediction": true
+    },
+    "state_avg_fee": {
+      "status": "SAFE",
+      "reason": "Historical average fee, leave-one-out",
+      "available_at_prediction": true
+    },
+    "segment_std_fee": {
+      "status": "SAFE",
+      "reason": "Historical fee volatility, leave-one-out",
+      "available_at_prediction": true
+    },
+    "client_avg_fee": {
+      "status": "SAFE",
+      "reason": "Client historical average, leave-one-out",
+      "available_at_prediction": true
+    },
+    "office_avg_fee": {
+      "status": "SAFE",
+      "reason": "Office historical average, leave-one-out",
+      "available_at_prediction": true
+    },
+    "TargetTime": {
+      "status": "SAFE",
+      "reason": "Days to complete - known at bid time",
+      "available_at_prediction": true
+    },
+    "client_std_fee": {
+      "status": "SAFE",
+      "reason": "Client fee volatility, leave-one-out",
+      "available_at_prediction": true
+    },
+    "BusinessSegment_frequency": {
+      "status": "SAFE",
+      "reason": "Static - how common this segment is",
+      "available_at_prediction": true
+    },
+    "propertytype_avg_fee": {
+      "status": "SAFE",
+      "reason": "Property type historical average, leave-one-out",
+      "available_at_prediction": true
+    },
+    "PropertyState_frequency": {
+      "status": "SAFE",
+      "reason": "Static - how common this state is",
+      "available_at_prediction": true
+    }
+  }
+}
