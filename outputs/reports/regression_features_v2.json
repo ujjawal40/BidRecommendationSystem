@@ -1,0 +1,150 @@
+{
+  "task": "regression",
+  "target": "BidFee",
+  "version": 2,
+  "num_features": 15,
+  "features": [
+    "state_fee_percentile",
+    "segment_fee_percentile",
+    "segment_cv",
+    "state_cv",
+    "state_std_fee",
+    "segment_avg_fee",
+    "state_avg_fee",
+    "segment_avg_fee_log",
+    "segment_property_interaction",
+    "segment_state_interaction",
+    "state_avg_fee_log",
+    "segment_std_fee",
+    "client_avg_fee",
+    "segment_win_rate",
+    "segment_avg_fee_sqrt"
+  ],
+  "new_features_added": [
+    "segment_state_interaction",
+    "segment_property_interaction",
+    "state_property_interaction",
+    "segment_vs_state_ratio",
+    "segment_vs_property_ratio",
+    "segment_vs_client_ratio",
+    "rolling_vs_segment_ratio",
+    "segment_cv",
+    "state_cv",
+    "property_cv",
+    "segment_avg_fee_log",
+    "state_avg_fee_log",
+    "segment_avg_fee_sqrt",
+    "segment_avg_fee_sq",
+    "segment_fee_percentile",
+    "state_fee_percentile",
+    "segment_deviation",
+    "rolling_deviation",
+    "TargetTime_log",
+    "TargetTime_sqrt"
+  ],
+  "feature_importance": [
+    {
+      "feature": "state_fee_percentile",
+      "importance": 741664094255.8826,
+      "importance_pct": 46.92064926056892,
+      "cumulative_pct": 46.92064926056892
+    },
+    {
+      "feature": "segment_fee_percentile",
+      "importance": 526698017049.9468,
+      "importance_pct": 33.32103187364418,
+      "cumulative_pct": 80.24168113421311
+    },
+    {
+      "feature": "segment_cv",
+      "importance": 109420363462.93604,
+      "importance_pct": 6.922371644753074,
+      "cumulative_pct": 87.16405277896618
+    },
+    {
+      "feature": "state_cv",
+      "importance": 64484084247.0686,
+      "importance_pct": 4.079522149284209,
+      "cumulative_pct": 91.24357492825038
+    },
+    {
+      "feature": "state_std_fee",
+      "importance": 43390201364.79077,
+      "importance_pct": 2.745038401279811,
+      "cumulative_pct": 93.9886133295302
+    },
+    {
+      "feature": "segment_avg_fee",
+      "importance": 33878361357.26367,
+      "importance_pct": 2.1432812011235804,
+      "cumulative_pct": 96.13189453065378
+    },
+    {
+      "feature": "state_avg_fee",
+      "importance": 19710976392.751465,
+      "importance_pct": 1.2469955294728898,
+      "cumulative_pct": 97.37889006012666
+    },
+    {
+      "feature": "segment_avg_fee_log",
+      "importance": 16848886085.84082,
+      "importance_pct": 1.0659282019823177,
+      "cumulative_pct": 98.44481826210898
+    },
+    {
+      "feature": "segment_property_interaction",
+      "importance": 4577168008.354004,
+      "importance_pct": 0.28957003094797135,
+      "cumulative_pct": 98.73438829305695
+    },
+    {
+      "feature": "segment_state_interaction",
+      "importance": 4505606337.958496,
+      "importance_pct": 0.28504275227406317,
+      "cumulative_pct": 99.01943104533102
+    },
+    {
+      "feature": "state_avg_fee_log",
+      "importance": 4484098039.572266,
+      "importance_pct": 0.2836820509369107,
+      "cumulative_pct": 99.30311309626794
+    },
+    {
+      "feature": "segment_std_fee",
+      "importance": 2083912709.0942383,
+      "importance_pct": 0.13183668734989082,
+      "cumulative_pct": 99.43494978361782
+    },
+    {
+      "feature": "client_avg_fee",
+      "importance": 1613999102.1401367,
+      "importance_pct": 0.1021080653154322,
+      "cumulative_pct": 99.53705784893326
+    },
+    {
+      "feature": "segment_win_rate",
+      "importance": 1533119897.025879,
+      "importance_pct": 0.09699132197430124,
+      "cumulative_pct": 99.63404917090756
+    },
+    {
+      "feature": "segment_avg_fee_sqrt",
+      "importance": 1296336811.1640625,
+      "importance_pct": 0.08201147299872932,
+      "cumulative_pct": 99.71606064390629
+    }
+  ],
+  "metrics": {
+    "train_rmse": 25.855907505049007,
+    "test_rmse": 68.87054820567114,
+    "test_r2": 0.9989517424839038,
+    "overfitting_ratio": 2.6636291219800525
+  },
+  "comparison": {
+    "baseline_rmse": 237.57,
+    "baseline_overfitting": 2.57,
+    "improvement_rmse_pct": 71.01041873735272,
+    "improvement_overfitting_pct": -3.6431564972783153
+  },
+  "creation_date": "2026-01-10 02:38:55"
+}

@@ -1,0 +1,89 @@
+{
+  "model_type": "LightGBM Regression (Feature Engineering V2)",
+  "phase": "1A - Bid Fee Prediction",
+  "target_variable": "BidFee",
+  "optimization": "Feature engineering round 2 + feature selection",
+  "num_features": 15,
+  "selected_features": [
+    "state_fee_percentile",
+    "segment_fee_percentile",
+    "segment_cv",
+    "state_cv",
+    "state_std_fee",
+    "segment_avg_fee",
+    "state_avg_fee",
+    "segment_avg_fee_log",
+    "segment_property_interaction",
+    "segment_state_interaction",
+    "state_avg_fee_log",
+    "segment_std_fee",
+    "client_avg_fee",
+    "segment_win_rate",
+    "segment_avg_fee_sqrt"
+  ],
+  "new_features_created": 20,
+  "new_features_list": [
+    "segment_state_interaction",
+    "segment_property_interaction",
+    "state_property_interaction",
+    "segment_vs_state_ratio",
+    "segment_vs_property_ratio",
+    "segment_vs_client_ratio",
+    "rolling_vs_segment_ratio",
+    "segment_cv",
+    "state_cv",
+    "property_cv",
+    "segment_avg_fee_log",
+    "state_avg_fee_log",
+    "segment_avg_fee_sqrt",
+    "segment_avg_fee_sq",
+    "segment_fee_percentile",
+    "state_fee_percentile",
+    "segment_deviation",
+    "rolling_deviation",
+    "TargetTime_log",
+    "TargetTime_sqrt"
+  ],
+  "data_range": {
+    "start_date": "2023-01-03",
+    "end_date": "2025-12-19",
+    "total_samples": 52308,
+    "train_samples": 41846,
+    "test_samples": 10462
+  },
+  "best_iteration": 0,
+  "parameters": {
+    "objective": "regression",
+    "metric": "rmse",
+    "boosting_type": "gbdt",
+    "num_leaves": 31,
+    "learning_rate": 0.05,
+    "feature_fraction": 0.8,
+    "bagging_fraction": 0.8,
+    "bagging_freq": 5,
+    "reg_alpha": 0.1,
+    "reg_lambda": 0.1,
+    "random_state": 42,
+    "verbose": -1
+  },
+  "metrics": {
+    "train": {
+      "rmse": 25.855907505049007,
+      "mae": 10.169916119247425,
+      "r2": 0.999855687042269
+    },
+    "test": {
+      "rmse": 68.87054820567114,
+      "mae": 16.628381046233113,
+      "r2": 0.9989517424839038
+    },
+    "overfitting_ratio": 2.6636291219800525
+  },
+  "training_date": "2026-01-10 02:38:55",
+  "comparison": {
+    "baseline_rmse": 237.57,
+    "baseline_overfitting": 2.57,
+    "improvement_rmse_pct": 71.01041873735272,
+    "improvement_overfitting_pct": -3.6431564972783153
+  }
+}
