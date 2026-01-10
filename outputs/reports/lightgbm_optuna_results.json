@@ -1,0 +1,121 @@
+{
+  "model_type": "LightGBM Regression (Optuna Optimized)",
+  "phase": "1A - Bid Fee Prediction",
+  "target_variable": "BidFee",
+  "optimization": "Optuna hyperparameter tuning (100 trials)",
+  "num_features": 11,
+  "selected_features": [
+    "segment_avg_fee",
+    "state_avg_fee",
+    "propertytype_avg_fee",
+    "rolling_avg_fee_segment",
+    "segment_std_fee",
+    "client_avg_fee",
+    "TargetTime",
+    "state_std_fee",
+    "propertytype_std_fee",
+    "office_avg_fee",
+    "segment_win_rate"
+  ],
+  "data_range": {
+    "start_date": "2023-01-03",
+    "end_date": "2025-12-19",
+    "total_samples": 52308,
+    "train_samples": 41846,
+    "test_samples": 10462
+  },
+  "best_iteration": 0,
+  "best_hyperparameters": {
+    "num_leaves": 27,
+    "learning_rate": 0.01761545364346967,
+    "feature_fraction": 0.9364618057259018,
+    "bagging_fraction": 0.9896347837346926,
+    "bagging_freq": 4,
+    "min_child_samples": 49,
+    "reg_alpha": 5.7202034649415445,
+    "reg_lambda": 6.610605552187706,
+    "max_depth": 12
+  },
+  "metrics": {
+    "train": {
+      "rmse": 192.02065541326786,
+      "mae": 56.4567008948217,
+      "r2": 0.9920405757811327
+    },
+    "test": {
+      "rmse": 279.317921853662,
+      "mae": 70.87978035737311,
+      "r2": 0.9827575684930423
+    },
+    "overfitting_ratio": 1.4546243540962431
+  },
+  "feature_importance": [
+    {
+      "feature": "segment_avg_fee",
+      "importance": 3957775022419.0,
+      "importance_pct": 72.60789340926516
+    },
+    {
+      "feature": "state_avg_fee",
+      "importance": 587614427209.0,
+      "importance_pct": 10.780159421608627
+    },
+    {
+      "feature": "rolling_avg_fee_segment",
+      "importance": 155785714310.0,
+      "importance_pct": 2.8579877520155863
+    },
+    {
+      "feature": "segment_std_fee",
+      "importance": 146119993751.0,
+      "importance_pct": 2.680663976890372
+    },
+    {
+      "feature": "client_avg_fee",
+      "importance": 118486053085.0,
+      "importance_pct": 2.1737018057236686
+    },
+    {
+      "feature": "TargetTime",
+      "importance": 107401374241.0,
+      "importance_pct": 1.9703463407409287
+    },
+    {
+      "feature": "state_std_fee",
+      "importance": 99926613573.0,
+      "importance_pct": 1.8332171146561689
+    },
+    {
+      "feature": "propertytype_avg_fee",
+      "importance": 98421993182.0,
+      "importance_pct": 1.8056138991241342
+    },
+    {
+      "feature": "propertytype_std_fee",
+      "importance": 95694641605.0,
+      "importance_pct": 1.7555789043428054
+    },
+    {
+      "feature": "segment_win_rate",
+      "importance": 42862393174.0,
+      "importance_pct": 0.7863377926271451
+    },
+    {
+      "feature": "office_avg_fee",
+      "importance": 40799874708.0,
+      "importance_pct": 0.7484995830054072
+    }
+  ],
+  "training_date": "2026-01-10 02:13:57",
+  "comparison": {
+    "baseline_rmse": 237.57,
+    "baseline_overfitting": 2.57,
+    "improvement_rmse_pct": -17.572892980452934,
+    "improvement_overfitting_pct": 43.39983057991271
+  },
+  "optuna_study": {
+    "n_trials": 100,
+    "best_trial": 78,
+    "best_score": 324.78035726328636
+  }
+}
