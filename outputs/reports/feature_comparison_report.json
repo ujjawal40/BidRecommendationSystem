@@ -1,0 +1,614 @@
+{
+  "comparison_date": "2026-01-09 22:13:41",
+  "total_available_features": 81,
+  "regression": {
+    "selected_features": 11,
+    "baseline_test_rmse": 276.9003247852996,
+    "baseline_test_r2": 0.9830547556635889
+  },
+  "classification": {
+    "selected_features": 10,
+    "baseline_test_auc": 0.9999998895099291,
+    "baseline_test_f1": 0.9997904442581727
+  },
+  "overlap_analysis": {
+    "shared_features": 2,
+    "regression_only": 9,
+    "classification_only": 8,
+    "total_unique": 19,
+    "shared_feature_list": [
+      "propertytype_std_fee",
+      "segment_win_rate"
+    ],
+    "regression_only_list": [
+      "TargetTime",
+      "client_avg_fee",
+      "office_avg_fee",
+      "propertytype_avg_fee",
+      "rolling_avg_fee_segment",
+      "segment_avg_fee",
+      "segment_std_fee",
+      "state_avg_fee",
+      "state_std_fee"
+    ],
+    "classification_only_list": [
+      "JobCount",
+      "client_win_rate",
+      "office_win_rate",
+      "propertytype_win_rate",
+      "rolling_bid_count_office",
+      "rolling_win_rate_office",
+      "state_win_rate",
+      "total_bids_to_client"
+    ]
+  },
+  "full_comparison": [
+    {
+      "feature": "segment_win_rate",
+      "reg_importance_pct": 0.7067965965227612,
+      "clf_importance_pct": 77.10192207543342,
+      "avg_importance": 38.90435933597809,
+      "importance_diff": 76.39512547891066
+    },
+    {
+      "feature": "segment_avg_fee",
+      "reg_importance_pct": 70.08908809348623,
+      "clf_importance_pct": 0.05787088495500418,
+      "avg_importance": 35.07347948922062,
+      "importance_diff": 70.03121720853122
+    },
+    {
+      "feature": "JobCount",
+      "reg_importance_pct": 0.058883461973783274,
+      "clf_importance_pct": 9.32098760680609,
+      "avg_importance": 4.689935534389937,
+      "importance_diff": 9.262104144832307
+    },
+    {
+      "feature": "state_avg_fee",
+      "reg_importance_pct": 8.424008365831005,
+      "clf_importance_pct": 0.0444610511806776,
+      "avg_importance": 4.234234708505841,
+      "importance_diff": 8.379547314650328
+    },
+    {
+      "feature": "state_win_rate",
+      "reg_importance_pct": 0.16188076289774195,
+      "clf_importance_pct": 6.612050314433477,
+      "avg_importance": 3.3869655386656095,
+      "importance_diff": 6.450169551535734
+    },
+    {
+      "feature": "propertytype_avg_fee",
+      "reg_importance_pct": 3.0308924857634545,
+      "clf_importance_pct": 0.0535625712820512,
+      "avg_importance": 1.542227528522753,
+      "importance_diff": 2.977329914481403
+    },
+    {
+      "feature": "office_win_rate",
+      "reg_importance_pct": 0.063635060510063,
+      "clf_importance_pct": 3.0149116019247515,
+      "avg_importance": 1.5392733312174072,
+      "importance_diff": 2.9512765414146886
+    },
+    {
+      "feature": "rolling_avg_fee_segment",
+      "reg_importance_pct": 2.271093732072316,
+      "clf_importance_pct": 0.013999962998000179,
+      "avg_importance": 1.1425468475351581,
+      "importance_diff": 2.257093769074316
+    },
+    {
+      "feature": "segment_std_fee",
+      "reg_importance_pct": 2.2337314720915704,
+      "clf_importance_pct": 0.019385198829348672,
+      "avg_importance": 1.1265583354604596,
+      "importance_diff": 2.2143462732622217
+    },
+    {
+      "feature": "client_avg_fee",
+      "reg_importance_pct": 2.2312003393757207,
+      "clf_importance_pct": 0.0006625265061301959,
+      "avg_importance": 1.1159314329409256,
+      "importance_diff": 2.2305378128695903
+    },
+    {
+      "feature": "propertytype_std_fee",
+      "reg_importance_pct": 1.4617033220636824,
+      "clf_importance_pct": 0.2542822667591654,
+      "avg_importance": 0.8579927944114238,
+      "importance_diff": 1.207421055304517
+    },
+    {
+      "feature": "office_avg_fee",
+      "reg_importance_pct": 1.3144994998191428,
+      "clf_importance_pct": 0.18180784511877512,
+      "avg_importance": 0.748153672468959,
+      "importance_diff": 1.1326916547003676
+    },
+    {
+      "feature": "state_std_fee",
+      "reg_importance_pct": 1.4839375755418425,
+      "clf_importance_pct": 0.012249796769054758,
+      "avg_importance": 0.7480936861554486,
+      "importance_diff": 1.4716877787727878
+    },
+    {
+      "feature": "TargetTime",
+      "reg_importance_pct": 1.4863170613936316,
+      "clf_importance_pct": 0.0015663643591901635,
+      "avg_importance": 0.7439417128764109,
+      "importance_diff": 1.4847506970344415
+    },
+    {
+      "feature": "client_win_rate",
+      "reg_importance_pct": 0.0017486127108085107,
+      "clf_importance_pct": 0.8435842563239174,
+      "avg_importance": 0.42266643451736297,
+      "importance_diff": 0.8418356436131089
+    },
+    {
+      "feature": "rolling_bid_count_office",
+      "reg_importance_pct": 0.10863523418904802,
+      "clf_importance_pct": 0.5695226320799589,
+      "avg_importance": 0.33907893313450344,
+      "importance_diff": 0.4608873978909109
+    },
+    {
+      "feature": "targettime_ratio_to_proptype",
+      "reg_importance_pct": 0.5990166967422124,
+      "clf_importance_pct": 0.006326884892301144,
+      "avg_importance": 0.30267179081725676,
+      "importance_diff": 0.5926898118499112
+    },
+    {
+      "feature": "Bid_Property_Type_encoded",
+      "reg_importance_pct": 0.5518502197065085,
+      "clf_importance_pct": 0.032059396325289244,
+      "avg_importance": 0.29195480801589885,
+      "importance_diff": 0.5197908233812193
+    },
+    {
+      "feature": "distance_x_volume",
+      "reg_importance_pct": 0.5317502234358298,
+      "clf_importance_pct": 0.03350333659447272,
+      "avg_importance": 0.28262678001515124,
+      "importance_diff": 0.49824688684135704
+    },
+    {
+      "feature": "RooftopLatitude",
+      "reg_importance_pct": 0.47646836851339325,
+      "clf_importance_pct": 0.028479620040436887,
+      "avg_importance": 0.2524739942769151,
+      "importance_diff": 0.44798874847295633
+    },
+    {
+      "feature": "rolling_win_rate_office",
+      "reg_importance_pct": 0.005325128064130901,
+      "clf_importance_pct": 0.47323516147539446,
+      "avg_importance": 0.23928014476976267,
+      "importance_diff": 0.4679100334112636
+    },
+    {
+      "feature": "RooftopLongitude",
+      "reg_importance_pct": 0.2669312613187586,
+      "clf_importance_pct": 0.07765716945793022,
+      "avg_importance": 0.1722942153883444,
+      "importance_diff": 0.1892740918608284
+    },
+    {
+      "feature": "rolling_avg_fee_proptype",
+      "reg_importance_pct": 0.31545293861618423,
+      "clf_importance_pct": 0.00845072014024693,
+      "avg_importance": 0.1619518293782156,
+      "importance_diff": 0.3070022184759373
+    },
+    {
+      "feature": "BusinessSegment_frequency",
+      "reg_importance_pct": 0.2447560819714889,
+      "clf_importance_pct": 0.07505303556998233,
+      "avg_importance": 0.15990455877073562,
+      "importance_diff": 0.16970304640150657
+    },
+    {
+      "feature": "propertytype_win_rate",
+      "reg_importance_pct": 0.1077846607281511,
+      "clf_importance_pct": 0.2018470508405178,
+      "avg_importance": 0.15481585578433443,
+      "importance_diff": 0.0940623901123667
+    },
+    {
+      "feature": "DistanceInKM",
+      "reg_importance_pct": 0.23736488949165535,
+      "clf_importance_pct": 0.017308013526427014,
+      "avg_importance": 0.1273364515090412,
+      "importance_diff": 0.22005687596522833
+    },
+    {
+      "feature": "client_std_fee",
+      "reg_importance_pct": 0.24236885174409745,
+      "clf_importance_pct": 0.0021682608477435147,
+      "avg_importance": 0.12226855629592048,
+      "importance_diff": 0.24020059089635393
+    },
+    {
+      "feature": "PropertyState_frequency",
+      "reg_importance_pct": 0.22614083831814066,
+      "clf_importance_pct": 0.00469421282973177,
+      "avg_importance": 0.11541752557393621,
+      "importance_diff": 0.2214466254884089
+    },
+    {
+      "feature": "total_bids_to_client",
+      "reg_importance_pct": 0.005076402310767482,
+      "clf_importance_pct": 0.2009129272601052,
+      "avg_importance": 0.10299466478543634,
+      "importance_diff": 0.19583652494933773
+    },
+    {
+      "feature": "rolling_avg_fee_office",
+      "reg_importance_pct": 0.14698291439721753,
+      "clf_importance_pct": 0.025904355382097923,
+      "avg_importance": 0.08644363488965773,
+      "importance_diff": 0.1210785590151196
+    },
+    {
+      "feature": "office_std_fee",
+      "reg_importance_pct": 0.09342304617340284,
+      "clf_importance_pct": 0.07079614286550709,
+      "avg_importance": 0.08210959451945496,
+      "importance_diff": 0.022626903307895754
+    },
+    {
+      "feature": "PropertyState_encoded",
+      "reg_importance_pct": 0.035155211491272015,
+      "clf_importance_pct": 0.11859308981916909,
+      "avg_importance": 0.07687415065522055,
+      "importance_diff": 0.08343787832789708
+    },
+    {
+      "feature": "BusinessSegment_encoded",
+      "reg_importance_pct": 0.13281193091451937,
+      "clf_importance_pct": 0.018117621833485142,
+      "avg_importance": 0.07546477637400226,
+      "importance_diff": 0.11469430908103423
+    },
+    {
+      "feature": "market_competitiveness",
+      "reg_importance_pct": 0.07256590780606181,
+      "clf_importance_pct": 0.06474634464181184,
+      "avg_importance": 0.06865612622393683,
+      "importance_diff": 0.007819563164249976
+    },
+    {
+      "feature": "prev_fee_same_client",
+      "reg_importance_pct": 0.1366016244624207,
+      "clf_importance_pct": 4.988365612078988e-05,
+      "avg_importance": 0.06832575405927074,
+      "importance_diff": 0.1365517408062999
+    },
+    {
+      "feature": "OfficeLocation_frequency",
+      "reg_importance_pct": 0.0857729990685782,
+      "clf_importance_pct": 0.03731985756013556,
+      "avg_importance": 0.06154642831435688,
+      "importance_diff": 0.04845314150844264
+    },
+    {
+      "feature": "win_rate_with_client",
+      "reg_importance_pct": 0.001963173842250591,
+      "clf_importance_pct": 0.11258543927083002,
+      "avg_importance": 0.057274306556540304,
+      "importance_diff": 0.11062226542857943
+    },
+    {
+      "feature": "rolling_avg_fee_state",
+      "reg_importance_pct": 0.08902995441372026,
+      "clf_importance_pct": 0.00988992767295388,
+      "avg_importance": 0.04945994104333707,
+      "importance_diff": 0.07914002674076638
+    },
+    {
+      "feature": "DeliveryTotal",
+      "reg_importance_pct": 0.010765338797358514,
+      "clf_importance_pct": 0.06665072450426734,
+      "avg_importance": 0.03870803165081293,
+      "importance_diff": 0.05588538570690883
+    },
+    {
+      "feature": "total_wins_with_client",
+      "reg_importance_pct": 0.00426279536845843,
+      "clf_importance_pct": 0.06197836809990626,
+      "avg_importance": 0.03312058173418235,
+      "importance_diff": 0.05771557273144783
+    },
+    {
+      "feature": "BidCompanyType_encoded",
+      "reg_importance_pct": 0.004964002288239009,
+      "clf_importance_pct": 0.05255484406866408,
+      "avg_importance": 0.028759423178451544,
+      "importance_diff": 0.04759084178042507
+    },
+    {
+      "feature": "avg_historical_fee_client",
+      "reg_importance_pct": 0.0554157069093998,
+      "clf_importance_pct": 0.0012648944667263465,
+      "avg_importance": 0.028340300688063074,
+      "importance_diff": 0.05415081244267345
+    },
+    {
+      "feature": "BidCompanyType_frequency",
+      "reg_importance_pct": 0.04181699341649734,
+      "clf_importance_pct": 0.004078398765034792,
+      "avg_importance": 0.022947696090766065,
+      "importance_diff": 0.03773859465146255
+    },
+    {
+      "feature": "DistanceInMiles",
+      "reg_importance_pct": 0.03112201369494721,
+      "clf_importance_pct": 0.009197704986035091,
+      "avg_importance": 0.02015985934049115,
+      "importance_diff": 0.02192430870891212
+    },
+    {
+      "feature": "rolling_std_fee_office",
+      "reg_importance_pct": 0.0095140969464136,
+      "clf_importance_pct": 0.012472019622083042,
+      "avg_importance": 0.010993058284248321,
+      "importance_diff": 0.0029579226756694423
+    },
+    {
+      "feature": "PropertyCity_encoded",
+      "reg_importance_pct": 0.01299535105109126,
+      "clf_importance_pct": 0.006575979298142578,
+      "avg_importance": 0.009785665174616919,
+      "importance_diff": 0.006419371752948682
+    },
+    {
+      "feature": "days_since_last_bid_client",
+      "reg_importance_pct": 0.013739353274386757,
+      "clf_importance_pct": 0.0044525486733898514,
+      "avg_importance": 0.009095950973888305,
+      "importance_diff": 0.009286804600996906
+    },
+    {
+      "feature": "BidCompanyName_encoded",
+      "reg_importance_pct": 0.00437910544840978,
+      "clf_importance_pct": 0.013021918890027384,
+      "avg_importance": 0.008700512169218582,
+      "importance_diff": 0.008642813441617603
+    },
+    {
+      "feature": "building_size_numeric",
+      "reg_importance_pct": 0.01482397283696408,
+      "clf_importance_pct": 3.370686684491213e-06,
+      "avg_importance": 0.007413671761824285,
+      "importance_diff": 0.014820602150279588
+    },
+    {
+      "feature": "days_since_start",
+      "reg_importance_pct": 0.006786847957556566,
+      "clf_importance_pct": 0.004276943786523913,
+      "avg_importance": 0.005531895872040239,
+      "importance_diff": 0.0025099041710326528
+    },
+    {
+      "feature": "client_relationship_strength",
+      "reg_importance_pct": 0.0007947733194467615,
+      "clf_importance_pct": 0.01003323968881476,
+      "avg_importance": 0.00541400650413076,
+      "importance_diff": 0.009238466369367999
+    },
+    {
+      "feature": "AverageHouseValue",
+      "reg_importance_pct": 0.00308444047279186,
+      "clf_importance_pct": 0.005123734384959373,
+      "avg_importance": 0.004104087428875617,
+      "importance_diff": 0.002039293912167513
+    },
+    {
+      "feature": "IncomePerHousehold",
+      "reg_importance_pct": 0.005599632481082753,
+      "clf_importance_pct": 0.0025928342195002305,
+      "avg_importance": 0.0040962333502914915,
+      "importance_diff": 0.0030067982615825223
+    },
+    {
+      "feature": "targettime_x_size",
+      "reg_importance_pct": 0.006410403223981693,
+      "clf_importance_pct": 0.0004787117178119315,
+      "avg_importance": 0.003444557470896812,
+      "importance_diff": 0.005931691506169762
+    },
+    {
+      "feature": "OfficeLocation_encoded",
+      "reg_importance_pct": 0.0013361272785645303,
+      "clf_importance_pct": 0.005477515472389457,
+      "avg_importance": 0.0034068213754769937,
+      "importance_diff": 0.004141388193824927
+    },
+    {
+      "feature": "Bid_SubProperty_Type_encoded",
+      "reg_importance_pct": 0.005770789561796272,
+      "clf_importance_pct": 0.0006349391152109536,
+      "avg_importance": 0.003202864338503613,
+      "importance_diff": 0.005135850446585318
+    },
+    {
+      "feature": "MedianAge",
+      "reg_importance_pct": 0.0040309241517907345,
+      "clf_importance_pct": 0.002063120612393608,
+      "avg_importance": 0.003047022382092171,
+      "importance_diff": 0.0019678035393971265
+    },
+    {
+      "feature": "Bid_Property_Type_frequency",
+      "reg_importance_pct": 0.005041982189059831,
+      "clf_importance_pct": 0.0008199976613843572,
+      "avg_importance": 0.002930989925222094,
+      "importance_diff": 0.0042219845276754734
+    },
+    {
+      "feature": "NumberofBusinesses",
+      "reg_importance_pct": 0.004576922995835618,
+      "clf_importance_pct": 0.0007936422922360459,
+      "avg_importance": 0.002685282644035832,
+      "importance_diff": 0.003783280703599572
+    },
+    {
+      "feature": "NumberofEmployees",
+      "reg_importance_pct": 0.0020924531925431613,
+      "clf_importance_pct": 0.0030705058409566718,
+      "avg_importance": 0.0025814795167499165,
+      "importance_diff": 0.0009780526484135105
+    },
+    {
+      "feature": "DayOfMonth",
+      "reg_importance_pct": 0.0039251344905653456,
+      "clf_importance_pct": 2.9717130250320327e-08,
+      "avg_importance": 0.001962582103847798,
+      "importance_diff": 0.003925104773435095
+    },
+    {
+      "feature": "ZipPopulation",
+      "reg_importance_pct": 0.0033677492605979644,
+      "clf_importance_pct": 5.338838146954663e-05,
+      "avg_importance": 0.0017105688210337555,
+      "importance_diff": 0.0033143608791284178
+    },
+    {
+      "feature": "Month_cos",
+      "reg_importance_pct": 0.0028133830262244476,
+      "clf_importance_pct": 0.0004834755289603104,
+      "avg_importance": 0.001648429277592379,
+      "importance_diff": 0.002329907497264137
+    },
+    {
+      "feature": "PopulationEstimate",
+      "reg_importance_pct": 0.000512112843375666,
+      "clf_importance_pct": 0.0017499585584609943,
+      "avg_importance": 0.0011310357009183302,
+      "importance_diff": 0.0012378457150853282
+    },
+    {
+      "feature": "LeaseCount",
+      "reg_importance_pct": 0.0011804504998544985,
+      "clf_importance_pct": 0.0010579915058704073,
+      "avg_importance": 0.001119221002862453,
+      "importance_diff": 0.0001224589939840912
+    },
+    {
+      "feature": "MarketOrientation_frequency",
+      "reg_importance_pct": 0.0010422367520837494,
+      "clf_importance_pct": 0.0009746270552881373,
+      "avg_importance": 0.0010084319036859433,
+      "importance_diff": 6.760969679561215e-05
+    },
+    {
+      "feature": "Month_sin",
+      "reg_importance_pct": 0.0004435684231782972,
+      "clf_importance_pct": 0.0013179298384694935,
+      "avg_importance": 0.0008807491308238953,
+      "importance_diff": 0.0008743614152911963
+    },
+    {
+      "feature": "quarterly_avg_fee",
+      "reg_importance_pct": 0.0008401900507692382,
+      "clf_importance_pct": 0.0008221945268255754,
+      "avg_importance": 0.0008311922887974068,
+      "importance_diff": 1.7995523943662795e-05
+    },
+    {
+      "feature": "WeekOfYear",
+      "reg_importance_pct": 0.0006880351215889417,
+      "clf_importance_pct": 0.000970576983859228,
+      "avg_importance": 0.0008293060527240849,
+      "importance_diff": 0.0002825418622702863
+    },
+    {
+      "feature": "DayOfWeek",
+      "reg_importance_pct": 0.0006203974979599028,
+      "clf_importance_pct": 0.000650209740126329,
+      "avg_importance": 0.0006353036190431159,
+      "importance_diff": 2.981224216642628e-05
+    },
+    {
+      "feature": "SaleCount",
+      "reg_importance_pct": 0.0,
+      "clf_importance_pct": 0.000857348413698977,
+      "avg_importance": 0.0004286742068494885,
+      "importance_diff": 0.000857348413698977
+    },
+    {
+      "feature": "IECount",
+      "reg_importance_pct": 0.0005012607302736538,
+      "clf_importance_pct": 0.00021771018172783016,
+      "avg_importance": 0.000359485456000742,
+      "importance_diff": 0.0002835505485458237
+    },
+    {
+      "feature": "DayOfWeek_cos",
+      "reg_importance_pct": 0.0006959242466740106,
+      "clf_importance_pct": 4.481612069086138e-06,
+      "avg_importance": 0.0003502029293715484,
+      "importance_diff": 0.0006914426346049245
+    },
+    {
+      "feature": "DayOfWeek_sin",
+      "reg_importance_pct": 0.0006877285218453676,
+      "clf_importance_pct": 0.0,
+      "avg_importance": 0.0003438642609226838,
+      "importance_diff": 0.0006877285218453676
+    },
+    {
+      "feature": "same_proptype_as_last_client",
+      "reg_importance_pct": 0.0006263271167630201,
+      "clf_importance_pct": 1.1684584295325099e-05,
+      "avg_importance": 0.0003190058505291726,
+      "importance_diff": 0.000614642532467695
+    },
+    {
+      "feature": "prev_won_same_client",
+      "reg_importance_pct": 0.0,
+      "clf_importance_pct": 0.00046483117870685066,
+      "avg_importance": 0.00023241558935342533,
+      "importance_diff": 0.00046483117870685066
+    },
+    {
+      "feature": "Month",
+      "reg_importance_pct": 0.0,
+      "clf_importance_pct": 0.00020221492289022316,
+      "avg_importance": 0.00010110746144511158,
+      "importance_diff": 0.00020221492289022316
+    },
+    {
+      "feature": "Year",
+      "reg_importance_pct": 8.647478807252542e-05,
+      "clf_importance_pct": 0.0,
+      "avg_importance": 4.323739403626271e-05,
+      "importance_diff": 8.647478807252542e-05
+    },
+    {
+      "feature": "is_peak_season",
+      "reg_importance_pct": 0.0,
+      "clf_importance_pct": 1.915560490161438e-05,
+      "avg_importance": 9.57780245080719e-06,
+      "importance_diff": 1.915560490161438e-05
+    },
+    {
+      "feature": "Quarter",
+      "reg_importance_pct": 0.0,
+      "clf_importance_pct": 8.265504129400441e-07,
+      "avg_importance": 4.1327520647002206e-07,
+      "importance_diff": 8.265504129400441e-07
+    },
+    {
+      "feature": "is_weekday",
+      "reg_importance_pct": 0.0,
+      "clf_importance_pct": 0.0,
+      "avg_importance": 0.0,
+      "importance_diff": 0.0
+    }
+  ]
+}

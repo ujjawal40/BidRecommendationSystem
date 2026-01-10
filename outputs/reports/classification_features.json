@@ -1,0 +1,85 @@
+{
+  "task": "classification",
+  "target": "Won",
+  "num_features": 10,
+  "features": [
+    "segment_win_rate",
+    "JobCount",
+    "state_win_rate",
+    "office_win_rate",
+    "client_win_rate",
+    "rolling_bid_count_office",
+    "rolling_win_rate_office",
+    "propertytype_std_fee",
+    "propertytype_win_rate",
+    "total_bids_to_client"
+  ],
+  "feature_importance": [
+    {
+      "feature": "segment_win_rate",
+      "importance": 458587.9884663038,
+      "importance_pct": 77.10192207543342,
+      "cumulative_pct": 77.10192207543342
+    },
+    {
+      "feature": "JobCount",
+      "importance": 55439.512298312875,
+      "importance_pct": 9.32098760680609,
+      "cumulative_pct": 86.4229096822395
+    },
+    {
+      "feature": "state_win_rate",
+      "importance": 39327.25374041195,
+      "importance_pct": 6.612050314433477,
+      "cumulative_pct": 93.03495999667298
+    },
+    {
+      "feature": "office_win_rate",
+      "importance": 17932.13722451317,
+      "importance_pct": 3.0149116019247515,
+      "cumulative_pct": 96.04987159859773
+    },
+    {
+      "feature": "client_win_rate",
+      "importance": 5017.48331035045,
+      "importance_pct": 0.8435842563239174,
+      "cumulative_pct": 96.89345585492165
+    },
+    {
+      "feature": "rolling_bid_count_office",
+      "importance": 3387.415400306867,
+      "importance_pct": 0.5695226320799589,
+      "cumulative_pct": 97.4629784870016
+    },
+    {
+      "feature": "rolling_win_rate_office",
+      "importance": 2814.7153135845824,
+      "importance_pct": 0.47323516147539446,
+      "cumulative_pct": 97.93621364847701
+    },
+    {
+      "feature": "propertytype_std_fee",
+      "importance": 1512.423945821356,
+      "importance_pct": 0.2542822667591654,
+      "cumulative_pct": 98.19049591523617
+    },
+    {
+      "feature": "propertytype_win_rate",
+      "importance": 1200.5489685749635,
+      "importance_pct": 0.2018470508405178,
+      "cumulative_pct": 98.39234296607668
+    },
+    {
+      "feature": "total_bids_to_client",
+      "importance": 1194.9929740914376,
+      "importance_pct": 0.2009129272601052,
+      "cumulative_pct": 98.59325589333679
+    }
+  ],
+  "baseline_metrics": {
+    "test_auc": 0.9999998895099291,
+    "test_f1": 0.9997904442581727,
+    "test_accuracy": 0.9998088319632957
+  },
+  "selection_date": "2026-01-09 22:13:41"
+}

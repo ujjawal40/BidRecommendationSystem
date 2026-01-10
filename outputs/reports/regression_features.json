@@ -1,0 +1,92 @@
+{
+  "task": "regression",
+  "target": "BidFee",
+  "num_features": 11,
+  "features": [
+    "segment_avg_fee",
+    "state_avg_fee",
+    "propertytype_avg_fee",
+    "rolling_avg_fee_segment",
+    "segment_std_fee",
+    "client_avg_fee",
+    "TargetTime",
+    "state_std_fee",
+    "propertytype_std_fee",
+    "office_avg_fee",
+    "segment_win_rate"
+  ],
+  "feature_importance": [
+    {
+      "feature": "segment_avg_fee",
+      "importance": 1385323643442.0,
+      "importance_pct": 70.08908809348623,
+      "cumulative_pct": 70.08908809348623
+    },
+    {
+      "feature": "state_avg_fee",
+      "importance": 166502065859.0,
+      "importance_pct": 8.424008365831005,
+      "cumulative_pct": 78.51309645931723
+    },
+    {
+      "feature": "propertytype_avg_fee",
+      "importance": 59906144244.0,
+      "importance_pct": 3.0308924857634545,
+      "cumulative_pct": 81.54398894508068
+    },
+    {
+      "feature": "rolling_avg_fee_segment",
+      "importance": 44888582932.0,
+      "importance_pct": 2.271093732072316,
+      "cumulative_pct": 83.815082677153
+    },
+    {
+      "feature": "segment_std_fee",
+      "importance": 44150111031.0,
+      "importance_pct": 2.2337314720915704,
+      "cumulative_pct": 86.04881414924458
+    },
+    {
+      "feature": "client_avg_fee",
+      "importance": 44100082730.0,
+      "importance_pct": 2.2312003393757207,
+      "cumulative_pct": 88.2800144886203
+    },
+    {
+      "feature": "TargetTime",
+      "importance": 29377328523.0,
+      "importance_pct": 1.4863170613936316,
+      "cumulative_pct": 89.76633155001393
+    },
+    {
+      "feature": "state_std_fee",
+      "importance": 29330297550.0,
+      "importance_pct": 1.4839375755418425,
+      "cumulative_pct": 91.25026912555577
+    },
+    {
+      "feature": "propertytype_std_fee",
+      "importance": 28890833464.0,
+      "importance_pct": 1.4617033220636824,
+      "cumulative_pct": 92.71197244761946
+    },
+    {
+      "feature": "office_avg_fee",
+      "importance": 25981322998.0,
+      "importance_pct": 1.3144994998191428,
+      "cumulative_pct": 94.02647194743861
+    },
+    {
+      "feature": "segment_win_rate",
+      "importance": 13969963983.0,
+      "importance_pct": 0.7067965965227612,
+      "cumulative_pct": 94.73326854396137
+    }
+  ],
+  "baseline_metrics": {
+    "train_rmse": 165.09088867779326,
+    "test_rmse": 276.9003247852996,
+    "test_r2": 0.9830547556635889
+  },
+  "selection_date": "2026-01-09 22:13:41"
+}
