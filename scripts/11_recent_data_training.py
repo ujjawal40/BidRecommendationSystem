@@ -1,15 +1,13 @@
 """
-Train Model with Recent Data Only (2023-2025)
-==============================================
-Address temporal drift by using only recent 2-3 years of data
+Regression Model with Optimized Features (Phase 3)
+===================================================
+Train bid fee prediction model using 11 regression-optimized features
+identified through dual feature selection
 
-Hypothesis: Older data (2018-2022) may hurt performance due to:
-- Market changes (COVID, economic shifts)
-- Different bidding patterns
-- Outdated business relationships
+Features selected specifically for REGRESSION task (not classification)
 
 Author: Bid Recommendation System
-Date: 2026-01-08
+Date: 2026-01-09 (Phase 3 - Optimized)
 """
 
 import sys
@@ -32,32 +30,32 @@ from config.model_config import (
 
 warnings.filterwarnings('ignore')
 
-# Load selected features
-with open(MODELS_DIR / "lightgbm_metadata_feature_selected.json", 'r') as f:
-    metadata = json.load(f)
-    SELECTED_FEATURES = metadata['selected_features']
+# Load regression-optimized features from dual selection
+REGRESSION_FEATURES_PATH = MODELS_DIR.parent / "reports" / "regression_features.json"
+with open(REGRESSION_FEATURES_PATH, 'r') as f:
+    regression_config = json.load(f)
+    SELECTED_FEATURES = regression_config['features']
 
 print("=" * 80)
-print("TRAINING WITH RECENT DATA ONLY (2023-2025)")
+print("REGRESSION MODEL - OPTIMIZED FEATURES (PHASE 3)")
 print("=" * 80)
 print(f"Timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-print(f"Strategy: Use only last 2-3 years to avoid temporal drift\n")
+print(f"Using {len(SELECTED_FEATURES)} regression-optimized features\n")
 
 # Load data
 df = pd.read_csv(FEATURES_DATA)
 df[DATE_COLUMN] = pd.to_datetime(df[DATE_COLUMN])
 df = df.sort_values(DATE_COLUMN).reset_index(drop=True)
 
-print(f"Full dataset: {len(df):,} rows")
-print(f"  Date range: {df[DATE_COLUMN].min()} to {df[DATE_COLUMN].max()}")
-
 # Filter to recent data only (2023-2025)
 recent_cutoff = pd.Timestamp('2023-01-01')
 df_recent = df[df[DATE_COLUMN] >= recent_cutoff].copy()
 
-print(f"\nRecent data (2023+): {len(df_recent):,} rows")
-print(f"  Date range: {df_recent[DATE_COLUMN].min()} to {df_recent[DATE_COLUMN].max()}")
-print(f"  Reduction: {(1 - len(df_recent)/len(df)) * 100:.1f}% of data removed\n")
+print(f"✓ Data loaded: {len(df_recent):,} rows (2023-2025)")
+print(f"  Features: {len(SELECTED_FEATURES)}")
+print(f"\nSelected features for REGRESSION:")
+for i, feat in enumerate(SELECTED_FEATURES, 1):
+    print(f"  {i:2d}. {feat}")
 
 # Prepare data
 X_recent = df_recent[SELECTED_FEATURES].fillna(0).values
@@ -70,22 +68,17 @@ X_test = X_recent[split_idx:]
 y_train = y_recent[:split_idx]
 y_test = y_recent[split_idx:]
 
-print(f"Training set: {len(X_train):,} samples")
-print(f"Test set: {len(X_test):,} samples\n")
+print(f"\nTrain: {len(X_train):,} samples")
+print(f"Test: {len(X_test):,} samples\n")
 
-# Compare with baseline (all data)
+# Train model
 print("=" * 80)
-print("BASELINE: MODEL TRAINED ON ALL DATA (2018-2025)")
+print("TRAINING LIGHTGBM REGRESSOR")
 print("=" * 80)
 
-X_all = df[SELECTED_FEATURES].fillna(0).values
-y_all = df[TARGET_COLUMN].values
-split_all = int(len(X_all) * 0.8)
+train_data = lgb.Dataset(X_train, label=y_train, feature_name=SELECTED_FEATURES)
 
-train_data_all = lgb.Dataset(X_all[:split_all], label=y_all[:split_all])
-val_data_all = lgb.Dataset(X_all[split_all:], label=y_all[split_all:], reference=train_data_all)
-
-baseline_params = {
+params = {
     'objective': 'regression',
     'metric': 'rmse',
     'boosting_type': 'gbdt',
@@ -100,144 +93,144 @@ baseline_params = {
     'verbose': -1
 }
 
-model_baseline = lgb.train(
-    baseline_params,
-    train_data_all,
+print("Training...")
+model = lgb.train(
+    params,
+    train_data,
     num_boost_round=1000,
-    valid_sets=[val_data_all],
-    callbacks=[lgb.early_stopping(50), lgb.log_evaluation(0)]
+    valid_sets=[train_data],
+    callbacks=[lgb.early_stopping(50)]
 )
 
-y_pred_base = model_baseline.predict(X_all[split_all:], num_iteration=model_baseline.best_iteration)
-y_train_pred_base = model_baseline.predict(X_all[:split_all], num_iteration=model_baseline.best_iteration)
+print(f"✓ Model trained (best iteration: {model.best_iteration})\n")
 
-baseline_train_rmse = np.sqrt(mean_squared_error(y_all[:split_all], y_train_pred_base))
-baseline_test_rmse = np.sqrt(mean_squared_error(y_all[split_all:], y_pred_base))
-baseline_test_mae = mean_absolute_error(y_all[split_all:], y_pred_base)
-baseline_test_r2 = r2_score(y_all[split_all:], y_pred_base)
-baseline_overfitting = baseline_test_rmse / baseline_train_rmse
+# Predictions
+y_pred_train = model.predict(X_train, num_iteration=model.best_iteration)
+y_pred_test = model.predict(X_test, num_iteration=model.best_iteration)
 
-print(f"Baseline (all data 2018-2025):")
-print(f"  Train RMSE: ${baseline_train_rmse:,.2f}")
-print(f"  Test RMSE:  ${baseline_test_rmse:,.2f}")
-print(f"  Test MAE:   ${baseline_test_mae:,.2f}")
-print(f"  Test R²:    {baseline_test_r2:.4f}")
-print(f"  Overfitting: {baseline_overfitting:.2f}x\n")
-
-# Train on recent data only
+# Evaluation
 print("=" * 80)
-print("NEW MODEL: TRAINED ON RECENT DATA (2023-2025)")
+print("EVALUATION")
 print("=" * 80)
 
-train_data_recent = lgb.Dataset(X_train, label=y_train, feature_name=SELECTED_FEATURES)
-val_data_recent = lgb.Dataset(X_test, label=y_test, reference=train_data_recent)
+train_rmse = np.sqrt(mean_squared_error(y_train, y_pred_train))
+train_mae = mean_absolute_error(y_train, y_pred_train)
+train_r2 = r2_score(y_train, y_pred_train)
 
-print("Training with recent data...")
-model_recent = lgb.train(
-    baseline_params,
-    train_data_recent,
-    num_boost_round=1000,
-    valid_sets=[train_data_recent, val_data_recent],
-    valid_names=['train', 'valid'],
-    callbacks=[lgb.early_stopping(50), lgb.log_evaluation(100)]
-)
+test_rmse = np.sqrt(mean_squared_error(y_test, y_pred_test))
+test_mae = mean_absolute_error(y_test, y_pred_test)
+test_r2 = r2_score(y_test, y_pred_test)
 
-# Evaluate
-y_pred_recent = model_recent.predict(X_test, num_iteration=model_recent.best_iteration)
-y_train_pred_recent = model_recent.predict(X_train, num_iteration=model_recent.best_iteration)
+print("\nTRAIN METRICS:")
+print(f"  RMSE: ${train_rmse:,.2f}")
+print(f"  MAE: ${train_mae:,.2f}")
+print(f"  R²: {train_r2:.4f}")
 
-recent_train_rmse = np.sqrt(mean_squared_error(y_train, y_train_pred_recent))
-recent_test_rmse = np.sqrt(mean_squared_error(y_test, y_pred_recent))
-recent_test_mae = mean_absolute_error(y_test, y_pred_recent)
-recent_test_r2 = r2_score(y_test, y_pred_recent)
-recent_overfitting = recent_test_rmse / recent_train_rmse
+print("\nTEST METRICS:")
+print(f"  RMSE: ${test_rmse:,.2f}")
+print(f"  MAE: ${test_mae:,.2f}")
+print(f"  R²: {test_r2:.4f}")
 
-print(f"\n✓ Model trained on recent data")
-print(f"\nRecent Model (2023-2025 only):")
-print(f"  Train RMSE: ${recent_train_rmse:,.2f}")
-print(f"  Test RMSE:  ${recent_test_rmse:,.2f}")
-print(f"  Test MAE:   ${recent_test_mae:,.2f}")
-print(f"  Test R²:    {recent_test_r2:.4f}")
-print(f"  Overfitting: {recent_overfitting:.2f}x\n")
+overfitting_ratio = test_rmse / train_rmse
+print(f"\nOVERFITTING RATIO: {overfitting_ratio:.2f}x")
 
-# Comparison
+# Feature importance
+importance = model.feature_importance(importance_type='gain')
+importance_df = pd.DataFrame({
+    'feature': SELECTED_FEATURES,
+    'importance': importance,
+    'importance_pct': (importance / importance.sum() * 100)
+}).sort_values('importance', ascending=False)
+
+print(f"\nFEATURE IMPORTANCE:")
+for i, row in enumerate(importance_df.itertuples(), 1):
+    print(f"  {i:2d}. {row.feature:40s} {row.importance_pct:6.2f}%")
+
+# Comparison with baselines
+print("\n" + "=" * 80)
+print("COMPARISON WITH PREVIOUS MODELS")
 print("=" * 80)
-print("COMPARISON")
-print("=" * 80)
-print(f"\n{'Metric':<20} {'All Data':<15} {'Recent Data':<15} {'Change'}")
-print("-" * 70)
-print(f"{'Train RMSE':<20} ${baseline_train_rmse:<14,.2f} ${recent_train_rmse:<14,.2f} {(recent_train_rmse - baseline_train_rmse)/baseline_train_rmse*100:+.1f}%")
-print(f"{'Test RMSE':<20} ${baseline_test_rmse:<14,.2f} ${recent_test_rmse:<14,.2f} {(recent_test_rmse - baseline_test_rmse)/baseline_test_rmse*100:+.1f}%")
-print(f"{'Test MAE':<20} ${baseline_test_mae:<14,.2f} ${recent_test_mae:<14,.2f} {(recent_test_mae - baseline_test_mae)/baseline_test_mae*100:+.1f}%")
-print(f"{'Test R²':<20} {baseline_test_r2:<15.4f} {recent_test_r2:<15.4f} {(recent_test_r2 - baseline_test_r2):+.4f}")
-print(f"{'Overfitting Ratio':<20} {baseline_overfitting:<15.2f} {recent_overfitting:<15.2f} {(recent_overfitting - baseline_overfitting)/baseline_overfitting*100:+.1f}%")
 
-# Determine if recent data approach is better
-rmse_improvement = (baseline_test_rmse - recent_test_rmse) / baseline_test_rmse * 100
-overfitting_improvement = (baseline_overfitting - recent_overfitting) / baseline_overfitting * 100
+baselines = {
+    "Previous (12 features, all data)": {"test_rmse": 263.23, "overfitting": 2.64},
+    "Previous (12 features, 2023+ data)": {"test_rmse": 238.03, "overfitting": 2.51},
+    "Dual Selection (81 features)": {"test_rmse": 276.90, "overfitting": 1.68},
+}
 
-print(f"\nIMPROVEMENT SUMMARY:")
-print(f"  Test RMSE: {rmse_improvement:+.1f}%")
-print(f"  Overfitting: {overfitting_improvement:+.1f}%")
+print(f"\n{'Model':<40} {'Test RMSE':<15} {'Overfitting':<15} {'Status'}")
+print("-" * 80)
+for name, metrics in baselines.items():
+    print(f"{name:<40} ${metrics['test_rmse']:<14,.2f} {metrics['overfitting']:<14.2f}x")
 
-if recent_test_rmse < baseline_test_rmse and recent_overfitting < baseline_overfitting:
-    print(f"\n✅ RECENT DATA MODEL IS BETTER - Use this for production!")
-    best_model = model_recent
-    best_type = "recent"
-elif recent_test_rmse < baseline_test_rmse:
-    print(f"\n⚠️  MIXED RESULTS - Recent model has better test performance but similar/worse overfitting")
-    best_model = model_recent
-    best_type = "recent"
+print(f"{'NEW: Optimized (11 features)':<40} ${test_rmse:<14,.2f} {overfitting_ratio:<14.2f}x {'← CURRENT'}")
+
+# Determine improvement
+best_baseline_rmse = min(m['test_rmse'] for m in baselines.values())
+improvement_pct = ((best_baseline_rmse - test_rmse) / best_baseline_rmse) * 100
+
+if test_rmse < best_baseline_rmse:
+    print(f"\n✓ IMPROVEMENT: {improvement_pct:.1f}% better than best baseline")
+elif test_rmse < 250:
+    print(f"\n✓ STRONG PERFORMANCE: Test RMSE under $250")
 else:
-    print(f"\n❌ ALL DATA MODEL IS BETTER - Recent data alone doesn't help")
-    best_model = model_baseline
-    best_type = "all_data"
+    print(f"\n⚠ Test RMSE: ${test_rmse:.2f} vs best baseline ${best_baseline_rmse:.2f}")
 
-# Save the better model
-if best_type == "recent":
-    model_path = MODELS_DIR / "lightgbm_bidfee_model_recent_data.txt"
-    best_model.save_model(str(model_path))
+# Save model
+print("\n" + "=" * 80)
+print("SAVING MODEL")
+print("=" * 80)
 
-    metadata_save = {
-        "model_type": "LightGBM (Recent Data 2023-2025)",
-        "phase": "1A - Bid Fee Prediction",
-        "target_variable": TARGET_COLUMN,
-        "num_features": len(SELECTED_FEATURES),
-        "selected_features": SELECTED_FEATURES,
-        "data_range": {
-            "start_date": df_recent[DATE_COLUMN].min().strftime('%Y-%m-%d'),
-            "end_date": df_recent[DATE_COLUMN].max().strftime('%Y-%m-%d'),
-            "total_samples": int(len(df_recent)),
-            "train_samples": int(len(X_train)),
-            "test_samples": int(len(X_test))
+model_path = MODELS_DIR / "lightgbm_bidfee_optimized.txt"
+model.save_model(str(model_path))
+
+metadata = {
+    "model_type": "LightGBM Regression (Phase 3 - Optimized)",
+    "phase": "1A - Bid Fee Prediction",
+    "target_variable": "BidFee",
+    "optimization": "Dual feature selection (regression-specific)",
+    "num_features": len(SELECTED_FEATURES),
+    "selected_features": SELECTED_FEATURES,
+    "data_range": {
+        "start_date": df_recent[DATE_COLUMN].min().strftime('%Y-%m-%d'),
+        "end_date": df_recent[DATE_COLUMN].max().strftime('%Y-%m-%d'),
+        "total_samples": int(len(df_recent)),
+        "train_samples": int(len(X_train)),
+        "test_samples": int(len(X_test))
+    },
+    "best_iteration": int(model.best_iteration),
+    "parameters": params,
+    "metrics": {
+        "train": {
+            "rmse": float(train_rmse),
+            "mae": float(train_mae),
+            "r2": float(train_r2)
         },
-        "best_iteration": int(model_recent.best_iteration),
-        "parameters": baseline_params,
-        "metrics": {
-            "train_rmse": float(recent_train_rmse),
-            "test_rmse": float(recent_test_rmse),
-            "test_mae": float(recent_test_mae),
-            "test_r2": float(recent_test_r2),
-            "overfitting_ratio": float(recent_overfitting)
+        "test": {
+            "rmse": float(test_rmse),
+            "mae": float(test_mae),
+            "r2": float(test_r2)
         },
-        "comparison_to_all_data": {
-            "all_data_test_rmse": float(baseline_test_rmse),
-            "recent_data_test_rmse": float(recent_test_rmse),
-            "test_rmse_improvement_pct": float(rmse_improvement),
-            "all_data_overfitting": float(baseline_overfitting),
-            "recent_data_overfitting": float(recent_overfitting),
-            "overfitting_improvement_pct": float(overfitting_improvement)
-        },
-        "training_date": datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        "overfitting_ratio": float(overfitting_ratio)
+    },
+    "feature_importance": importance_df.to_dict('records'),
+    "training_date": datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+    "comparison": {
+        "improvement_vs_best_baseline_pct": float(improvement_pct),
+        "best_baseline_rmse": float(best_baseline_rmse)
     }
+}
 
-    metadata_path = MODELS_DIR / "lightgbm_metadata_recent_data.json"
-    with open(metadata_path, 'w') as f:
-        json.dump(metadata_save, f, indent=2)
+metadata_path = MODELS_DIR / "lightgbm_bidfee_optimized_metadata.json"
+with open(metadata_path, 'w') as f:
+    json.dump(metadata, f, indent=2)
 
-    print(f"\n✓ Recent data model saved: {model_path}")
-    print(f"✓ Metadata saved: {metadata_path}")
+print(f"✓ Model saved: {model_path}")
+print(f"✓ Metadata saved: {metadata_path}")
 
 print("\n" + "=" * 80)
-print("RECENT DATA TRAINING COMPLETE")
+print("PHASE 3: REGRESSION MODEL COMPLETE")
 print("=" * 80)
+print(f"✓ Features: {len(SELECTED_FEATURES)} (regression-optimized)")
+print(f"✓ Test RMSE: ${test_rmse:,.2f}")
+print(f"✓ Test R²: {test_r2:.4f}")
+print(f"✓ Overfitting: {overfitting_ratio:.2f}x\n")
