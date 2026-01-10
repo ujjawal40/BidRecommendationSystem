@@ -1,0 +1,51 @@
+{
+  "timestamp": "2026-01-10 02:57:45",
+  "baseline_rmse": 237.5733585277002,
+  "models_compared": 4,
+  "results": {
+    "Baseline LightGBM": {
+      "features": 11,
+      "test_rmse": 237.5733585277002,
+      "test_r2": 0.9875262688417565,
+      "overfitting": 2.5731870904083896,
+      "improvement_pct": 0.0,
+      "approach": "Original regression features"
+    },
+    "LightGBM Optuna": {
+      "features": 11,
+      "test_rmse": 279.317921853662,
+      "test_r2": 0.9827575684930423,
+      "overfitting": 1.4546243540962431,
+      "improvement_pct": -17.571230875660053,
+      "approach": "100 trials, optimized for RMSE + overfitting"
+    },
+    "XGBoost Optuna": {
+      "features": 11,
+      "test_rmse": 351.3364017849285,
+      "test_r2": 0.9727198217683273,
+      "overfitting": 1.3321653344127702,
+      "improvement_pct": -47.885437981028474,
+      "approach": "100 trials, optimized for RMSE + overfitting"
+    },
+    "Feature Engineering V2": {
+      "features": 15,
+      "test_rmse": 68.87054820567114,
+      "test_r2": 0.9989517424839038,
+      "overfitting": 2.6636291219800525,
+      "improvement_pct": 71.01082855734387,
+      "approach": "20 new features (percentiles, CV, interactions)"
+    }
+  },
+  "best_model": {
+    "name": "Feature Engineering V2",
+    "test_rmse": 68.87054820567114,
+    "improvement_pct": 71.01082855734387,
+    "features": 15,
+    "approach": "20 new features (percentiles, CV, interactions)"
+  },
+  "best_overfitting_model": {
+    "name": "XGBoost Optuna",
+    "overfitting": 1.3321653344127702,
+    "test_rmse": 351.3364017849285
+  }
+}
