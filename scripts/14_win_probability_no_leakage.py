@@ -1,13 +1,14 @@
 """
-Win Probability Model - No Data Leakage
-========================================
-Retrain win probability model using only non-leaky features
+Win Probability Model - Classification Optimized (Phase 3)
+===========================================================
+Train win probability model using classification-optimized features
+with ALL leaky win_rate features removed
 
-Removed: segment_win_rate (was 92% of importance, caused 99.97% accuracy)
-Expect: Lower accuracy (70-85%) but honest, production-ready predictions
+Features selected specifically for CLASSIFICATION task (not regression)
+Only using features available BEFORE bid outcome
 
 Author: Bid Recommendation System
-Date: 2026-01-08
+Date: 2026-01-09 (Phase 3 - Optimized & Clean)
 """
 
 import sys
@@ -22,31 +23,38 @@ import json
 from datetime import datetime
 from sklearn.metrics import (
     accuracy_score, precision_score, recall_score, f1_score,
-    roc_auc_score, average_precision_score, confusion_matrix,
-    classification_report
+    roc_auc_score, confusion_matrix, classification_report
 )
-import matplotlib.pyplot as plt
-import seaborn as sns
 import warnings
 
 from config.model_config import (
     FEATURES_DATA, DATE_COLUMN,
-    MODELS_DIR, REPORTS_DIR, FIGURES_DIR, RANDOM_SEED,
+    MODELS_DIR, RANDOM_SEED,
 )
 
 warnings.filterwarnings('ignore')
-sns.set_style("whitegrid")
 
-# Load safe features from audit
-with open("outputs/reports/feature_leakage_audit.json", 'r') as f:
-    audit = json.load(f)
-    SAFE_FEATURES = audit['recommended_for_classification']
+# Classification-optimized features (leaky win_rate features removed)
+SAFE_FEATURES = [
+    'JobCount',  # 9.32% importance
+    'rolling_bid_count_office',  # 0.57%
+    'propertytype_std_fee',  # 0.25%
+    'total_bids_to_client',  # 0.20%
+    'office_avg_fee',  # 0.18%
+    'PropertyState_encoded',  # 0.12%
+    'RooftopLongitude',  # 0.08%
+    'BusinessSegment_frequency',  # 0.08%
+    'office_std_fee',  # 0.07%
+    'DeliveryTotal',  # 0.07%
+    'market_competitiveness',  # 0.06%
+]
 
 print("=" * 80)
-print("WIN PROBABILITY MODEL - NO DATA LEAKAGE")
+print("WIN PROBABILITY MODEL - CLASSIFICATION OPTIMIZED (PHASE 3)")
 print("=" * 80)
 print(f"Timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-print(f"Using {len(SAFE_FEATURES)} safe features (removed leaky ones)\n")
+print(f"Using {len(SAFE_FEATURES)} classification-optimized features")
+print(f"ALL leaky win_rate features removed\n")
 
 # Load data
 df = pd.read_csv(FEATURES_DATA)
@@ -58,8 +66,11 @@ recent_cutoff = pd.Timestamp('2023-01-01')
 df_recent = df[df[DATE_COLUMN] >= recent_cutoff].copy()
 
 print(f"✓ Data loaded: {len(df_recent):,} rows (2023-2025)")
+print(f"\nSelected features for CLASSIFICATION (NO LEAKAGE):")
+for i, feat in enumerate(SAFE_FEATURES, 1):
+    print(f"  {i:2d}. {feat}")
 
-# Prepare data with SAFE features only
+# Prepare data
 X = df_recent[SAFE_FEATURES].fillna(0).values
 y = df_recent['Won'].values
 
@@ -154,38 +165,60 @@ importance_df = pd.DataFrame({
     'importance': importance
 }).sort_values('importance', ascending=False)
 
-print("TOP 10 FEATURES:")
-for i, row in enumerate(importance_df.head(10).itertuples(), 1):
+print("FEATURE IMPORTANCE:")
+for i, row in enumerate(importance_df.itertuples(), 1):
     pct = row.importance / importance_df['importance'].sum() * 100
-    print(f"  {i}. {row.feature}: {pct:.1f}%")
+    print(f"  {i:2d}. {row.feature:45s} {pct:6.2f}%")
 
-# Compare with leaky model
+# Compare with previous models
 print("\n" + "=" * 80)
-print("COMPARISON: LEAKY vs CLEAN MODEL")
+print("COMPARISON: PREVIOUS VS OPTIMIZED MODEL")
 print("=" * 80)
-print(f"{'Metric':<20} {'Leaky Model':<20} {'Clean Model':<20} {'Realistic?'}")
+
+baselines = {
+    "Leaky model (12 features)": {"accuracy": 0.9997, "auc": 1.0000},
+    "Clean model (11 features)": {"accuracy": 0.7715, "auc": 0.8485},
+}
+
+print(f"\n{'Model':<35} {'Accuracy':<15} {'AUC-ROC':<15} {'Status'}")
 print("-" * 80)
-print(f"{'Accuracy':<20} {0.9997:<20.4f} {test_acc:<20.4f} ✓ Yes")
-print(f"{'AUC-ROC':<20} {1.0000:<20.4f} {test_auc:<20.4f} ✓ Yes")
-print(f"{'F1 Score':<20} {0.9997:<20.4f} {test_f1:<20.4f} ✓ Yes")
-print(f"\nThe clean model has realistic performance!")
-print(f"Lower accuracy is EXPECTED and HONEST.\n")
+for name, metrics in baselines.items():
+    print(f"{name:<35} {metrics['accuracy']:<15.4f} {metrics['auc']:<15.4f}")
+
+print(f"{'NEW: Optimized (11 features)':<35} {test_acc:<15.4f} {test_auc:<15.4f} {'← CURRENT'}")
+
+# Determine improvement
+clean_baseline_auc = 0.8485
+improvement_pct = ((test_auc - clean_baseline_auc) / clean_baseline_auc) * 100
+
+if test_auc > clean_baseline_auc:
+    print(f"\n✓ IMPROVEMENT: {improvement_pct:.1f}% better AUC than previous clean model")
+elif test_auc > 0.80:
+    print(f"\n✓ STRONG PERFORMANCE: AUC > 0.80 without data leakage")
+else:
+    print(f"\n⚠ AUC: {test_auc:.4f} vs clean baseline {clean_baseline_auc:.4f}")
+
+print(f"\nModel is production-ready: {'Yes' if test_auc > 0.75 and test_acc < 0.95 else 'Needs review'}")
 
 # Save model
-print("=" * 80)
+print("\n" + "=" * 80)
 print("SAVING MODEL")
 print("=" * 80)
 
-model_path = MODELS_DIR / "lightgbm_win_probability_clean.txt"
+model_path = MODELS_DIR / "lightgbm_win_probability_optimized.txt"
 model.save_model(str(model_path))
 
 metadata = {
-    "model_type": "LightGBM Binary Classifier (No Leakage)",
+    "model_type": "LightGBM Binary Classifier (Phase 3 - Optimized)",
     "phase": "1B - Win Probability Prediction",
     "target_variable": "Won",
+    "optimization": "Dual feature selection (classification-specific, no leakage)",
     "num_features": len(SAFE_FEATURES),
     "selected_features": SAFE_FEATURES,
-    "removed_leaky_features": audit['leaky_features'],
+    "removed_leaky_features": [
+        "segment_win_rate", "state_win_rate", "office_win_rate",
+        "client_win_rate", "rolling_win_rate_office", "propertytype_win_rate"
+    ],
     "data_range": {
         "start_date": df_recent[DATE_COLUMN].min().strftime('%Y-%m-%d'),
         "end_date": df_recent[DATE_COLUMN].max().strftime('%Y-%m-%d'),
@@ -212,21 +245,26 @@ metadata = {
     },
     "feature_importance": importance_df.to_dict('records'),
     "training_date": datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-    "production_ready": True,
-    "leakage_fixed": True
+    "production_ready": bool(test_auc > 0.75 and test_acc < 0.95),
+    "leakage_fixed": True,
+    "comparison": {
+        "improvement_vs_clean_baseline_pct": float(improvement_pct),
+        "clean_baseline_auc": float(clean_baseline_auc)
+    }
 }
 
-metadata_path = MODELS_DIR / "lightgbm_win_probability_clean_metadata.json"
+metadata_path = MODELS_DIR / "lightgbm_win_probability_optimized_metadata.json"
 with open(metadata_path, 'w') as f:
     json.dump(metadata, f, indent=2)
 
 print(f"✓ Model saved: {model_path}")
-print(f"✓ Metadata saved: {metadata_path}\n")
+print(f"✓ Metadata saved: {metadata_path}")
 
+print("\n" + "=" * 80)
+print("PHASE 3: CLASSIFICATION MODEL COMPLETE")
 print("=" * 80)
-print("CLEAN WIN PROBABILITY MODEL COMPLETE")
-print("=" * 80)
-print(f"✓ No data leakage")
+print(f"✓ Features: {len(SAFE_FEATURES)} (classification-optimized)")
+print(f"✓ No data leakage: True")
 print(f"✓ Accuracy: {test_acc:.1%} (realistic)")
 print(f"✓ AUC-ROC: {test_auc:.4f}")
-print(f"✓ Production ready: True\n")
+print(f"✓ Production ready: {'Yes' if metadata['production_ready'] else 'No'}\n")
