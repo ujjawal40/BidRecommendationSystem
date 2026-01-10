@@ -1,0 +1,69 @@
+{
+  "model_type": "PyTorch Neural Network (Optuna Optimized)",
+  "phase": "1A - Bid Fee Prediction",
+  "target_variable": "BidFee",
+  "optimization": "Optuna architecture search (50 trials)",
+  "num_features": 11,
+  "selected_features": [
+    "segment_avg_fee",
+    "state_avg_fee",
+    "propertytype_avg_fee",
+    "rolling_avg_fee_segment",
+    "segment_std_fee",
+    "client_avg_fee",
+    "TargetTime",
+    "state_std_fee",
+    "propertytype_std_fee",
+    "office_avg_fee",
+    "segment_win_rate"
+  ],
+  "data_range": {
+    "start_date": "2023-01-03",
+    "end_date": "2025-12-19",
+    "total_samples": 52308,
+    "train_samples": 41846,
+    "test_samples": 10462
+  },
+  "best_architecture": {
+    "n_layers": 3,
+    "layer_sizes": [
+      64,
+      201,
+      104
+    ],
+    "dropout_rates": [
+      0.30147350400230294,
+      0.12315129961765546,
+      0.03757942171045145
+    ],
+    "activation": "elu",
+    "learning_rate": 0.0016430401122386896,
+    "batch_size": 128,
+    "weight_decay": 0.0028405510255018604
+  },
+  "metrics": {
+    "train": {
+      "rmse": 1654.1903373556202,
+      "mae": 944.2658508380092,
+      "r2": 0.4093139477398784
+    },
+    "test": {
+      "rmse": 1736.3161989088983,
+      "mae": 1002.287129136459,
+      "r2": 0.3337172967408598
+    },
+    "overfitting_ratio": 1.0496471655641297
+  },
+  "training_date": "2026-01-10 04:37:43",
+  "comparison": {
+    "baseline_rmse": 237.57,
+    "baseline_overfitting": 2.57,
+    "improvement_rmse_pct": -630.8650919345449,
+    "improvement_overfitting_pct": 59.157697837971604
+  },
+  "optuna_study": {
+    "n_trials": 50,
+    "best_trial": 34,
+    "best_score": 1733.4082650944636
+  }
+}
