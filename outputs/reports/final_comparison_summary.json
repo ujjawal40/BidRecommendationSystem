@@ -1,7 +1,7 @@
 {
-  "timestamp": "2026-01-10 02:57:45",
+  "timestamp": "2026-01-10 15:05:25",
   "baseline_rmse": 237.5733585277002,
-  "models_compared": 4,
+  "models_compared": 5,
   "results": {
     "Baseline LightGBM": {
       "features": 11,
@@ -27,6 +27,14 @@
       "improvement_pct": -47.885437981028474,
       "approach": "100 trials, optimized for RMSE + overfitting"
     },
+    "Neural Network Optuna": {
+      "features": 11,
+      "test_rmse": 1736.3161989088983,
+      "test_r2": 0.3337172967408598,
+      "overfitting": 1.0496471655641297,
+      "improvement_pct": -630.8547598389277,
+      "approach": "3 layers, elu activation"
+    },
     "Feature Engineering V2": {
       "features": 15,
       "test_rmse": 68.87054820567114,
@@ -44,8 +52,8 @@
     "approach": "20 new features (percentiles, CV, interactions)"
   },
   "best_overfitting_model": {
-    "name": "XGBoost Optuna",
-    "overfitting": 1.3321653344127702,
-    "test_rmse": 351.3364017849285
+    "name": "Neural Network Optuna",
+    "overfitting": 1.0496471655641297,
+    "test_rmse": 1736.3161989088983
   }
 }
