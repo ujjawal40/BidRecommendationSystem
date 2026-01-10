@@ -1,0 +1,117 @@
+{
+  "model_type": "LightGBM Regression (Phase 3 - Optimized)",
+  "phase": "1A - Bid Fee Prediction",
+  "target_variable": "BidFee",
+  "optimization": "Dual feature selection (regression-specific)",
+  "num_features": 11,
+  "selected_features": [
+    "segment_avg_fee",
+    "state_avg_fee",
+    "propertytype_avg_fee",
+    "rolling_avg_fee_segment",
+    "segment_std_fee",
+    "client_avg_fee",
+    "TargetTime",
+    "state_std_fee",
+    "propertytype_std_fee",
+    "office_avg_fee",
+    "segment_win_rate"
+  ],
+  "data_range": {
+    "start_date": "2023-01-03",
+    "end_date": "2025-12-19",
+    "total_samples": 52308,
+    "train_samples": 41846,
+    "test_samples": 10462
+  },
+  "best_iteration": 0,
+  "parameters": {
+    "objective": "regression",
+    "metric": "rmse",
+    "boosting_type": "gbdt",
+    "num_leaves": 31,
+    "learning_rate": 0.05,
+    "feature_fraction": 0.8,
+    "bagging_fraction": 0.8,
+    "bagging_freq": 5,
+    "reg_alpha": 0.1,
+    "reg_lambda": 0.1,
+    "random_state": 42,
+    "verbose": -1
+  },
+  "metrics": {
+    "train": {
+      "rmse": 92.32650024293221,
+      "mae": 37.18517195878877,
+      "r2": 0.9981599123795952
+    },
+    "test": {
+      "rmse": 237.5733585277002,
+      "mae": 62.96186798525541,
+      "r2": 0.9875262688417565
+    },
+    "overfitting_ratio": 2.5731870904083896
+  },
+  "feature_importance": [
+    {
+      "feature": "segment_avg_fee",
+      "importance": 1072158982700.8242,
+      "importance_pct": 67.46111605057969
+    },
+    {
+      "feature": "state_avg_fee",
+      "importance": 189215302538.21094,
+      "importance_pct": 11.905580878426175
+    },
+    {
+      "feature": "rolling_avg_fee_segment",
+      "importance": 56395526629.791016,
+      "importance_pct": 3.548452447902962
+    },
+    {
+      "feature": "propertytype_avg_fee",
+      "importance": 55734370392.27344,
+      "importance_pct": 3.506851959182173
+    },
+    {
+      "feature": "client_avg_fee",
+      "importance": 47174652087.08594,
+      "importance_pct": 2.968267514838011
+    },
+    {
+      "feature": "TargetTime",
+      "importance": 40685485214.50781,
+      "importance_pct": 2.5599638522973924
+    },
+    {
+      "feature": "segment_std_fee",
+      "importance": 36591537107.60547,
+      "importance_pct": 2.302369304472897
+    },
+    {
+      "feature": "propertytype_std_fee",
+      "importance": 36578764009.78125,
+      "importance_pct": 2.3015656107590465
+    },
+    {
+      "feature": "state_std_fee",
+      "importance": 22225993513.191406,
+      "importance_pct": 1.398477606330168
+    },
+    {
+      "feature": "office_avg_fee",
+      "importance": 21421548383.78125,
+      "importance_pct": 1.3478612638780847
+    },
+    {
+      "feature": "segment_win_rate",
+      "importance": 11117044831.496094,
+      "importance_pct": 0.6994935113334088
+    }
+  ],
+  "training_date": "2026-01-09 22:32:18",
+  "comparison": {
+    "improvement_vs_best_baseline_pct": 0.1918419830692742,
+    "best_baseline_rmse": 238.03
+  }
+}
