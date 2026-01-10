@@ -1,0 +1,50 @@
+{
+  "timestamp": "2026-01-10 01:56:28",
+  "models_compared": [
+    "LightGBM",
+    "XGBoost",
+    "Blended",
+    "Neural Network"
+  ],
+  "features_used": 11,
+  "data_samples": {
+    "train": 41846,
+    "test": 10462
+  },
+  "results": {
+    "LightGBM": {
+      "test_rmse": 255.96420646493334,
+      "test_r2": 0.9855203060522095,
+      "overfitting_ratio": 1.958246299117943
+    },
+    "XGBoost": {
+      "test_rmse": 349.93716075205276,
+      "test_r2": 0.9729366824927145,
+      "overfitting_ratio": 2.642424991320555
+    },
+    "Blended": {
+      "test_rmse": 255.96420646493334,
+      "test_r2": 0.9855203060522095,
+      "overfitting_ratio": 1.958246299117943
+    },
+    "Neural Network": {
+      "test_rmse": 1783.6044058320542,
+      "test_r2": 0.2969309534415012,
+      "overfitting_ratio": 1.0155105508342246
+    }
+  },
+  "blending": {
+    "weights": {
+      "lightgbm": 1.0,
+      "xgboost": 0.0,
+      "neural_network": 0.0
+    },
+    "test_rmse": 255.96420646493334,
+    "test_r2": 0.9855203060522095
+  },
+  "best_model": {
+    "name": "LightGBM",
+    "test_rmse": 255.96420646493334,
+    "improvement_vs_baseline_pct": -7.742646994541966
+  }
+}
