@@ -1,0 +1,144 @@
+{
+  "timestamp": "2026-01-11 00:02:17",
+  "baseline_rmse": 237.57,
+  "unused_features_count": 16,
+  "unused_features": [
+    "GBA_encoded",
+    "YearBuilt_encoded",
+    "DistanceInMiles",
+    "JobCount",
+    "IECount",
+    "DeliveryTotal",
+    "PopulationEstimate",
+    "AverageHouseValue",
+    "IncomePerHousehold",
+    "MedianAge",
+    "NumberofBusinesses",
+    "NumberofEmployees",
+    "PropertyType_encoded",
+    "SubType_encoded",
+    "BusinessSegment_encoded",
+    "Market_encoded"
+  ],
+  "results": {
+    "unused_only": {
+      "test_rmse": 1801.8462579076058,
+      "test_r2": 0.28247610356083097,
+      "overfitting": 1.1633247403617872,
+      "improvement_pct": -658.4485658574761
+    },
+    "current_plus_unused": {
+      "test_rmse": 237.20040348840925,
+      "test_r2": 0.9875654019275235,
+      "overfitting": 2.972940044085669,
+      "improvement_pct": 0.15557373051763385
+    }
+  },
+  "best_model": "Current + Unused",
+  "best_features": [
+    "segment_avg_fee",
+    "state_avg_fee",
+    "propertytype_avg_fee",
+    "rolling_avg_fee_segment",
+    "segment_std_fee",
+    "client_avg_fee",
+    "TargetTime",
+    "state_std_fee",
+    "propertytype_std_fee",
+    "office_avg_fee",
+    "segment_win_rate",
+    "GBA_encoded",
+    "YearBuilt_encoded",
+    "DistanceInMiles",
+    "JobCount",
+    "IECount",
+    "DeliveryTotal",
+    "PopulationEstimate",
+    "AverageHouseValue",
+    "IncomePerHousehold",
+    "MedianAge",
+    "NumberofBusinesses",
+    "NumberofEmployees",
+    "PropertyType_encoded",
+    "SubType_encoded",
+    "BusinessSegment_encoded",
+    "Market_encoded"
+  ],
+  "top_features": [
+    {
+      "feature": "segment_avg_fee",
+      "importance": 1038357100493.3086,
+      "importance_pct": 65.33536482951038
+    },
+    {
+      "feature": "state_avg_fee",
+      "importance": 187185654195.5664,
+      "importance_pct": 11.7780703785891
+    },
+    {
+      "feature": "propertytype_avg_fee",
+      "importance": 59187199893.81641,
+      "importance_pct": 3.7241689746836504
+    },
+    {
+      "feature": "rolling_avg_fee_segment",
+      "importance": 50411944909.61719,
+      "importance_pct": 3.172013569195257
+    },
+    {
+      "feature": "client_avg_fee",
+      "importance": 46278075447.16211,
+      "importance_pct": 2.911902794820276
+    },
+    {
+      "feature": "TargetTime",
+      "importance": 40520839539.06836,
+      "importance_pct": 2.549646776841337
+    },
+    {
+      "feature": "segment_std_fee",
+      "importance": 32697703941.496094,
+      "importance_pct": 2.057400498431641
+    },
+    {
+      "feature": "propertytype_std_fee",
+      "importance": 29160227917.597656,
+      "importance_pct": 1.8348159112147318
+    },
+    {
+      "feature": "office_avg_fee",
+      "importance": 28772035268.351562,
+      "importance_pct": 1.8103901059204084
+    },
+    {
+      "feature": "state_std_fee",
+      "importance": 22508230040.308594,
+      "importance_pct": 1.416259801807542
+    },
+    {
+      "feature": "PropertyType_encoded",
+      "importance": 20506472576.714844,
+      "importance_pct": 1.290305489825702
+    },
+    {
+      "feature": "segment_win_rate",
+      "importance": 14584567238.205078,
+      "importance_pct": 0.9176881642509596
+    },
+    {
+      "feature": "DistanceInMiles",
+      "importance": 9566349626.402344,
+      "importance_pct": 0.6019325554096072
+    },
+    {
+      "feature": "BusinessSegment_encoded",
+      "importance": 3124716823.7851562,
+      "importance_pct": 0.19661300873651386
+    },
+    {
+      "feature": "GBA_encoded",
+      "importance": 982278157.3984375,
+      "importance_pct": 0.06180677316810982
+    }
+  ]
+}
