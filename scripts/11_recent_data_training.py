@@ -36,11 +36,15 @@ with open(REGRESSION_FEATURES_PATH, 'r') as f:
     regression_config = json.load(f)
     SELECTED_FEATURES = regression_config['features']
 
+# REMOVE segment_avg_fee (circular/leakage feature - 67% importance)
+SELECTED_FEATURES = [f for f in SELECTED_FEATURES if f != 'segment_avg_fee']
+
 print("=" * 80)
-print("REGRESSION MODEL - OPTIMIZED FEATURES (PHASE 3)")
+print("REGRESSION MODEL - WITHOUT segment_avg_fee")
 print("=" * 80)
 print(f"Timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-print(f"Using {len(SELECTED_FEATURES)} regression-optimized features\n")
+print(f"Using {len(SELECTED_FEATURES)} features (removed segment_avg_fee)")
+print(f"Reason: segment_avg_fee is circular (uses avg fee to predict fee)\n")
 
 # Load data
 df = pd.read_csv(FEATURES_DATA)

@@ -3,9 +3,8 @@
   "phase": "1A - Bid Fee Prediction",
   "target_variable": "BidFee",
   "optimization": "Dual feature selection (regression-specific)",
-  "num_features": 11,
+  "num_features": 10,
   "selected_features": [
-    "segment_avg_fee",
     "state_avg_fee",
     "propertytype_avg_fee",
     "rolling_avg_fee_segment",
@@ -41,77 +40,72 @@
   },
   "metrics": {
     "train": {
-      "rmse": 92.32650024293221,
-      "mae": 37.18517195878877,
-      "r2": 0.9981599123795952
+      "rmse": 223.61807230231028,
+      "mae": 104.10303892367757,
+      "r2": 0.9892055739500106
     },
     "test": {
-      "rmse": 237.5733585277002,
-      "mae": 62.96186798525541,
-      "r2": 0.9875262688417565
+      "rmse": 428.0453615066595,
+      "mae": 163.96911677687598,
+      "r2": 0.9595069494631843
     },
-    "overfitting_ratio": 2.5731870904083896
+    "overfitting_ratio": 1.9141805360345967
   },
   "feature_importance": [
     {
-      "feature": "segment_avg_fee",
-      "importance": 1072158982700.8242,
-      "importance_pct": 67.46111605057969
-    },
-    {
       "feature": "state_avg_fee",
-      "importance": 189215302538.21094,
-      "importance_pct": 11.905580878426175
-    },
-    {
-      "feature": "rolling_avg_fee_segment",
-      "importance": 56395526629.791016,
-      "importance_pct": 3.548452447902962
+      "importance": 599345562448.0,
+      "importance_pct": 37.65990402189213
     },
     {
       "feature": "propertytype_avg_fee",
-      "importance": 55734370392.27344,
-      "importance_pct": 3.506851959182173
-    },
-    {
-      "feature": "client_avg_fee",
-      "importance": 47174652087.08594,
-      "importance_pct": 2.968267514838011
-    },
-    {
-      "feature": "TargetTime",
-      "importance": 40685485214.50781,
-      "importance_pct": 2.5599638522973924
-    },
-    {
-      "feature": "segment_std_fee",
-      "importance": 36591537107.60547,
-      "importance_pct": 2.302369304472897
-    },
-    {
-      "feature": "propertytype_std_fee",
-      "importance": 36578764009.78125,
-      "importance_pct": 2.3015656107590465
-    },
-    {
-      "feature": "state_std_fee",
-      "importance": 22225993513.191406,
-      "importance_pct": 1.398477606330168
+      "importance": 421149758535.0,
+      "importance_pct": 26.462963070068984
     },
     {
       "feature": "office_avg_fee",
-      "importance": 21421548383.78125,
-      "importance_pct": 1.3478612638780847
+      "importance": 144516256454.0,
+      "importance_pct": 9.080685148366282
+    },
+    {
+      "feature": "TargetTime",
+      "importance": 144165821692.0,
+      "importance_pct": 9.058665565124603
+    },
+    {
+      "feature": "client_avg_fee",
+      "importance": 121683267749.0,
+      "importance_pct": 7.645973327607865
+    },
+    {
+      "feature": "propertytype_std_fee",
+      "importance": 74553048324.0,
+      "importance_pct": 4.684543976522596
+    },
+    {
+      "feature": "state_std_fee",
+      "importance": 62890463814.0,
+      "importance_pct": 3.9517249805833177
+    },
+    {
+      "feature": "rolling_avg_fee_segment",
+      "importance": 10286218087.0,
+      "importance_pct": 0.6463349529484175
     },
     {
       "feature": "segment_win_rate",
-      "importance": 11117044831.496094,
-      "importance_pct": 0.6994935113334088
+      "importance": 7753608458.0,
+      "importance_pct": 0.48719831871107805
+    },
+    {
+      "feature": "segment_std_fee",
+      "importance": 5124634666.0,
+      "importance_pct": 0.32200663817472674
     }
   ],
-  "training_date": "2026-01-09 22:32:18",
+  "training_date": "2026-01-13 22:48:07",
   "comparison": {
-    "improvement_vs_best_baseline_pct": 0.1918419830692742,
+    "improvement_vs_best_baseline_pct": -79.82832479379049,
     "best_baseline_rmse": 238.03
   }
 }
