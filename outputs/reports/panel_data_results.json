@@ -1,0 +1,166 @@
+{
+  "timestamp": "2026-01-14 23:47:40",
+  "baseline_rmse": 237.57,
+  "data": {
+    "total_observations": 52287,
+    "train_observations": 41829,
+    "test_observations": 10458,
+    "num_offices": 33,
+    "num_features": 81
+  },
+  "models": {
+    "pooled_ols": {
+      "train_rmse": 1802.5714841804463,
+      "test_rmse": 1814.523507959567,
+      "test_mae": 1092.1170469431231,
+      "test_r2": 0.2701655391091089,
+      "improvement_pct": -663.7847825733751
+    },
+    "fixed_effects": {
+      "train_rmse": 1794.9516015618856,
+      "test_rmse": 1804.3163952236835,
+      "test_mae": 1071.4012003134542,
+      "test_r2": 0.27835341874151354,
+      "improvement_pct": -659.4883172217383,
+      "num_fixed_effects": 31
+    },
+    "random_effects": {
+      "train_rmse": 1801.5311220848637,
+      "test_rmse": 1813.975925593014,
+      "test_mae": 1083.399781893918,
+      "test_r2": 0.27060596788027413,
+      "improvement_pct": -663.5542895117288
+    }
+  },
+  "best_model": "Fixed Effects",
+  "office_fixed_effects": [
+    {
+      "OfficeCode": "206 - St. Louis, MO",
+      "FixedEffect": 4725.877727102368
+    },
+    {
+      "OfficeCode": "118 - INDIANAPOLIS, IN",
+      "FixedEffect": 4372.248203797703
+    },
+    {
+      "OfficeCode": "159 - Syracuse, NY",
+      "FixedEffect": 3082.299106025075
+    },
+    {
+      "OfficeCode": "144 - NASHVILLE, TN",
+      "FixedEffect": 2077.6469990809132
+    },
+    {
+      "OfficeCode": "214 - Oklahoma City, OK",
+      "FixedEffect": 1606.0516685801297
+    },
+    {
+      "OfficeCode": "142 - DETROIT, MI",
+      "FixedEffect": 1238.9002935520405
+    },
+    {
+      "OfficeCode": "111 - COLUMBUS, OH",
+      "FixedEffect": 861.3619583170223
+    },
+    {
+      "OfficeCode": "122 - LOUISVILLE, KY",
+      "FixedEffect": 730.1343204200799
+    },
+    {
+      "OfficeCode": "191 - DFW",
+      "FixedEffect": 537.6708511428972
+    },
+    {
+      "OfficeCode": "205 - Tellatin Senior Housing",
+      "FixedEffect": 401.300923223404
+    },
+    {
+      "OfficeCode": "130 - ORLANDO, FL",
+      "FixedEffect": 366.55490174821983
+    },
+    {
+      "OfficeCode": "179 - SAN ANTONIO, TX",
+      "FixedEffect": 366.40549500553317
+    },
+    {
+      "OfficeCode": "900 - Integra AIM CORE",
+      "FixedEffect": 308.95321783380535
+    },
+    {
+      "OfficeCode": "123 - MIAMI, FL",
+      "FixedEffect": 72.56698390792647
+    },
+    {
+      "OfficeCode": "194 - Chicago",
+      "FixedEffect": 21.58203419513043
+    },
+    {
+      "OfficeCode": "108 - CINCINNATI, OH",
+      "FixedEffect": 0.0
+    },
+    {
+      "OfficeCode": "203 - Philadelphia",
+      "FixedEffect": -65.40239481743967
+    },
+    {
+      "OfficeCode": "173 - Birmingham, AL",
+      "FixedEffect": -237.27899841547227
+    },
+    {
+      "OfficeCode": "152 - NAPLES, FL",
+      "FixedEffect": -831.2024327655018
+    },
+    {
+      "OfficeCode": "218 - Kansas City",
+      "FixedEffect": -1032.5523524181822
+    },
+    {
+      "OfficeCode": "195 - Fort Worth, TX",
+      "FixedEffect": -1133.2409503363106
+    },
+    {
+      "OfficeCode": "154 - SEATTLE, WA",
+      "FixedEffect": -1326.0935210475152
+    },
+    {
+      "OfficeCode": "166 - CLEVELAND",
+      "FixedEffect": -1343.658308919161
+    },
+    {
+      "OfficeCode": "209 - Denver, CO",
+      "FixedEffect": -1970.254449137442
+    },
+    {
+      "OfficeCode": "162 - SAN DIEGO, CA",
+      "FixedEffect": -2025.7138118322237
+    },
+    {
+      "OfficeCode": "215 - Lubbock, TX",
+      "FixedEffect": -2473.9157250230173
+    },
+    {
+      "OfficeCode": "181 - Puerto Rico",
+      "FixedEffect": -2903.7029732209853
+    },
+    {
+      "OfficeCode": "148 - TAMPA, FL",
+      "FixedEffect": -3669.7387001800657
+    },
+    {
+      "OfficeCode": "950 - Washington Baltimore Metro",
+      "FixedEffect": -3712.9828432019735
+    },
+    {
+      "OfficeCode": "160 - SALT LAKE CITY, UT",
+      "FixedEffect": -3899.0480077358425
+    },
+    {
+      "OfficeCode": "150 - PROVIDENCE, RI",
+      "FixedEffect": -4163.422801020391
+    },
+    {
+      "OfficeCode": "185 - Austin",
+      "FixedEffect": -5139.230694500836
+    }
+  ]
+}
