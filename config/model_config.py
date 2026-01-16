@@ -23,7 +23,7 @@ ROOT_DIR = Path(__file__).parent.parent
 
 # Data paths
 DATA_DIR = ROOT_DIR / "data"
-FEATURES_DATA = DATA_DIR / "features" / "BidData_enriched_with_jobs.csv"  # Updated to use JobData-enriched dataset
+FEATURES_DATA = DATA_DIR / "features" / "BidData_features.csv"  # Reverted: Enriched version degraded performance
 PROCESSED_DATA = DATA_DIR / "processed" / "BidData_processed.csv"
 
 # Output paths
