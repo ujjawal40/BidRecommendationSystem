@@ -1,0 +1,81 @@
+{
+  "timestamp": "2026-01-15 22:57:44",
+  "input_data": {
+    "biddata_records": 114503,
+    "biddata_features": 123,
+    "jobdata_records_raw": 571462,
+    "jobdata_records_cleaned": 282878,
+    "offices_matched": 94
+  },
+  "output_data": {
+    "enriched_records": 114503,
+    "enriched_features": 147,
+    "new_features_count": 24
+  },
+  "new_features": {
+    "volume_features": [
+      "office_job_volume",
+      "region_job_volume"
+    ],
+    "fee_features": [
+      "office_avg_job_fee",
+      "office_median_job_fee",
+      "office_job_fee_std",
+      "office_min_job_fee",
+      "office_max_job_fee",
+      "office_avg_appraisal_fee",
+      "office_median_appraisal_fee",
+      "office_fee_range",
+      "office_fee_cv",
+      "region_avg_job_fee",
+      "region_median_job_fee",
+      "property_region_avg_fee",
+      "property_region_median_fee"
+    ],
+    "region_features": [
+      "office_region",
+      "region_avg_job_fee",
+      "region_median_job_fee",
+      "region_job_volume",
+      "office_vs_region_premium",
+      "office_vs_region_ratio",
+      "office_region_encoded",
+      "property_region_avg_fee",
+      "property_region_median_fee"
+    ],
+    "market_features": [
+      "office_market_tier",
+      "office_market_tier_encoded"
+    ],
+    "other_features": [
+      "PropertyType_x",
+      "office_master_job_pct",
+      "office_primary_property_type",
+      "office_primary_client_type",
+      "office_avg_profit_margin",
+      "office_primary_client_type_encoded",
+      "PropertyType_enriched",
+      "PropertyType_y"
+    ]
+  },
+  "data_quality": {
+    "missing_values": {
+      "PropertyType_x": 32579,
+      "office_primary_property_type": 10,
+      "office_primary_client_type": 10,
+      "office_region": 10,
+      "office_market_tier": 10,
+      "PropertyType_enriched": 32579,
+      "PropertyType_y": 32814
+    }
+  },
+  "regional_breakdown": {
+    "Central": 79189,
+    "Northeast": 33006,
+    "Other": 4028,
+    "Southeast": 86974,
+    "Southwest": 53717,
+    "Unknown": 620,
+    "West": 25344
+  }
+}

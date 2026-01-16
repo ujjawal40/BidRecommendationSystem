@@ -1,0 +1,263 @@
+================================================================================
+JOBDATA ENRICHMENT - BID FEE PREDICTION
+================================================================================
+Timestamp: 2026-01-15 22:57:36
+
+================================================================================
+STEP 1: LOADING DATA
+================================================================================
+
+📊 Loading BidData...
+✓ BidData loaded: 114,503 records
+  Columns: 123
+  Date range: 2018-01-02 to 2025-12-19
+
+📊 Loading JobData...
+✓ JobData loaded: 571,462 records
+  Columns: 22
+
+================================================================================
+STEP 2: CLEANING JOBDATA
+================================================================================
+
+✓ JobFee cleaned:
+  Original records: 571,462
+  After cleaning: 532,317
+  Removed: 39,145 (6.8%)
+  Mean JobFee: $3,256.79
+  Median JobFee: $2,900.00
+
+✓ Filtered to recent data (2016+): 282,878 records
+
+================================================================================
+STEP 3: CREATING OFFICE-LEVEL AGGREGATES
+================================================================================
+
+📊 Computing office statistics from JobData...
+✓ Created aggregates for 94 offices
+
+Sample office statistics:
+                      OfficeCode  office_job_volume  office_avg_job_fee  office_median_job_fee  office_job_fee_std  office_min_job_fee  office_max_job_fee  office_avg_appraisal_fee  office_median_appraisal_fee  office_master_job_pct office_primary_property_type   office_primary_client_type office_region
+0         100 - CORPORATE OFFICE                  2         1250.000000                 1250.0         1060.660172               500.0              2000.0              2.659398e+12                 2.659398e+12               0.500000       Residential 1-4 Family  Banks / Credit Institutions         Other
+1              101 - Atlanta, GA                791         3423.687421                 3000.0         3085.460848               350.0             52000.0              5.124108e+05                 2.380250e+05               0.007585                       Retail  Banks / Credit Institutions     Southeast
+2  102 - Baltimore-Washington DC                784         3971.783163                 3705.0         2223.627073               200.0             28500.0              1.109322e+06                 4.356150e+05               0.000000                       Retail  Banks / Credit Institutions     Northeast
+3               104 - BOSTON, MA               1078         4697.168831                 4400.0         2024.103556               300.0             21500.0              4.328548e+05                 2.265025e+05               0.000928                       Office  Banks / Credit Institutions     Northeast
+4            105 - CHARLOTTE, NC              16808         2672.889250                 2550.0         1949.843851                 1.0             70500.0              6.173052e+05                 3.249500e+05               0.000654                         Land  Banks / Credit Institutions     Southeast
+5              107 - CHICAGO, IL               1183         4292.202663                 3695.0         6073.471939               350.0            150000.0              7.467583e+05                 3.454370e+05               0.084531                  Multifamily  Banks / Credit Institutions       Central
+6           108 - CINCINNATI, OH               7884         2547.825542                 2375.0         1866.683000                 1.0             40937.5              3.254071e+05                 1.085000e+05               0.019153                       Retail  Banks / Credit Institutions       Central
+7       109 - COASTAL NEW JERSEY               1763         4448.199677                 3517.6         5382.865484               277.5            125000.0              2.651641e+05                 1.132500e+05               0.002269                         Land  Banks / Credit Institutions     Northeast
+8             110 - COLUMBIA, SC               5051         2354.826826                 2450.0         1001.781078                50.0             16500.0              6.067070e+05                 3.100950e+05               0.000198                         Land  Banks / Credit Institutions     Southeast
+9             111 - COLUMBUS, OH               4362         3333.512396                 2900.0         8912.171205                 1.0            576875.0              7.629227e+05                 3.774980e+05               0.005731                       Retail  Banks / Credit Institutions       Central
+
+================================================================================
+STEP 4: CREATING DERIVED FEATURES
+================================================================================
+✓ Created derived features:
+  • office_fee_range
+  • office_fee_cv (coefficient of variation)
+  • office_avg_profit_margin
+  • office_market_tier (Budget/Mid/Premium)
+
+================================================================================
+STEP 5: CREATING REGIONAL AGGREGATES
+================================================================================
+✓ Created aggregates for 6 regions
+
+Regional statistics:
+      Region  region_avg_job_fee  region_median_job_fee  region_job_fee_std  region_job_volume
+0    Central         2668.386473                 2450.0         4059.310256              79189
+1  Northeast         3630.162471                 3250.0         3387.739525              33006
+2      Other         2131.770720                  750.0         3838.952892               4028
+3  Southeast         2884.627024                 2650.0         2455.564814              86974
+4  Southwest         3218.402606                 2800.0         4543.214775              53717
+5       West         4325.849515                 3500.0         4482.526905              25344
+✓ Added regional comparison features:
+  • office_vs_region_premium
+  • office_vs_region_ratio
+
+================================================================================
+STEP 6: CREATING PROPERTY TYPE × REGION FEATURES
+================================================================================
+✓ Created 59 PropertyType × Region combinations
+
+Sample combinations:
+   PropertyType     Region  property_region_avg_fee  property_region_median_fee  property_region_volume
+0         Hotel    Central              4159.750848                    3900.000                    1462
+1         Hotel  Northeast              4435.561719                    4500.000                     640
+2         Hotel      Other              7657.718750                    7000.000                     128
+3         Hotel  Southeast              4358.615877                    3850.000                    1596
+4         Hotel  Southwest              3585.130182                    3600.000                    1100
+5         Hotel       West              4378.756999                    4450.000                     893
+6    Industrial    Central              2788.346850                    2500.000                    9886
+7    Industrial  Northeast              3525.697792                    3250.000                    4900
+8    Industrial      Other              3381.785980                    1767.855                     204
+9    Industrial  Southeast              2752.124488                    2700.000                   12092
+10   Industrial  Southwest              3119.929881                    2950.000                    6714
+11   Industrial       West              3611.390892                    3400.000                    3890
+12         Land    Central              2868.613002                    2500.000                    8140
+13         Land  Northeast              3806.880045                    3400.000                    4683
+14         Land      Other              2781.966509                    1500.000                     636
+
+================================================================================
+STEP 7: ENCODING CATEGORICAL FEATURES
+================================================================================
+✓ Encoded categorical features:
+  • office_region: 7 categories
+  • office_primary_client_type: 6 categories
+  • office_market_tier: 3 categories
+
+================================================================================
+STEP 8: MERGING ENRICHED FEATURES INTO BIDDATA
+================================================================================
+
+📊 BidData before enrichment:
+  Records: 114,503
+  Features: 123
+
+✓ Merge complete!
+
+📊 BidData after enrichment:
+  Records: 114,503
+  Features: 147
+  New features added: 24
+
+================================================================================
+STEP 9: ADDING PROPERTY TYPE × REGION BENCHMARKS
+================================================================================
+✓ Added property type × region benchmarks
+  Total features now: 151
+
+================================================================================
+STEP 10: NEW FEATURES SUMMARY
+================================================================================
+
+✨ 29 new features created:
+
+📊 Volume Features (2):
+  • office_job_volume
+  • region_job_volume
+
+💰 Fee Features (13):
+  • office_avg_job_fee
+  • office_median_job_fee
+  • office_job_fee_std
+  • office_min_job_fee
+  • office_max_job_fee
+  • office_avg_appraisal_fee
+  • office_median_appraisal_fee
+  • office_fee_range
+  • office_fee_cv
+  • region_avg_job_fee
+  • region_median_job_fee
+  • property_region_avg_fee
+  • property_region_median_fee
+
+🌎 Regional Features (9):
+  • office_region
+  • region_avg_job_fee
+  • region_median_job_fee
+  • region_job_volume
+  • office_vs_region_premium
+  • office_vs_region_ratio
+  • office_region_encoded
+  • property_region_avg_fee
+  • property_region_median_fee
+
+📈 Market Features (2):
+  • office_market_tier
+  • office_market_tier_encoded
+
+🔧 Other Features (8):
+  • PropertyType_x
+  • office_master_job_pct
+  • office_primary_property_type
+  • office_primary_client_type
+  • office_avg_profit_margin
+  • office_primary_client_type_encoded
+  • PropertyType_enriched
+  • PropertyType_y
+
+================================================================================
+STEP 11: DATA QUALITY CHECKS
+================================================================================
+
+🔍 Checking data quality...
+
+⚠️ Features with missing values:
+  • PropertyType_x: 32,579 (28.5%)
+  • office_primary_property_type: 10 (0.0%)
+  • office_primary_client_type: 10 (0.0%)
+  • office_region: 10 (0.0%)
+  • office_market_tier: 10 (0.0%)
+  • PropertyType_enriched: 32,579 (28.5%)
+  • PropertyType_y: 32,814 (28.7%)
+
+📊 Feature Statistics (sample):
+
+  office_avg_job_fee:
+    Mean: 2914.20
+    Median: 2817.73
+    Min: 1148.69
+    Max: 6993.05
+
+  office_job_volume:
+    Mean: 8930.46
+    Median: 4668.00
+    Min: 2.00
+    Max: 19000.00
+
+  office_vs_region_premium:
+    Mean: -3.62
+    Median: -161.59
+    Min: -1258.13
+    Max: 2667.20
+
+  office_fee_cv:
+    Mean: 1.07
+    Median: 0.98
+    Min: 0.16
+    Max: 5.00
+
+================================================================================
+STEP 12: SAVING ENRICHED DATASET
+================================================================================
+
+✓ Enriched dataset saved:
+  Path: data/features/BidData_enriched_with_jobs.csv
+  Records: 114,503
+  Features: 151
+  File size: 180.2 MB
+
+✓ Office aggregates saved: data/features/office_aggregates_from_jobdata.csv
+✓ Region aggregates saved: data/features/region_aggregates_from_jobdata.csv
+
+================================================================================
+STEP 13: GENERATING ENRICHMENT REPORT
+================================================================================
+
+✓ Enrichment report saved: outputs/reports/jobdata_enrichment_report.json
+
+================================================================================
+ENRICHMENT COMPLETE
+================================================================================
+
+✨ Summary:
+  • Input: 123 features
+  • Output: 147 features
+  • Added: 24 new features
+  • Source: 282,878 job records
+  • Offices enriched: 94
+  • Regions added: 7
+
+📁 Output files:
+  1. data/features/BidData_enriched_with_jobs.csv
+  2. data/features/office_aggregates_from_jobdata.csv
+  3. data/features/region_aggregates_from_jobdata.csv
+  4. outputs/reports/jobdata_enrichment_report.json
+
+🚀 Next Step:
+  Run regression model with enriched data:
+  → Use: data/features/BidData_enriched_with_jobs.csv
+  → Expected: 3-7% RMSE improvement
+
+================================================================================
