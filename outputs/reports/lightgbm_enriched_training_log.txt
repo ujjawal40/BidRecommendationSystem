@@ -1,0 +1,154 @@
+/Users/ujjawaldwivedi/Desktop/BidRecommendationSystem/scripts/04_model_lightgbm.py:493: RuntimeWarning: divide by zero encountered in divide
+  'Pct_Error': np.abs((self.y_test.values - self.predictions) / self.y_test.values) * 100
+================================================================================
+LIGHTGBM BID FEE PREDICTOR - PHASE 1A
+================================================================================
+Timestamp: 2026-01-16 17:19:27
+
+================================================================================
+LOADING DATA
+================================================================================
+✓ Data loaded from: /Users/ujjawaldwivedi/Desktop/BidRecommendationSystem/data/features/BidData_enriched_with_jobs.csv
+  Rows: 114,503
+  Columns: 151
+✓ Data sorted by BidDate
+  Date range: 2018-01-02 00:00:00 to 2025-12-19 00:00:00
+
+================================================================================
+PREPARING FEATURES
+================================================================================
+Total columns: 151
+Excluded columns: 10
+Feature columns: 106
+
+⚠ Warning: 572744 missing values found in features
+  Filling with 0...
+
+✓ Features prepared
+  Feature matrix shape: (114503, 106)
+  Target variable: BidFee
+  Target shape: (114503,)
+  Target mean: $3,363.41
+  Target std: $2,130.53
+
+================================================================================
+TIME-BASED TRAIN/TEST SPLIT
+================================================================================
+Train/Test ratio: 80% / 20%
+
+Training set:
+  Rows: 91,602
+  Date range: 2018-01-02 00:00:00 to 2024-10-04 00:00:00
+  Target mean: $3,360.73
+
+Test set:
+  Rows: 22,901
+  Date range: 2024-10-04 00:00:00 to 2025-12-19 00:00:00
+  Target mean: $3,374.12
+
+================================================================================
+TRAINING LIGHTGBM MODEL
+================================================================================
+Training configuration:
+  Boosting rounds: 1000
+  Early stopping: 50 rounds
+  Learning rate: 0.05
+  Num leaves: 31
+  Max depth: -1
+
+Training in progress...
+
+Training until validation scores don't improve for 50 rounds
+[100]	train's rmse: 262.2	valid's rmse: 418.555
+[200]	train's rmse: 185.884	valid's rmse: 343.652
+[300]	train's rmse: 152.601	valid's rmse: 320.756
+[400]	train's rmse: 134.079	valid's rmse: 312.626
+[500]	train's rmse: 120.419	valid's rmse: 307.754
+[600]	train's rmse: 109.05	valid's rmse: 302.365
+[700]	train's rmse: 100.21	valid's rmse: 300.96
+[800]	train's rmse: 93.2092	valid's rmse: 298.98
+[900]	train's rmse: 86.5429	valid's rmse: 297.657
+[1000]	train's rmse: 81.3549	valid's rmse: 296.778
+Did not meet early stopping. Best iteration is:
+[1000]	train's rmse: 81.3549	valid's rmse: 296.778
+
+✓ Model training complete
+  Best iteration: 1000
+  Best score: 296.78
+
+================================================================================
+MODEL EVALUATION
+================================================================================
+Test Set Performance:
+  RMSE: $296.78
+  MAE: $85.37
+  R²: 0.9811
+  MAPE: inf%
+  Median AE: $25.34
+
+Prediction Statistics:
+  Mean prediction: $3,380.20
+  Std prediction: $2,117.09
+  Min prediction: $-249.75
+  Max prediction: $16,926.41
+
+================================================================================
+FEATURE IMPORTANCE ANALYSIS
+================================================================================
+
+Top 30 Most Important Features:
+                     feature   importance
+             segment_avg_fee 2.189026e+12
+               state_avg_fee 3.406217e+11
+            segment_win_rate 2.108684e+11
+              client_avg_fee 1.340905e+11
+             segment_std_fee 8.526352e+10
+                  TargetTime 5.702684e+10
+   BusinessSegment_frequency 5.606800e+10
+              office_avg_fee 5.311535e+10
+        propertytype_avg_fee 2.919498e+10
+     rolling_avg_fee_segment 2.829549e+10
+     PropertyState_frequency 2.721424e+10
+               state_std_fee 1.875564e+10
+              client_std_fee 1.671560e+10
+             RooftopLatitude 1.470707e+10
+    rolling_avg_fee_proptype 1.409484e+10
+            RooftopLongitude 1.390701e+10
+              state_win_rate 1.261600e+10
+     BusinessSegment_encoded 6.883890e+09
+      rolling_avg_fee_office 6.727036e+09
+        propertytype_std_fee 5.667890e+09
+   Bid_Property_Type_encoded 5.448570e+09
+         TargetTime_Original 4.897066e+09
+targettime_ratio_to_proptype 4.838501e+09
+  property_region_median_fee 4.671151e+09
+    OfficeLocation_frequency 4.620101e+09
+                    OfficeId 4.125545e+09
+            days_since_start 4.053591e+09
+        prev_fee_same_client 3.761793e+09
+       PropertyState_encoded 3.714988e+09
+       propertytype_win_rate 3.265780e+09
+
+✓ Feature importance plot saved: /Users/ujjawaldwivedi/Desktop/BidRecommendationSystem/outputs/figures/lightgbm_feature_importance.png
+✓ Feature importance saved: /Users/ujjawaldwivedi/Desktop/BidRecommendationSystem/outputs/reports/lightgbm_feature_importance.csv
+
+================================================================================
+SHAP EXPLAINABILITY ANALYSIS
+================================================================================
+Computing SHAP values for 1000 samples...
+✓ SHAP summary plot saved: /Users/ujjawaldwivedi/Desktop/BidRecommendationSystem/outputs/figures/lightgbm_shap_summary.png
+
+================================================================================
+SAVING MODEL ARTIFACTS
+================================================================================
+✓ Model saved: /Users/ujjawaldwivedi/Desktop/BidRecommendationSystem/outputs/models/lightgbm_bidfee_model.txt
+✓ Metadata saved: /Users/ujjawaldwivedi/Desktop/BidRecommendationSystem/outputs/models/lightgbm_metadata.json
+✓ Predictions saved: /Users/ujjawaldwivedi/Desktop/BidRecommendationSystem/outputs/reports/lightgbm_predictions.csv
+
+================================================================================
+PIPELINE COMPLETE
+================================================================================
+✓ LightGBM model trained and evaluated successfully
+  Final RMSE: $296.78
+  Final R²: 0.9811
+

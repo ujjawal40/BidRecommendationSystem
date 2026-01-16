@@ -1,0 +1,139 @@
+================================================================================
+LIGHTGBM MODEL - JOBDATA ENRICHED (532K jobs)
+Training Results and Analysis
+================================================================================
+Date: 2026-01-16
+Dataset: BidData_enriched_with_jobs.csv (114,503 records × 151 features)
+
+================================================================================
+PERFORMANCE COMPARISON
+================================================================================
+
+Model                         Train RMSE    Test RMSE    Test R²    Status
+--------------------------------------------------------------------------------
+Baseline (123 features)            N/A        $237.57        N/A    Previous
+Enriched (151 features)         $81.35        $296.78     0.9811    DEGRADED
+--------------------------------------------------------------------------------
+Change                              --        +$59.21    +0.9811    +24.9% worse
+
+⚠️ ISSUE: Model performance DEGRADED by 24.9%
+
+================================================================================
+DIAGNOSTIC ANALYSIS
+================================================================================
+
+Overfitting Indicators:
+  • Train RMSE: $81.35 (extremely low)
+  • Test RMSE: $296.78 (high)
+  • Overfitting ratio: 3.65x (test/train)
+  • R² = 0.9811 (unrealistically high - suggests leakage or overfitting)
+
+Training Configuration:
+  • Boosting rounds: 1,000 (no early stopping triggered)
+  • Learning rate: 0.05
+  • Num leaves: 31
+  • Features used: 106 (out of 151)
+  • Train samples: 91,602
+  • Test samples: 22,901
+
+Test Set Metrics:
+  • RMSE: $296.78
+  • MAE: $85.37
+  • R²: 0.9811
+  • Median AE: $25.34
+  • Prediction range: -$249.75 to $16,926.41 (negative predictions!)
+
+================================================================================
+TOP 15 FEATURES BY IMPORTANCE
+================================================================================
+
+1.  segment_avg_fee                (2.19e+12)
+2.  state_avg_fee                  (3.41e+11)
+3.  segment_win_rate               (2.11e+11)
+4.  client_avg_fee                 (1.34e+11)
+5.  segment_std_fee                (8.53e+10)
+6.  TargetTime                     (5.70e+10)
+7.  BusinessSegment_frequency      (5.61e+10)
+8.  office_avg_fee                 (5.31e+10)
+9.  propertytype_avg_fee           (2.92e+10)
+10. rolling_avg_fee_segment        (2.83e+10)
+11. PropertyState_frequency        (2.72e+10)
+12. state_std_fee                  (1.88e+10)
+13. client_std_fee                 (1.67e+10)
+14. RooftopLatitude                (1.47e+10)
+15. rolling_avg_fee_proptype       (1.41e+10)
+
+JobData Features in Top 30:
+  • property_region_median_fee (rank 24)
+  
+Note: Most important features are from original dataset, not JobData enrichment
+
+================================================================================
+POTENTIAL ISSUES IDENTIFIED
+================================================================================
+
+1. SEVERE OVERFITTING
+   - R² of 0.9811 is unrealistic for this problem
+   - Train RMSE ($81) vs Test RMSE ($297) shows 3.65x overfitting
+   - Model memorizing training data
+
+2. POSSIBLE DATA LEAKAGE
+   - Need to audit new JobData features for circular references
+   - Check if any features use future information
+
+3. TOO MANY FEATURES
+   - 151 features might be causing curse of dimensionality
+   - Original 123 features performed better
+
+4. NEGATIVE PREDICTIONS
+   - Model predicting negative fees (min: -$249.75)
+   - Indicates model instability
+
+5. FEATURE CORRELATION
+   - JobData features may correlate with existing features
+   - Creating multicollinearity issues
+
+================================================================================
+RECOMMENDED NEXT STEPS
+================================================================================
+
+1. REVERT TO BASELINE
+   ✓ Confirm baseline performance ($237.57 RMSE)
+   ✓ Use BidData_features.csv (123 features)
+
+2. INVESTIGATE DATA LEAKAGE
+   ✓ Audit JobData features for circular references
+   ✓ Check office_avg_job_fee vs rolling_avg_fee_office
+   ✓ Verify no future information in features
+
+3. INCREMENTAL FEATURE ADDITION
+   ✓ Add JobData features one category at a time
+   ✓ Test impact of each feature group
+   ✓ Keep only features that improve performance
+
+4. REGULARIZATION
+   ✓ Increase regularization (reg_alpha, reg_lambda)
+   ✓ Reduce num_leaves to prevent overfitting
+   ✓ Add feature selection/elimination
+
+5. FEATURE ENGINEERING REVIEW
+   ✓ Check for highly correlated features
+   ✓ Remove redundant JobData features
+   ✓ Consider PCA or feature selection
+
+================================================================================
+CONCLUSION
+================================================================================
+
+The JobData enrichment (532K jobs) did NOT improve model performance.
+In fact, performance degraded by 24.9%.
+
+Root causes likely:
+  • Overfitting due to increased feature count
+  • Possible data leakage in JobData features
+  • Feature correlation/multicollinearity
+
+Action: Further investigation needed before using enriched dataset.
+
+Recommendation: Revert to baseline and add JobData features selectively
+after careful leakage audit and correlation analysis.
