@@ -1,11 +1,11 @@
 {
-  "timestamp": "2026-01-15 22:57:44",
+  "timestamp": "2026-01-15 23:56:11",
   "input_data": {
     "biddata_records": 114503,
     "biddata_features": 123,
     "jobdata_records_raw": 571462,
-    "jobdata_records_cleaned": 282878,
-    "offices_matched": 94
+    "jobdata_records_cleaned": 532317,
+    "offices_matched": 112
   },
   "output_data": {
     "enriched_records": 114503,
@@ -61,21 +61,21 @@
   "data_quality": {
     "missing_values": {
       "PropertyType_x": 32579,
-      "office_primary_property_type": 10,
-      "office_primary_client_type": 10,
-      "office_region": 10,
-      "office_market_tier": 10,
+      "office_primary_property_type": 1,
+      "office_primary_client_type": 1,
+      "office_region": 1,
+      "office_market_tier": 1,
       "PropertyType_enriched": 32579,
-      "PropertyType_y": 32814
+      "PropertyType_y": 32811
     }
   },
   "regional_breakdown": {
-    "Central": 79189,
-    "Northeast": 33006,
-    "Other": 4028,
-    "Southeast": 86974,
-    "Southwest": 53717,
+    "Central": 160565,
+    "Northeast": 71729,
+    "Other": 4841,
+    "Southeast": 135781,
+    "Southwest": 105454,
     "Unknown": 620,
-    "West": 25344
+    "West": 53327
   }
 }

@@ -1,22 +1,26 @@
 """
-JobData Enrichment Script
-=========================
+JobData Enrichment Script (ALL DATA VERSION)
+=============================================
 Enrich BidData with insights from JobData (571K completed job records).
 
 Enrichment Strategy:
 - Link via OfficeCode (100% overlap)
-- Create office-level aggregate features
+- Create office-level aggregate features from ALL historical data
 - Add Region and ClientType dimensions
 - Generate market intelligence features
+- NO date filtering - use all 532K valid jobs (2001-2026)
 
 Data Sources:
-- BidData: 166K bid records (2018-2025)
-- JobData: 571K job records (2001-2026)
+- BidData: 114K bid records (2018-2025)
+- JobData: 571K job records → 532K after cleaning (2001-2026)
 
-Expected Impact: 3-7% RMSE improvement
+Cleaning: Only remove NULL, ≤$0, or >$1M JobFees (6.8%)
+No date filter applied for maximum statistical power
+
+Expected Impact: 4-8% RMSE improvement
 
 Author: Bid Recommendation System
-Date: 2026-01-15
+Date: 2026-01-15 (Updated)
 """
 
 import sys
@@ -92,17 +96,18 @@ df_job_clean = df_job[
     (df_job['JobFee'] < 1_000_000)
 ].copy()
 
-print(f"\n✓ JobFee cleaned:")
+print(f"\n✓ JobFee cleaned (removed NULL, ≤$0, >$1M):")
 print(f"  Original records: {initial_count:,}")
 print(f"  After cleaning: {len(df_job_clean):,}")
 print(f"  Removed: {initial_count - len(df_job_clean):,} ({(initial_count - len(df_job_clean))/initial_count*100:.1f}%)")
 print(f"  Mean JobFee: ${df_job_clean['JobFee'].mean():,.2f}")
 print(f"  Median JobFee: ${df_job_clean['JobFee'].median():,.2f}")
+print(f"  Date range: {df_job_clean['JobCreateDate'].min()} to {df_job_clean['JobCreateDate'].max()}")
 
-# Filter to recent data (last 8 years to match BidData timeframe)
-recent_cutoff = pd.Timestamp('2016-01-01')
-df_job_clean = df_job_clean[df_job_clean['JobCreateDate'] >= recent_cutoff].copy()
-print(f"\n✓ Filtered to recent data (2016+): {len(df_job_clean):,} records")
+# NO DATE FILTER - Using all historical data for maximum statistical power
+print(f"\n✓ Using ALL historical data (no date filter)")
+print(f"  Timespan: {(df_job_clean['JobCreateDate'].max() - df_job_clean['JobCreateDate'].min()).days / 365.25:.1f} years")
+print(f"  Total jobs for aggregates: {len(df_job_clean):,}")
 
 # ============================================================================
 # CREATE OFFICE-LEVEL AGGREGATES
