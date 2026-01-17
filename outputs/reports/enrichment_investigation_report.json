@@ -1,0 +1,80 @@
+{
+  "summary": {
+    "total_new_features": 29,
+    "leakage_suspects": 0,
+    "redundant_features": 0,
+    "valuable_features": 10
+  },
+  "features_to_remove": {
+    "leakage": [],
+    "redundant": []
+  },
+  "features_to_keep": [
+    "office_avg_job_fee",
+    "office_market_tier_encoded",
+    "office_vs_region_ratio",
+    "office_median_job_fee",
+    "office_vs_region_premium",
+    "property_region_avg_fee",
+    "office_job_volume",
+    "office_job_fee_std",
+    "office_primary_client_type_encoded",
+    "region_job_volume"
+  ],
+  "feature_analysis": {
+    "leakage_suspects": [],
+    "high_redundancy": [],
+    "valuable_features": [
+      {
+        "feature": "office_avg_job_fee",
+        "target_correlation": 0.1908682087679015,
+        "category": "office"
+      },
+      {
+        "feature": "office_job_fee_std",
+        "target_correlation": 0.1153141824387528,
+        "category": "office"
+      },
+      {
+        "feature": "office_job_volume",
+        "target_correlation": 0.13859365769278928,
+        "category": "office"
+      },
+      {
+        "feature": "office_market_tier_encoded",
+        "target_correlation": 0.18979898956007657,
+        "category": "office"
+      },
+      {
+        "feature": "office_median_job_fee",
+        "target_correlation": 0.16179804351479443,
+        "category": "office"
+      },
+      {
+        "feature": "office_primary_client_type_encoded",
+        "target_correlation": 0.11235353782364214,
+        "category": "office"
+      },
+      {
+        "feature": "office_vs_region_premium",
+        "target_correlation": 0.15568138309380938,
+        "category": "office"
+      },
+      {
+        "feature": "office_vs_region_ratio",
+        "target_correlation": 0.16204440786859028,
+        "category": "office"
+      },
+      {
+        "feature": "property_region_avg_fee",
+        "target_correlation": 0.1542454139259128,
+        "category": "region"
+      },
+      {
+        "feature": "region_job_volume",
+        "target_correlation": 0.10512477657801109,
+        "category": "region"
+      }
+    ]
+  }
+}
