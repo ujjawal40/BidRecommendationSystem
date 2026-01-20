@@ -2,7 +2,7 @@
   "model_type": "LightGBM",
   "phase": "1A - Bid Fee Prediction",
   "target_variable": "BidFee",
-  "num_features": 106,
+  "num_features": 95,
   "features": [
     "TargetTime",
     "BusinessSegmentDetail",
@@ -88,38 +88,27 @@
     "is_peak_season",
     "is_weekday",
     "targettime_ratio_to_proptype",
-    "office_job_volume",
-    "office_avg_job_fee",
-    "office_median_job_fee",
-    "office_job_fee_std",
-    "office_min_job_fee",
-    "office_max_job_fee",
-    "office_avg_appraisal_fee",
-    "office_median_appraisal_fee",
-    "office_master_job_pct",
-    "office_fee_range",
-    "office_fee_cv",
-    "office_avg_profit_margin",
-    "region_avg_job_fee",
-    "region_median_job_fee",
-    "region_job_volume",
-    "office_vs_region_premium",
-    "office_vs_region_ratio",
-    "office_region_encoded",
-    "office_primary_client_type_encoded",
-    "office_market_tier_encoded",
-    "property_region_avg_fee",
-    "property_region_median_fee"
+    "OfficeCode_y",
+    "office_win_trend_ratio",
+    "office_win_trend_slope",
+    "office_peak_month",
+    "office_peak_quarter",
+    "office_seasonality_strength",
+    "office_client_retention_rate",
+    "office_repeat_job_rate",
+    "office_avg_jobs_per_client",
+    "is_office_peak_month",
+    "is_office_peak_quarter"
   ],
   "training_samples": 91602,
   "test_samples": 22901,
   "best_iteration": 1000,
   "metrics": {
-    "rmse": 296.7780179870002,
-    "mae": 85.3666364367559,
-    "r2": 0.9811122463849036,
+    "rmse": 296.809284265238,
+    "mae": 87.51595517691732,
+    "r2": 0.981108266434692,
     "mape": Infinity,
-    "median_ae": 25.335766019536862
+    "median_ae": 26.499623859547228
   },
   "hyperparameters": {
     "objective": "regression",
@@ -138,5 +127,5 @@
     "n_jobs": -1,
     "verbose": -1
   },
-  "training_date": "2026-01-16 17:19:48"
+  "training_date": "2026-01-20 16:41:30"
 }

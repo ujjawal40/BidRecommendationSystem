@@ -23,7 +23,7 @@ ROOT_DIR = Path(__file__).parent.parent
 
 # Data paths
 DATA_DIR = ROOT_DIR / "data"
-FEATURES_DATA = DATA_DIR / "features" / "BidData_features.csv"  # REVERTED: JobData enrichment degraded performance (see jobdata_enrichment_final_results.txt)
+FEATURES_DATA = DATA_DIR / "features" / "BidData_features.csv"  # Baseline: All JobData approaches failed (static, selective, competitive)
 PROCESSED_DATA = DATA_DIR / "processed" / "BidData_processed.csv"
 
 # Output paths
