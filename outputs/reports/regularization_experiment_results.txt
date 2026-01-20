@@ -1,0 +1,169 @@
+================================================================================
+REGULARIZATION EXPERIMENT RESULTS
+================================================================================
+Date: 2026-01-20
+Goal: Fix severe overfitting (3.6x train/test gap)
+
+================================================================================
+APPROACH: AGGRESSIVE REGULARIZATION
+================================================================================
+
+Changed parameters:
+1. Regularization (50x increase):
+   - reg_alpha: 0.1 → 5.0 (L1 penalty)
+   - reg_lambda: 0.1 → 5.0 (L2 penalty)
+
+2. Model Complexity (reduced):
+   - num_leaves: 31 → 15 (50% reduction)
+   - max_depth: unlimited → 6 (capped)
+   - num_boost_round: 1000 → 300 (70% reduction)
+   - min_child_samples: 20 → 50 (larger leaves)
+   - min_child_weight: 0 → 10 (new)
+
+3. Proper Validation Split:
+   - OLD: 80% train / 20% test (validation = test set)
+   - NEW: 60% train / 20% validation / 20% test
+   - Early stopping on validation set (NOT test set)
+
+================================================================================
+RESULTS COMPARISON
+================================================================================
+
+Model             Train RMSE   Valid RMSE   Test RMSE   Overfit Ratio   Status
+--------------------------------------------------------------------------------
+Baseline          $82.35       N/A          $296.81     3.60x           Severe
+(no validation)
+
+Regularized       $237.66      $519.07      $559.79     2.36x           Moderate
+(proper split)
+--------------------------------------------------------------------------------
+Change            +$155.31     N/A          +$262.98    -1.24x          IMPROVED
+                  (+189%)                   (+89%)      (-34%)
+
+================================================================================
+ANALYSIS
+================================================================================
+
+GOOD NEWS - Overfitting Reduced:
+✓ Train/Test ratio: 3.60x → 2.36x (34% improvement)
+✓ Overfitting level: Severe → Moderate (acceptable range)
+✓ Train RMSE increased: $82 → $238 (less memorization)
+
+BAD NEWS - Test Performance Degraded:
+✗ Test RMSE: $297 → $560 (+89% worse)
+✗ Test MAE: $88 → $178 (+102% worse)
+✗ Test % Error: 9.9% → 16.6% (+67% worse)
+
+FINDING: TOO AGGRESSIVE
+The regularization successfully reduced overfitting, but overcorrected.
+The model is now UNDERFITTING - too simple to capture patterns.
+
+Performance Breakdown:
+  Train:      7.0% error (good - not memorizing)
+  Validation: 16.3% error (acceptable)
+  Test:       16.6% error (too high)
+
+Median bid: $3,000
+Test RMSE: $560 = 18.7% of median (was 9.9%)
+
+================================================================================
+ROOT CAUSE INSIGHTS
+================================================================================
+
+Why did test RMSE worsen?
+
+1. VALIDATION SPLIT EFFECT:
+   - OLD: 80% train (91,602 samples) / 20% test
+   - NEW: 60% train (68,701 samples) / 20% valid / 20% test
+   - Lost 25% of training data (22,901 samples)
+   - Less data to learn patterns
+
+2. TEMPORAL SHIFT:
+   - Train: 2018-2023 (5.4 years)
+   - Valid: 2023-2024 (1.4 years)
+   - Test: 2024-2025 (1.2 years)
+   - Each period has different market dynamics
+
+3. TOO MUCH REGULARIZATION:
+   - 50x increase may be excessive
+   - Model can't fit even valid patterns
+   - Need to find middle ground
+
+4. COMPLEXITY TOO LOW:
+   - 15 leaves may be too few for 84 features
+   - Max depth 6 may be too shallow
+   - 300 trees may be insufficient
+
+================================================================================
+FEATURE IMPORTANCE UNCHANGED
+================================================================================
+
+Top features remain same as baseline:
+1. segment_avg_fee
+2. state_avg_fee
+3. segment_win_rate
+4. segment_std_fee
+5. client_avg_fee
+
+Regularization didn't change which features matter,
+just how aggressively the model uses them.
+
+================================================================================
+RECOMMENDATIONS
+================================================================================
+
+Current regularization is TOO AGGRESSIVE. Need to find optimal middle ground.
+
+Option A: MODERATE REGULARIZATION (Recommended)
+   - reg_alpha: 1.0 (10x increase, not 50x)
+   - reg_lambda: 1.0
+   - num_leaves: 20 (between 15 and 31)
+   - max_depth: 8 (between 6 and unlimited)
+   - num_boost_round: 500 (between 300 and 1000)
+   - min_child_samples: 30 (between 20 and 50)
+   - Keep validation split (60/20/20)
+
+Option B: GRID SEARCH
+   Systematically test combinations:
+   - reg_alpha/lambda: [0.5, 1.0, 2.0, 5.0]
+   - num_leaves: [15, 20, 25, 31]
+   - max_depth: [6, 8, 10, -1]
+   - Find optimal trade-off
+
+Option C: INCREASE TRAINING DATA
+   - Use 70/15/15 split instead of 60/20/20
+   - Give model more data to learn
+   - Still maintain separate validation set
+
+Option D: ENSEMBLE APPROACH
+   - Train multiple models with different regularization
+   - Average predictions to reduce overfitting
+   - May achieve better generalization
+
+================================================================================
+EXPECTED OUTCOMES
+================================================================================
+
+With Moderate Regularization (Option A):
+  - Train RMSE: ~$150-180 (between $82 and $238)
+  - Valid RMSE: ~$350-400 (between $297 and $519)
+  - Test RMSE: ~$350-400 (target: beat $297 baseline)
+  - Overfitting ratio: 2.0-2.5x (moderate, acceptable)
+
+Target: Test RMSE < $300 with overfitting ratio < 2.5x
+
+================================================================================
+CONCLUSION
+================================================================================
+
+The aggressive regularization experiment was PARTIALLY SUCCESSFUL:
+✓ Reduced overfitting from severe (3.6x) to moderate (2.36x)
+✗ But test performance degraded significantly ($297 → $560)
+
+The approach is correct (regularization + proper validation split),
+but the parameters are too aggressive. Need to tune to find optimal balance
+between model complexity and generalization.
+
+Next step: Try moderate regularization (Option A) to find sweet spot.
+
+================================================================================

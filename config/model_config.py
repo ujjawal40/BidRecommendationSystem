@@ -74,30 +74,31 @@ TRAIN_TEST_SPLIT = {
 # ============================================================================
 
 LIGHTGBM_CONFIG = {
-    # Model hyperparameters
+    # Model hyperparameters - AGGRESSIVE REGULARIZATION to fix overfitting
     "params": {
         "objective": "regression",
         "metric": "rmse",
         "boosting_type": "gbdt",
-        "num_leaves": 31,
+        "num_leaves": 15,  # Was 31 (reduced by 50% - simpler trees)
         "learning_rate": 0.05,
         "feature_fraction": 0.8,
         "bagging_fraction": 0.8,
         "bagging_freq": 5,
-        "max_depth": -1,
-        "min_child_samples": 20,
-        "reg_alpha": 0.1,  # L1 regularization
-        "reg_lambda": 0.1,  # L2 regularization
+        "max_depth": 6,  # Was -1/unlimited (capped to prevent deep trees)
+        "min_child_samples": 50,  # Was 20 (force larger leaf nodes)
+        "min_child_weight": 10,  # NEW: Additional weight-based regularization
+        "reg_alpha": 5.0,  # Was 0.1 (50x increase - strong L1 penalty)
+        "reg_lambda": 5.0,  # Was 0.1 (50x increase - strong L2 penalty)
         "random_state": 42,
         "n_jobs": -1,
         "verbose": -1,
     },
 
-    # Training parameters
+    # Training parameters - Fewer trees with proper validation
     "training": {
-        "num_boost_round": 1000,
+        "num_boost_round": 300,  # Was 1000 (70% reduction - prevent overfitting)
         "early_stopping_rounds": 50,
-        "verbose_eval": 100,
+        "verbose_eval": 50,  # Report every 50 rounds
     },
 
     # Feature importance

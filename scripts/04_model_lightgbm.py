@@ -199,29 +199,42 @@ class LightGBMBidFeePredictor:
             Sets self.X_train, self.X_test, self.y_train, self.y_test
         """
         print("=" * 80)
-        print("TIME-BASED TRAIN/TEST SPLIT")
+        print("TIME-BASED TRAIN/VALIDATION/TEST SPLIT")
         print("=" * 80)
 
-        train_ratio = TRAIN_TEST_SPLIT["train_ratio"]
-        split_idx = int(len(df) * train_ratio)
+        # Split: 60% train, 20% validation, 20% test
+        train_ratio = 0.6
+        valid_ratio = 0.2
+
+        train_split_idx = int(len(df) * train_ratio)
+        valid_split_idx = int(len(df) * (train_ratio + valid_ratio))
 
         # Split data chronologically
-        self.X_train = X.iloc[:split_idx].copy()
-        self.X_test = X.iloc[split_idx:].copy()
-        self.y_train = y.iloc[:split_idx].copy()
-        self.y_test = y.iloc[split_idx:].copy()
+        self.X_train = X.iloc[:train_split_idx].copy()
+        self.X_valid = X.iloc[train_split_idx:valid_split_idx].copy()
+        self.X_test = X.iloc[valid_split_idx:].copy()
+
+        self.y_train = y.iloc[:train_split_idx].copy()
+        self.y_valid = y.iloc[train_split_idx:valid_split_idx].copy()
+        self.y_test = y.iloc[valid_split_idx:].copy()
 
         # Get date ranges
-        train_dates = df[DATE_COLUMN].iloc[:split_idx]
-        test_dates = df[DATE_COLUMN].iloc[split_idx:]
+        train_dates = df[DATE_COLUMN].iloc[:train_split_idx]
+        valid_dates = df[DATE_COLUMN].iloc[train_split_idx:valid_split_idx]
+        test_dates = df[DATE_COLUMN].iloc[valid_split_idx:]
 
-        print(f"Train/Test ratio: {train_ratio:.0%} / {1-train_ratio:.0%}")
+        print(f"Split ratio: 60% train / 20% validation / 20% test")
         print(f"\nTraining set:")
         print(f"  Rows: {len(self.X_train):,}")
         print(f"  Date range: {train_dates.min()} to {train_dates.max()}")
         print(f"  Target mean: ${self.y_train.mean():,.2f}")
 
-        print(f"\nTest set:")
+        print(f"\nValidation set (for early stopping):")
+        print(f"  Rows: {len(self.X_valid):,}")
+        print(f"  Date range: {valid_dates.min()} to {valid_dates.max()}")
+        print(f"  Target mean: ${self.y_valid.mean():,.2f}")
+
+        print(f"\nTest set (held out):")
         print(f"  Rows: {len(self.X_test):,}")
         print(f"  Date range: {test_dates.min()} to {test_dates.max()}")
         print(f"  Target mean: ${self.y_test.mean():,.2f}\n")
@@ -248,9 +261,10 @@ class LightGBMBidFeePredictor:
             feature_name=self.feature_names,
         )
 
+        # CRITICAL: Use validation set for early stopping, NOT test set
         valid_data = lgb.Dataset(
-            self.X_test,
-            label=self.y_test,
+            self.X_valid,
+            label=self.y_valid,
             feature_name=self.feature_names,
             reference=train_data,
         )
@@ -261,15 +275,17 @@ class LightGBMBidFeePredictor:
         early_stopping_rounds = self.config["training"]["early_stopping_rounds"]
         verbose_eval = self.config["training"]["verbose_eval"]
 
-        print("Training configuration:")
-        print(f"  Boosting rounds: {num_boost_round}")
-        print(f"  Early stopping: {early_stopping_rounds} rounds")
+        print("Training configuration (AGGRESSIVE REGULARIZATION):")
+        print(f"  Boosting rounds: {num_boost_round} (reduced from 1000)")
+        print(f"  Early stopping: {early_stopping_rounds} rounds (on validation set)")
         print(f"  Learning rate: {params['learning_rate']}")
-        print(f"  Num leaves: {params['num_leaves']}")
-        print(f"  Max depth: {params['max_depth']}")
+        print(f"  Num leaves: {params['num_leaves']} (reduced from 31)")
+        print(f"  Max depth: {params['max_depth']} (capped from unlimited)")
+        print(f"  Min child samples: {params['min_child_samples']} (increased from 20)")
+        print(f"  Regularization: L1={params['reg_alpha']}, L2={params['reg_lambda']} (50x increase)")
         print("\nTraining in progress...\n")
 
-        # Train model
+        # Train model - monitor ONLY validation set for early stopping
         callbacks = [
             lgb.early_stopping(stopping_rounds=early_stopping_rounds),
             lgb.log_evaluation(period=verbose_eval),
@@ -279,8 +295,8 @@ class LightGBMBidFeePredictor:
             params,
             train_data,
             num_boost_round=num_boost_round,
-            valid_sets=[train_data, valid_data],
-            valid_names=["train", "valid"],
+            valid_sets=[valid_data],  # ONLY validation set (not train_data!)
+            valid_names=["valid"],
             callbacks=callbacks,
         )
 
@@ -307,36 +323,71 @@ class LightGBMBidFeePredictor:
             Dictionary of evaluation metrics
         """
         print("=" * 80)
-        print("MODEL EVALUATION")
+        print("MODEL EVALUATION - OVERFITTING ANALYSIS")
         print("=" * 80)
 
-        # Generate predictions
+        # Generate predictions for all sets
+        train_preds = self.model.predict(self.X_train, num_iteration=self.model.best_iteration)
+        valid_preds = self.model.predict(self.X_valid, num_iteration=self.model.best_iteration)
         self.predictions = self.model.predict(self.X_test, num_iteration=self.model.best_iteration)
 
-        # Calculate metrics
-        rmse = np.sqrt(mean_squared_error(self.y_test, self.predictions))
-        mae = mean_absolute_error(self.y_test, self.predictions)
-        r2 = r2_score(self.y_test, self.predictions)
-        mape = np.mean(np.abs((self.y_test - self.predictions) / self.y_test)) * 100
-        median_ae = median_absolute_error(self.y_test, self.predictions)
+        # Calculate metrics for all sets
+        train_rmse = np.sqrt(mean_squared_error(self.y_train, train_preds))
+        valid_rmse = np.sqrt(mean_squared_error(self.y_valid, valid_preds))
+        test_rmse = np.sqrt(mean_squared_error(self.y_test, self.predictions))
+
+        train_mae = mean_absolute_error(self.y_train, train_preds)
+        valid_mae = mean_absolute_error(self.y_valid, valid_preds)
+        test_mae = mean_absolute_error(self.y_test, self.predictions)
+
+        test_r2 = r2_score(self.y_test, self.predictions)
+        test_mape = np.mean(np.abs((self.y_test - self.predictions) / self.y_test)) * 100
+        test_median_ae = median_absolute_error(self.y_test, self.predictions)
+
+        # Overfitting ratios
+        valid_train_ratio = valid_rmse / train_rmse if train_rmse > 0 else 0
+        test_train_ratio = test_rmse / train_rmse if train_rmse > 0 else 0
 
         self.metrics = {
-            "rmse": rmse,
-            "mae": mae,
-            "r2": r2,
-            "mape": mape,
-            "median_ae": median_ae,
+            "train_rmse": train_rmse,
+            "valid_rmse": valid_rmse,
+            "test_rmse": test_rmse,
+            "rmse": test_rmse,
+            "mae": test_mae,
+            "r2": test_r2,
+            "mape": test_mape,
+            "median_ae": test_median_ae,
+            "overfitting_ratio": test_train_ratio,
         }
 
-        print("Test Set Performance:")
-        print(f"  RMSE: ${rmse:,.2f}")
-        print(f"  MAE: ${mae:,.2f}")
-        print(f"  R²: {r2:.4f}")
-        print(f"  MAPE: {mape:.2f}%")
-        print(f"  Median AE: ${median_ae:,.2f}\n")
+        print("Performance Across All Sets:")
+        print(f"  {'Set':12s} {'RMSE':>12s} {'MAE':>12s} {'% Error':>10s}")
+        print(f"  {'-'*12} {'-'*12} {'-'*12} {'-'*10}")
+        print(f"  {'Train':12s} ${train_rmse:>10,.2f} ${train_mae:>10,.2f} {(train_rmse/self.y_train.mean())*100:>9.1f}%")
+        print(f"  {'Validation':12s} ${valid_rmse:>10,.2f} ${valid_mae:>10,.2f} {(valid_rmse/self.y_valid.mean())*100:>9.1f}%")
+        print(f"  {'Test':12s} ${test_rmse:>10,.2f} ${test_mae:>10,.2f} {(test_rmse/self.y_test.mean())*100:>9.1f}%")
+
+        print(f"\nOverfitting Analysis:")
+        print(f"  Valid/Train ratio: {valid_train_ratio:.2f}x")
+        print(f"  Test/Train ratio:  {test_train_ratio:.2f}x")
+        if test_train_ratio < 1.5:
+            print(f"  Status: ✓ Good generalization")
+        elif test_train_ratio < 2.5:
+            print(f"  Status: ⚠ Moderate overfitting (acceptable)")
+        elif test_train_ratio < 3.5:
+            print(f"  Status: ⚠⚠ High overfitting (concerning)")
+        else:
+            print(f"  Status: ⚠⚠⚠ Severe overfitting (problematic)")
+
+        print(f"\nTest Set Metrics:")
+        print(f"  RMSE: ${test_rmse:,.2f}")
+        print(f"  MAE: ${test_mae:,.2f}")
+        print(f"  R²: {test_r2:.4f}")
+        print(f"  MAPE: {test_mape:.2f}%")
+        print(f"  Median AE: ${test_median_ae:,.2f}\n")
 
         # Prediction statistics
-        print("Prediction Statistics:")
+        print("Test Prediction Statistics:")
         print(f"  Mean prediction: ${self.predictions.mean():,.2f}")
         print(f"  Std prediction: ${self.predictions.std():,.2f}")
         print(f"  Min prediction: ${self.predictions.min():,.2f}")
