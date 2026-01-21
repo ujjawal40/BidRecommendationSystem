@@ -121,9 +121,47 @@ class LightGBMBidFeePredictor:
         # Sort by date for time-aware split
         df = df.sort_values(DATE_COLUMN).reset_index(drop=True)
         print(f"✓ Data sorted by {DATE_COLUMN}")
-        print(f"  Date range: {df[DATE_COLUMN].min()} to {df[DATE_COLUMN].max()}\n")
+        print(f"  Full date range: {df[DATE_COLUMN].min()} to {df[DATE_COLUMN].max()}")
+        print(f"  Total records: {len(df):,}\n")
 
         return df
+
+    def filter_recent_data(self, df, start_date='2023-01-01'):
+        """
+        Filter dataset to only include recent data from start_date onwards.
+
+        This addresses temporal distribution shift - if market dynamics changed
+        significantly, training on only recent data may improve generalization.
+
+        Parameters
+        ----------
+        df : pd.DataFrame
+            Input dataset
+        start_date : str
+            Start date for filtering (default: '2023-01-01')
+
+        Returns
+        -------
+        pd.DataFrame
+            Filtered dataset
+        """
+        print("=" * 80)
+        print("FILTERING TO RECENT DATA")
+        print("=" * 80)
+
+        start_date = pd.to_datetime(start_date)
+        original_count = len(df)
+
+        df_filtered = df[df[DATE_COLUMN] >= start_date].copy()
+
+        print(f"\n✓ Filtered to data from {start_date.date()} onwards")
+        print(f"  Original records: {original_count:,}")
+        print(f"  Filtered records: {len(df_filtered):,}")
+        print(f"  Removed: {original_count - len(df_filtered):,} ({(original_count - len(df_filtered))/original_count*100:.1f}%)")
+        print(f"  New date range: {df_filtered[DATE_COLUMN].min()} to {df_filtered[DATE_COLUMN].max()}")
+        print(f"  Timespan: {(df_filtered[DATE_COLUMN].max() - df_filtered[DATE_COLUMN].min()).days / 365.25:.1f} years\n")
+
+        return df_filtered
 
     def prepare_features(self, df):
         """
@@ -569,6 +607,10 @@ class LightGBMBidFeePredictor:
         """
         # Load and prepare data
         df = self.load_data()
+
+        # Filter to recent data (2023+) to address temporal shift
+        df = self.filter_recent_data(df, start_date='2023-01-01')
+
         X, y = self.prepare_features(df)
 
         # Train/test split

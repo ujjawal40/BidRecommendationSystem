@@ -74,29 +74,29 @@ TRAIN_TEST_SPLIT = {
 # ============================================================================
 
 LIGHTGBM_CONFIG = {
-    # Model hyperparameters - AGGRESSIVE REGULARIZATION to fix overfitting
+    # Model hyperparameters - MODERATE REGULARIZATION + Recent data (2023+)
     "params": {
         "objective": "regression",
         "metric": "rmse",
         "boosting_type": "gbdt",
-        "num_leaves": 15,  # Was 31 (reduced by 50% - simpler trees)
+        "num_leaves": 20,  # Moderate (was 31 originally, 15 was too aggressive)
         "learning_rate": 0.05,
         "feature_fraction": 0.8,
         "bagging_fraction": 0.8,
         "bagging_freq": 5,
-        "max_depth": 6,  # Was -1/unlimited (capped to prevent deep trees)
-        "min_child_samples": 50,  # Was 20 (force larger leaf nodes)
-        "min_child_weight": 10,  # NEW: Additional weight-based regularization
-        "reg_alpha": 5.0,  # Was 0.1 (50x increase - strong L1 penalty)
-        "reg_lambda": 5.0,  # Was 0.1 (50x increase - strong L2 penalty)
+        "max_depth": 8,  # Moderate (was unlimited, 6 was too restrictive)
+        "min_child_samples": 30,  # Moderate (was 20 originally, 50 was too aggressive)
+        "min_child_weight": 5,  # Moderate weight-based regularization
+        "reg_alpha": 1.0,  # 10x increase from 0.1 (was 5.0 - too aggressive)
+        "reg_lambda": 1.0,  # 10x increase from 0.1 (was 5.0 - too aggressive)
         "random_state": 42,
         "n_jobs": -1,
         "verbose": -1,
     },
 
-    # Training parameters - Fewer trees with proper validation
+    # Training parameters - Moderate number of trees
     "training": {
-        "num_boost_round": 300,  # Was 1000 (70% reduction - prevent overfitting)
+        "num_boost_round": 500,  # Moderate (was 1000 originally, 300 was too few)
         "early_stopping_rounds": 50,
         "verbose_eval": 50,  # Report every 50 rounds
     },
