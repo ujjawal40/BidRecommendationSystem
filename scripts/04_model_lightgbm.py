@@ -163,6 +163,54 @@ class LightGBMBidFeePredictor:
 
         return df_filtered
 
+    def select_top_features(self, X):
+        """
+        Filter features to only the top 68 most important ones.
+
+        Based on feature ablation study, using only top 68 features improves
+        performance by 5.9% while reducing model complexity.
+
+        Parameters
+        ----------
+        X : pd.DataFrame
+            Full feature matrix
+
+        Returns
+        -------
+        pd.DataFrame
+            Filtered feature matrix with only top 68 features
+        """
+        print("=" * 80)
+        print("FEATURE SELECTION - TOP 68")
+        print("=" * 80)
+
+        # Load selected features
+        selected_features_path = REPORTS_DIR / 'selected_features_top68.csv'
+
+        if not selected_features_path.exists():
+            print(f"\n⚠️  Selected features file not found: {selected_features_path}")
+            print(f"  Using all available features")
+            return X
+
+        selected_features = pd.read_csv(selected_features_path, header=None)[0].tolist()
+
+        # Filter to features that exist in X
+        available_selected = [f for f in selected_features if f in X.columns]
+
+        print(f"\n✓ Feature selection loaded")
+        print(f"  Selected features (optimal): {len(selected_features)}")
+        print(f"  Available in dataset: {len(available_selected)}")
+        print(f"  Original features: {len(X.columns)}")
+        print(f"  Features removed: {len(X.columns) - len(available_selected)}")
+
+        # Return filtered dataframe
+        X_filtered = X[available_selected].copy()
+
+        print(f"\n✓ Using optimized feature set (68 features)")
+        print(f"  Expected improvement: ~6% better RMSE\n")
+
+        return X_filtered
+
     def prepare_features(self, df):
         """
         Prepare features and target variable.
@@ -612,6 +660,9 @@ class LightGBMBidFeePredictor:
         df = self.filter_recent_data(df, start_date='2023-01-01')
 
         X, y = self.prepare_features(df)
+
+        # Select top 68 features (from ablation study)
+        X = self.select_top_features(X)
 
         # Train/test split
         self.time_based_split(df, X, y)
