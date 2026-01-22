@@ -664,6 +664,9 @@ class LightGBMBidFeePredictor:
         # Select top 68 features (from ablation study)
         X = self.select_top_features(X)
 
+        # Update feature names after selection
+        self.feature_names = X.columns.tolist()
+
         # Train/test split
         self.time_based_split(df, X, y)
 
