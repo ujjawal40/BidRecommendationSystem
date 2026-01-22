@@ -55,17 +55,22 @@ print(f"\n✓ Data loaded and filtered to 2023+")
 print(f"  Records: {len(df):,}")
 print(f"  Date range: {df[DATE_COLUMN].min()} to {df[DATE_COLUMN].max()}")
 
-# Prepare features
-feature_cols = [col for col in df.columns if col not in EXCLUDE_COLUMNS]
-X = df[feature_cols].fillna(0)
-y = df[TARGET_COLUMN]
-
-print(f"\n  Total features: {len(feature_cols)}")
-print(f"  Target mean: ${y.mean():,.2f}")
-
-# Load feature importance
+# Load feature importance first to know which features were actually used
 fi_df = pd.read_csv(REPORTS_DIR / 'lightgbm_feature_importance.csv')
 print(f"\n✓ Feature importance loaded: {len(fi_df)} features")
+
+# Use ONLY the features that were in the trained model
+feature_cols = fi_df['feature'].tolist()
+
+# Filter to features that exist in dataset
+available_features = [col for col in feature_cols if col in df.columns]
+
+X = df[available_features].fillna(0)
+y = df[TARGET_COLUMN]
+
+print(f"\n  Features in importance file: {len(feature_cols)}")
+print(f"  Features available in data: {len(available_features)}")
+print(f"  Target mean: ${y.mean():,.2f}")
 
 # ============================================================================
 # SPLIT DATA
@@ -101,7 +106,7 @@ print("\n" + "=" * 80)
 print("STEP 3: BASELINE - ALL FEATURES")
 print("=" * 80)
 
-print(f"\n📊 Training baseline model with ALL {len(feature_cols)} features...")
+print(f"\n📊 Training baseline model with ALL {len(available_features)} features...")
 
 train_data = lgb.Dataset(X_train, label=y_train)
 valid_data = lgb.Dataset(X_valid, label=y_valid, reference=train_data)
@@ -147,7 +152,7 @@ results = []
 # Add baseline result
 results.append({
     'removal_pct': 0,
-    'num_features': len(feature_cols),
+    'num_features': len(available_features),
     'features_removed': 0,
     'test_rmse': baseline_rmse,
     'test_mae': baseline_mae,
@@ -262,14 +267,14 @@ print(f"\n✓ Results saved: {csv_path}")
 report = {
     'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
     'baseline': {
-        'num_features': len(feature_cols),
+        'num_features': len(available_features),
         'test_rmse': float(baseline_rmse),
         'test_mae': float(baseline_mae),
     },
     'experiments': results_df.to_dict('records'),
     'optimal_config': {
         'removal_pct': int(optimal['removal_pct']) if len(acceptable_results) > 1 else 0,
-        'num_features': int(optimal['num_features']) if len(acceptable_results) > 1 else len(feature_cols),
+        'num_features': int(optimal['num_features']) if len(acceptable_results) > 1 else len(available_features),
         'rmse_change_pct': float(optimal['rmse_change_pct']) if len(acceptable_results) > 1 else 0.0,
     } if len(acceptable_results) > 1 else None,
     'recommendation': 'Simplify model' if len(acceptable_results) > 1 else 'Keep all features',
