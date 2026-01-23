@@ -23,7 +23,7 @@ ROOT_DIR = Path(__file__).parent.parent
 
 # Data paths
 DATA_DIR = ROOT_DIR / "data"
-FEATURES_DATA = DATA_DIR / "features" / "BidData_features.csv"  # Baseline features (NO JobData - enrichment degraded performance)
+FEATURES_DATA = DATA_DIR / "features" / "BidData_features.csv"  # Baseline: All JobData approaches failed (static, selective, competitive)
 PROCESSED_DATA = DATA_DIR / "processed" / "BidData_processed.csv"
 
 # ============================================================================
@@ -113,36 +113,31 @@ TRAIN_TEST_SPLIT = {
 # ============================================================================
 
 LIGHTGBM_CONFIG = {
-    # Model hyperparameters (OPTIMIZED - see regularization_grid_search_results.csv)
-    # Changes from baseline:
-    # - Increased regularization (0.1 → 1.0) to reduce overfitting
-    # - Reduced num_leaves (31 → 20) for simpler trees
-    # - Added max_depth cap (8) to prevent deep trees
-    # - Increased min_child_samples (20 → 30) for more robust splits
+    # Model hyperparameters - MODERATE REGULARIZATION + Recent data (2023+)
     "params": {
         "objective": "regression",
         "metric": "rmse",
         "boosting_type": "gbdt",
-        "num_leaves": 20,           # Reduced from 31 (simpler trees)
+        "num_leaves": 20,  # Moderate (was 31 originally, 15 was too aggressive)
         "learning_rate": 0.05,
         "feature_fraction": 0.8,
         "bagging_fraction": 0.8,
         "bagging_freq": 5,
-        "max_depth": 8,             # Added cap (was unlimited)
-        "min_child_samples": 30,    # Increased from 20 (more robust)
-        "min_child_weight": 5,      # Added for additional regularization
-        "reg_alpha": 1.0,           # L1 regularization (increased from 0.1)
-        "reg_lambda": 1.0,          # L2 regularization (increased from 0.1)
+        "max_depth": 8,  # Moderate (was unlimited, 6 was too restrictive)
+        "min_child_samples": 30,  # Moderate (was 20 originally, 50 was too aggressive)
+        "min_child_weight": 5,  # Moderate weight-based regularization
+        "reg_alpha": 1.0,  # 10x increase from 0.1 (was 5.0 - too aggressive)
+        "reg_lambda": 1.0,  # 10x increase from 0.1 (was 5.0 - too aggressive)
         "random_state": 42,
         "n_jobs": -1,
         "verbose": -1,
     },
 
-    # Training parameters
+    # Training parameters - Moderate number of trees
     "training": {
-        "num_boost_round": 500,     # Reduced from 1000 (with early stopping)
+        "num_boost_round": 500,  # Moderate (was 1000 originally, 300 was too few)
         "early_stopping_rounds": 50,
-        "verbose_eval": 100,
+        "verbose_eval": 50,  # Report every 50 rounds
     },
 
     # Feature importance

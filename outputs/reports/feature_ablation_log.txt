@@ -1,0 +1,167 @@
+Error processing line 1 of /Users/ujjawaldwivedi/anaconda3/lib/python3.11/site-packages/distutils-precedence.pth:
+
+  Traceback (most recent call last):
+    File "<frozen site>", line 186, in addpackage
+    File "<string>", line 1, in <module>
+  ModuleNotFoundError: No module named '_distutils_hack'
+
+Remainder of file ignored
+/Users/ujjawaldwivedi/anaconda3/lib/python3.11/site-packages/pandas/core/arrays/masked.py:61: UserWarning: Pandas requires version '1.3.6' or newer of 'bottleneck' (version '1.3.5' currently installed).
+  from pandas.core import (
+================================================================================
+FEATURE ABLATION STUDY
+================================================================================
+Timestamp: 2026-01-21 19:19:56
+
+================================================================================
+STEP 1: LOAD DATA AND FEATURE IMPORTANCE
+================================================================================
+
+✓ Data loaded and filtered to 2023+
+  Records: 52,308
+  Date range: 2023-01-03 00:00:00 to 2025-12-19 00:00:00
+
+✓ Feature importance loaded: 84 features
+
+  Features in importance file: 84
+  Features available in data: 84
+  Target mean: $3,258.88
+
+================================================================================
+STEP 2: TRAIN/VALIDATION/TEST SPLIT
+================================================================================
+
+Split: 60% train / 20% validation / 20% test
+  Train: 31,384 samples
+  Valid: 10,462 samples
+  Test:  10,462 samples
+
+================================================================================
+STEP 3: BASELINE - ALL FEATURES
+================================================================================
+
+📊 Training baseline model with ALL 84 features...
+Training until validation scores don't improve for 50 rounds
+Did not meet early stopping. Best iteration is:
+[500]	valid_0's rmse: 351.657
+✓ Baseline trained
+  Features: 84
+  Test RMSE: $349.32
+  Test MAE: $103.99
+
+================================================================================
+STEP 4: FEATURE ABLATION EXPERIMENTS
+================================================================================
+
+================================================================================
+EXPERIMENT: Remove bottom 10% features
+================================================================================
+
+📊 Configuration:
+  Features to remove: 8 (10%)
+  Features to keep: 76
+Training until validation scores don't improve for 50 rounds
+Did not meet early stopping. Best iteration is:
+[500]	valid_0's rmse: 346.42
+
+✓ Results:
+  Test RMSE: $339.73
+  Test MAE: $103.43
+  RMSE change: $-9.59 (-2.75%)
+
+================================================================================
+EXPERIMENT: Remove bottom 20% features
+================================================================================
+
+📊 Configuration:
+  Features to remove: 16 (20%)
+  Features to keep: 68
+Training until validation scores don't improve for 50 rounds
+Did not meet early stopping. Best iteration is:
+[500]	valid_0's rmse: 350.947
+
+✓ Results:
+  Test RMSE: $328.75
+  Test MAE: $102.44
+  RMSE change: $-20.58 (-5.89%)
+
+================================================================================
+EXPERIMENT: Remove bottom 30% features
+================================================================================
+
+📊 Configuration:
+  Features to remove: 25 (30%)
+  Features to keep: 59
+Training until validation scores don't improve for 50 rounds
+Did not meet early stopping. Best iteration is:
+[500]	valid_0's rmse: 354.01
+
+✓ Results:
+  Test RMSE: $338.78
+  Test MAE: $108.09
+  RMSE change: $-10.54 (-3.02%)
+
+================================================================================
+EXPERIMENT: Remove bottom 40% features
+================================================================================
+
+📊 Configuration:
+  Features to remove: 33 (40%)
+  Features to keep: 51
+Training until validation scores don't improve for 50 rounds
+Did not meet early stopping. Best iteration is:
+[500]	valid_0's rmse: 344
+
+✓ Results:
+  Test RMSE: $332.80
+  Test MAE: $96.30
+  RMSE change: $-16.52 (-4.73%)
+
+================================================================================
+EXPERIMENT: Remove bottom 50% features
+================================================================================
+
+📊 Configuration:
+  Features to remove: 42 (50%)
+  Features to keep: 42
+Training until validation scores don't improve for 50 rounds
+Did not meet early stopping. Best iteration is:
+[500]	valid_0's rmse: 360.369
+
+✓ Results:
+  Test RMSE: $352.01
+  Test MAE: $113.41
+  RMSE change: $+2.69 (+0.77%)
+
+================================================================================
+ABLATION STUDY RESULTS SUMMARY
+================================================================================
+
+ removal_pct  num_features  features_removed  test_rmse   test_mae  rmse_change  rmse_change_pct
+           0            84                 0 349.322473 103.988007     0.000000         0.000000
+          10            76                 8 339.727832 103.434831    -9.594641        -2.746643
+          20            68                16 328.746411 102.443063   -20.576062        -5.890277
+          30            59                25 338.781586 108.086007   -10.540887        -3.017523
+          40            51                33 332.798781  96.303348   -16.523692        -4.730212
+          50            42                42 352.007729 113.413912     2.685257         0.768704
+
+================================================================================
+OPTIMAL CONFIGURATION FOUND
+================================================================================
+  Remove bottom 50% features
+  Keep 42 features (remove 42)
+  Test RMSE: $352.01
+  RMSE change: $+2.69 (+0.77%)
+
+  ✓ Achieves <1.0% performance degradation with fewer features
+
+================================================================================
+SAVING RESULTS
+================================================================================
+
+✓ Results saved: /Users/ujjawaldwivedi/Desktop/BidRecommendationSystem/outputs/reports/feature_ablation_results.csv
+✓ Report saved: /Users/ujjawaldwivedi/Desktop/BidRecommendationSystem/outputs/reports/feature_ablation_report.json
+
+================================================================================
+ABLATION STUDY COMPLETE
+================================================================================

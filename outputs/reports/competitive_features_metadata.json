@@ -1,0 +1,21 @@
+{
+  "creation_date": "2026-01-20 16:40:55",
+  "jobdata_records": 532323,
+  "biddata_records": 114503,
+  "enriched_records": 114503,
+  "original_features": 123,
+  "new_features": 8,
+  "total_features": 134,
+  "competitive_features": [
+    "office_win_trend_ratio",
+    "office_win_trend_slope",
+    "office_seasonality_strength",
+    "office_client_retention_rate",
+    "office_repeat_job_rate",
+    "office_avg_jobs_per_client",
+    "is_office_peak_month",
+    "is_office_peak_quarter"
+  ],
+  "approach": "Competitive Intelligence (momentum, seasonality, loyalty)",
+  "why_different": "Extracts dynamic patterns instead of static aggregates"
+}
