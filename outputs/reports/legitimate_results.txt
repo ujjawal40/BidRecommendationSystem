@@ -1,0 +1,7 @@
+Baseline: $237.57 RMSE, 2.57x overfitting
+LightGBM Optuna: $279.32 RMSE (WORSE)
+XGBoost Optuna: $351.34 RMSE (WORSE)
+Neural Network: $1,736.32 RMSE (TERRIBLE)
+Feature Eng V2: $68.87 RMSE (DATA LEAKAGE - INVALID)
+
+Real status: NO IMPROVEMENT over baseline $237.57

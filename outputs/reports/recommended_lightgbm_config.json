@@ -1,0 +1,30 @@
+{
+  "name": "Mild + leaves=15",
+  "params": {
+    "objective": "regression",
+    "metric": "rmse",
+    "boosting_type": "gbdt",
+    "learning_rate": 0.05,
+    "feature_fraction": 0.8,
+    "bagging_fraction": 0.8,
+    "bagging_freq": 5,
+    "reg_alpha": 0.5,
+    "reg_lambda": 0.5,
+    "num_leaves": 15,
+    "max_depth": -1,
+    "min_child_samples": 20,
+    "random_state": 42,
+    "verbose": -1
+  },
+  "training": {
+    "num_boost_round": 500,
+    "early_stopping_rounds": 30
+  },
+  "expected_metrics": {
+    "train_rmse": 146.9427854564992,
+    "valid_rmse": 382.37867830044473,
+    "test_rmse": 429.08843597617295,
+    "overfit_ratio": 2.9201054998593303
+  },
+  "search_date": "2026-01-20 19:50:35"
+}
