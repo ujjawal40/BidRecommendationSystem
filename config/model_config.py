@@ -23,8 +23,47 @@ ROOT_DIR = Path(__file__).parent.parent
 
 # Data paths
 DATA_DIR = ROOT_DIR / "data"
-FEATURES_DATA = DATA_DIR / "features" / "BidData_features.csv"  # REVERTED: JobData enrichment degraded performance (see jobdata_enrichment_final_results.txt)
+FEATURES_DATA = DATA_DIR / "features" / "BidData_features.csv"  # Baseline features (NO JobData - enrichment degraded performance)
 PROCESSED_DATA = DATA_DIR / "processed" / "BidData_processed.csv"
+
+# ============================================================================
+# DATA FILTERING CONFIGURATION
+# ============================================================================
+# Training on recent data (2023+) improves generalization
+# See: outputs/reports/recent_data_experiment_results.json
+DATA_START_DATE = "2023-01-01"  # Filter training data to 2023+ only
+USE_RECENT_DATA_ONLY = True     # Set to False to use all historical data
+
+# JobData features to EXCLUDE (they degrade performance - see jobdata_enrichment_final_results.txt)
+JOBDATA_FEATURES_TO_EXCLUDE = [
+    "office_job_volume",
+    "office_avg_job_fee",
+    "office_median_job_fee",
+    "office_job_fee_std",
+    "office_min_job_fee",
+    "office_max_job_fee",
+    "office_avg_appraisal_fee",
+    "office_median_appraisal_fee",
+    "office_master_job_pct",
+    "office_fee_range",
+    "office_fee_cv",
+    "office_avg_profit_margin",
+    "region_avg_job_fee",
+    "region_median_job_fee",
+    "region_job_volume",
+    "office_vs_region_premium",
+    "office_vs_region_ratio",
+    "office_region_encoded",
+    "office_primary_client_type_encoded",
+    "office_market_tier_encoded",
+    "property_region_avg_fee",
+    "property_region_median_fee",
+    "office_region",
+    "office_primary_property_type",
+    "office_primary_client_type",
+    "office_market_tier",
+    "PropertyType_enriched",
+]
 
 # Output paths
 OUTPUTS_DIR = ROOT_DIR / "outputs"
@@ -74,20 +113,26 @@ TRAIN_TEST_SPLIT = {
 # ============================================================================
 
 LIGHTGBM_CONFIG = {
-    # Model hyperparameters
+    # Model hyperparameters (OPTIMIZED - see regularization_grid_search_results.csv)
+    # Changes from baseline:
+    # - Increased regularization (0.1 → 1.0) to reduce overfitting
+    # - Reduced num_leaves (31 → 20) for simpler trees
+    # - Added max_depth cap (8) to prevent deep trees
+    # - Increased min_child_samples (20 → 30) for more robust splits
     "params": {
         "objective": "regression",
         "metric": "rmse",
         "boosting_type": "gbdt",
-        "num_leaves": 31,
+        "num_leaves": 20,           # Reduced from 31 (simpler trees)
         "learning_rate": 0.05,
         "feature_fraction": 0.8,
         "bagging_fraction": 0.8,
         "bagging_freq": 5,
-        "max_depth": -1,
-        "min_child_samples": 20,
-        "reg_alpha": 0.1,  # L1 regularization
-        "reg_lambda": 0.1,  # L2 regularization
+        "max_depth": 8,             # Added cap (was unlimited)
+        "min_child_samples": 30,    # Increased from 20 (more robust)
+        "min_child_weight": 5,      # Added for additional regularization
+        "reg_alpha": 1.0,           # L1 regularization (increased from 0.1)
+        "reg_lambda": 1.0,          # L2 regularization (increased from 0.1)
         "random_state": 42,
         "n_jobs": -1,
         "verbose": -1,
@@ -95,7 +140,7 @@ LIGHTGBM_CONFIG = {
 
     # Training parameters
     "training": {
-        "num_boost_round": 1000,
+        "num_boost_round": 500,     # Reduced from 1000 (with early stopping)
         "early_stopping_rounds": 50,
         "verbose_eval": 100,
     },

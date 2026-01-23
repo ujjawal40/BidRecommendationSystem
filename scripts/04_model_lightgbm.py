@@ -48,6 +48,9 @@ from config.model_config import (
     REPORTS_DIR,
     FIGURES_DIR,
     RANDOM_SEED,
+    DATA_START_DATE,
+    USE_RECENT_DATA_ONLY,
+    JOBDATA_FEATURES_TO_EXCLUDE,
 )
 
 
@@ -118,6 +121,15 @@ class LightGBMBidFeePredictor:
         # Convert BidDate to datetime
         df[DATE_COLUMN] = pd.to_datetime(df[DATE_COLUMN])
 
+        # Filter to recent data if configured (improves generalization)
+        if USE_RECENT_DATA_ONLY:
+            original_count = len(df)
+            start_date = pd.Timestamp(DATA_START_DATE)
+            df = df[df[DATE_COLUMN] >= start_date].copy()
+            print(f"✓ Filtered to {DATA_START_DATE}+ data")
+            print(f"  Removed: {original_count - len(df):,} older records")
+            print(f"  Remaining: {len(df):,} records")
+
         # Sort by date for time-aware split
         df = df.sort_values(DATE_COLUMN).reset_index(drop=True)
         print(f"✓ Data sorted by {DATE_COLUMN}")
@@ -145,14 +157,22 @@ class LightGBMBidFeePredictor:
         print("PREPARING FEATURES")
         print("=" * 80)
 
-        # Identify feature columns
+        # Identify feature columns (exclude IDs, targets, dates)
         feature_cols = [col for col in df.columns if col not in EXCLUDE_COLUMNS]
+
+        # Exclude JobData features (they degrade performance - see documentation)
+        jobdata_excluded = [col for col in feature_cols if col in JOBDATA_FEATURES_TO_EXCLUDE]
+        feature_cols = [col for col in feature_cols if col not in JOBDATA_FEATURES_TO_EXCLUDE]
+
+        if jobdata_excluded:
+            print(f"✓ Excluded {len(jobdata_excluded)} JobData features (degrade performance)")
 
         # Remove any remaining non-numeric columns
         numeric_features = df[feature_cols].select_dtypes(include=[np.number]).columns.tolist()
 
         print(f"Total columns: {df.shape[1]}")
         print(f"Excluded columns: {len(EXCLUDE_COLUMNS)}")
+        print(f"JobData features excluded: {len(jobdata_excluded)}")
         print(f"Feature columns: {len(numeric_features)}")
 
         # Extract features and target
@@ -179,10 +199,12 @@ class LightGBMBidFeePredictor:
 
     def time_based_split(self, df, X, y):
         """
-        Perform time-based train/test split to prevent data leakage.
+        Perform time-based train/valid/test split to prevent data leakage.
 
-        Uses chronological ordering to split data, ensuring no future information
-        leaks into training set.
+        Uses 60/20/20 split for proper validation during training:
+        - Train (60%): Model fitting
+        - Valid (20%): Early stopping and hyperparameter tuning
+        - Test (20%): Final unbiased evaluation
 
         Parameters
         ----------
@@ -196,41 +218,52 @@ class LightGBMBidFeePredictor:
         Returns
         -------
         None
-            Sets self.X_train, self.X_test, self.y_train, self.y_test
+            Sets self.X_train, self.X_valid, self.X_test, self.y_train, self.y_valid, self.y_test
         """
         print("=" * 80)
-        print("TIME-BASED TRAIN/TEST SPLIT")
+        print("TIME-BASED TRAIN/VALID/TEST SPLIT")
         print("=" * 80)
 
-        train_ratio = TRAIN_TEST_SPLIT["train_ratio"]
-        split_idx = int(len(df) * train_ratio)
+        # 60/20/20 split for train/valid/test
+        n = len(df)
+        train_idx = int(n * 0.6)
+        valid_idx = int(n * 0.8)
 
         # Split data chronologically
-        self.X_train = X.iloc[:split_idx].copy()
-        self.X_test = X.iloc[split_idx:].copy()
-        self.y_train = y.iloc[:split_idx].copy()
-        self.y_test = y.iloc[split_idx:].copy()
+        self.X_train = X.iloc[:train_idx].copy()
+        self.X_valid = X.iloc[train_idx:valid_idx].copy()
+        self.X_test = X.iloc[valid_idx:].copy()
+        self.y_train = y.iloc[:train_idx].copy()
+        self.y_valid = y.iloc[train_idx:valid_idx].copy()
+        self.y_test = y.iloc[valid_idx:].copy()
 
         # Get date ranges
-        train_dates = df[DATE_COLUMN].iloc[:split_idx]
-        test_dates = df[DATE_COLUMN].iloc[split_idx:]
+        train_dates = df[DATE_COLUMN].iloc[:train_idx]
+        valid_dates = df[DATE_COLUMN].iloc[train_idx:valid_idx]
+        test_dates = df[DATE_COLUMN].iloc[valid_idx:]
 
-        print(f"Train/Test ratio: {train_ratio:.0%} / {1-train_ratio:.0%}")
+        print(f"Split ratio: 60% train / 20% valid / 20% test")
         print(f"\nTraining set:")
         print(f"  Rows: {len(self.X_train):,}")
         print(f"  Date range: {train_dates.min()} to {train_dates.max()}")
         print(f"  Target mean: ${self.y_train.mean():,.2f}")
 
-        print(f"\nTest set:")
+        print(f"\nValidation set (for early stopping):")
+        print(f"  Rows: {len(self.X_valid):,}")
+        print(f"  Date range: {valid_dates.min()} to {valid_dates.max()}")
+        print(f"  Target mean: ${self.y_valid.mean():,.2f}")
+
+        print(f"\nTest set (final evaluation):")
         print(f"  Rows: {len(self.X_test):,}")
         print(f"  Date range: {test_dates.min()} to {test_dates.max()}")
         print(f"  Target mean: ${self.y_test.mean():,.2f}\n")
 
     def train_model(self):
         """
-        Train LightGBM model with early stopping.
+        Train LightGBM model with early stopping on validation set.
 
-        Uses configuration from LIGHTGBM_CONFIG for hyperparameters and training settings.
+        IMPORTANT: Uses validation set (not test set) for early stopping.
+        Test set is reserved for final unbiased evaluation only.
 
         Returns
         -------
@@ -248,9 +281,10 @@ class LightGBMBidFeePredictor:
             feature_name=self.feature_names,
         )
 
+        # Use VALIDATION set for early stopping (NOT test set!)
         valid_data = lgb.Dataset(
-            self.X_test,
-            label=self.y_test,
+            self.X_valid,
+            label=self.y_valid,
             feature_name=self.feature_names,
             reference=train_data,
         )
@@ -267,7 +301,8 @@ class LightGBMBidFeePredictor:
         print(f"  Learning rate: {params['learning_rate']}")
         print(f"  Num leaves: {params['num_leaves']}")
         print(f"  Max depth: {params['max_depth']}")
-        print("\nTraining in progress...\n")
+        print(f"  Regularization: L1={params['reg_alpha']}, L2={params['reg_lambda']}")
+        print("\nTraining in progress (early stopping on validation set)...\n")
 
         # Train model
         callbacks = [
@@ -292,14 +327,13 @@ class LightGBMBidFeePredictor:
 
     def evaluate_model(self):
         """
-        Evaluate model performance on test set.
+        Evaluate model performance on train, validation, and test sets.
 
-        Calculates multiple regression metrics:
+        Calculates metrics for all three sets to assess overfitting:
         - RMSE (Root Mean Squared Error)
         - MAE (Mean Absolute Error)
         - R² (R-squared)
-        - MAPE (Mean Absolute Percentage Error)
-        - Median Absolute Error
+        - Overfitting Ratio (Test RMSE / Train RMSE)
 
         Returns
         -------
@@ -310,30 +344,61 @@ class LightGBMBidFeePredictor:
         print("MODEL EVALUATION")
         print("=" * 80)
 
-        # Generate predictions
+        # Generate predictions for all sets
+        pred_train = self.model.predict(self.X_train, num_iteration=self.model.best_iteration)
+        pred_valid = self.model.predict(self.X_valid, num_iteration=self.model.best_iteration)
         self.predictions = self.model.predict(self.X_test, num_iteration=self.model.best_iteration)
 
-        # Calculate metrics
-        rmse = np.sqrt(mean_squared_error(self.y_test, self.predictions))
-        mae = mean_absolute_error(self.y_test, self.predictions)
-        r2 = r2_score(self.y_test, self.predictions)
-        mape = np.mean(np.abs((self.y_test - self.predictions) / self.y_test)) * 100
-        median_ae = median_absolute_error(self.y_test, self.predictions)
+        # Calculate metrics for all sets
+        train_rmse = np.sqrt(mean_squared_error(self.y_train, pred_train))
+        valid_rmse = np.sqrt(mean_squared_error(self.y_valid, pred_valid))
+        test_rmse = np.sqrt(mean_squared_error(self.y_test, self.predictions))
+
+        test_mae = mean_absolute_error(self.y_test, self.predictions)
+        test_r2 = r2_score(self.y_test, self.predictions)
+        test_mape = np.mean(np.abs((self.y_test - self.predictions) / self.y_test)) * 100
+        test_median_ae = median_absolute_error(self.y_test, self.predictions)
+
+        # Overfitting ratio (key metric for generalization)
+        overfitting_ratio = test_rmse / train_rmse
 
         self.metrics = {
-            "rmse": rmse,
-            "mae": mae,
-            "r2": r2,
-            "mape": mape,
-            "median_ae": median_ae,
+            "train_rmse": train_rmse,
+            "valid_rmse": valid_rmse,
+            "test_rmse": test_rmse,
+            "rmse": test_rmse,  # For backward compatibility
+            "mae": test_mae,
+            "r2": test_r2,
+            "mape": test_mape,
+            "median_ae": test_median_ae,
+            "overfitting_ratio": overfitting_ratio,
         }
 
-        print("Test Set Performance:")
-        print(f"  RMSE: ${rmse:,.2f}")
-        print(f"  MAE: ${mae:,.2f}")
-        print(f"  R²: {r2:.4f}")
-        print(f"  MAPE: {mape:.2f}%")
-        print(f"  Median AE: ${median_ae:,.2f}\n")
+        # Display results with overfitting assessment
+        print("\nPerformance Summary:")
+        print(f"  {'Set':<12} {'RMSE':<12} {'Assessment'}")
+        print(f"  {'-'*40}")
+        print(f"  {'Train':<12} ${train_rmse:>8,.2f}    (fitting)")
+        print(f"  {'Valid':<12} ${valid_rmse:>8,.2f}    (tuning)")
+        print(f"  {'Test':<12} ${test_rmse:>8,.2f}    (final)")
+
+        print(f"\nOverfitting Analysis:")
+        print(f"  Overfitting Ratio: {overfitting_ratio:.2f}x (Test/Train)")
+        if overfitting_ratio < 1.5:
+            print(f"  Assessment: ✅ Excellent generalization")
+        elif overfitting_ratio < 2.0:
+            print(f"  Assessment: ✅ Good generalization")
+        elif overfitting_ratio < 2.5:
+            print(f"  Assessment: ⚠️ Moderate overfitting")
+        else:
+            print(f"  Assessment: ❌ Severe overfitting")
+
+        print(f"\nTest Set Detailed Metrics:")
+        print(f"  RMSE: ${test_rmse:,.2f}")
+        print(f"  MAE: ${test_mae:,.2f}")
+        print(f"  R²: {test_r2:.4f}")
+        print(f"  MAPE: {test_mape:.2f}%")
+        print(f"  Median AE: ${test_median_ae:,.2f}\n")
 
         # Prediction statistics
         print("Prediction Statistics:")
