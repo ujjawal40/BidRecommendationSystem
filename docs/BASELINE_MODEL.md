@@ -1,8 +1,26 @@
-# Baseline Model - Phase 1A: Bid Fee Prediction
+# Baseline Models - Bid Recommendation System
 
 **Established**: January 23, 2026
+**Status**: Both Phases Production Ready
+
+---
+
+## Expected Value System
+
+```
+Expected Value = P(Win) × Bid Fee
+```
+
+| Phase | Model | Target | Status |
+|-------|-------|--------|--------|
+| 1A | Bid Fee Prediction | Regression | ✅ Complete |
+| 1B | Win Probability | Classification | ✅ Complete |
+
+---
+
+# Phase 1A: Bid Fee Prediction
+
 **Model**: LightGBM Regression
-**Status**: Production Ready
 
 ---
 
@@ -150,9 +168,124 @@ python scripts/04_model_lightgbm.py
 
 ---
 
-## Next Step: Phase 1B
+# Phase 1B: Win Probability Prediction
 
-Build Win Probability Classification Model to complete:
+**Model**: LightGBM Binary Classifier
+
+## Performance Metrics
+
+| Metric | Value | Assessment |
+|--------|-------|------------|
+| **Test AUC-ROC** | 0.9617 | Excellent |
+| **Test Accuracy** | 89.16% | Strong |
+| **Test F1** | 0.8846 | Good balance |
+| **Test Precision** | 85.95% | Low false positives |
+| **Test Recall** | 91.13% | Catches most wins |
+| **Brier Score** | 0.0779 | Well calibrated |
+| **Overfitting Ratio** | 1.02x | Near-perfect |
+
+### Performance by Split
+
+| Set | AUC-ROC | Accuracy | F1 |
+|-----|---------|----------|-----|
+| Train | 0.9784 | 91.14% | 0.9102 |
+| Validation | 0.9672 | 90.06% | 0.9062 |
+| Test | 0.9617 | 89.16% | 0.8846 |
+
+### Confusion Matrix (Test Set)
+
 ```
-Expected Value = Win Probability × Bid Fee
+                 Predicted
+              Loss    Win
+Actual Loss  4,980    711
+Actual Win     423  4,348
 ```
+
+---
+
+## Classification Configuration
+
+### Features Excluded (Leaky)
+```python
+# These features use the Won outcome - cannot use to predict Won
+LEAKY_CLASSIFICATION_FEATURES = [
+    'win_rate_with_client',
+    'office_win_rate',
+    'propertytype_win_rate',
+    'state_win_rate',
+    'segment_win_rate',
+    'client_win_rate',
+    'rolling_win_rate_office',
+    'total_wins_with_client',
+    'prev_won_same_client',
+]
+```
+
+### Hyperparameters
+```python
+CLASSIFICATION_CONFIG = {
+    "params": {
+        "objective": "binary",
+        "metric": ["binary_logloss", "auc"],
+        "boosting_type": "gbdt",
+        "num_leaves": 20,
+        "learning_rate": 0.05,
+        "max_depth": 8,
+        "min_child_samples": 30,
+        "reg_alpha": 1.0,
+        "reg_lambda": 1.0,
+        "scale_pos_weight": 1.05,  # Adjusted for class balance
+    },
+}
+```
+
+---
+
+## Top 10 Predictive Features for Win Probability
+
+1. **JobCount** (47.1%) - Number of jobs in bid (dominant)
+2. **market_competitiveness** (10.8%) - Market competition level
+3. **TargetTime_Original** (3.5%) - Turnaround requirements
+4. **PropertyState_frequency** (3.5%) - State activity level
+5. **RooftopLongitude** (2.5%) - Geographic location
+6. **targettime_ratio_to_proptype** (2.3%) - Relative turnaround
+7. **RooftopLatitude** (2.2%) - Geographic location
+8. **propertytype_std_fee** (1.5%) - Property type variability
+9. **segment_std_fee** (1.5%) - Segment variability
+10. **IECount** (1.5%) - Internal examiner count
+
+---
+
+## Phase 1B Files
+
+| File | Description |
+|------|-------------|
+| `outputs/models/lightgbm_win_probability.txt` | Trained model |
+| `outputs/models/lightgbm_win_probability_metadata.json` | Model metadata |
+| `scripts/15_win_probability_baseline.py` | Training script |
+| `outputs/figures/win_probability_evaluation.png` | ROC & calibration plots |
+| `outputs/figures/win_probability_feature_importance.png` | Feature importance |
+
+---
+
+## How to Reproduce Phase 1B
+
+```bash
+# Train the win probability model
+python scripts/15_win_probability_baseline.py
+
+# Expected output:
+# Test AUC-ROC: ~0.9617
+# Overfitting Ratio: ~1.02x
+# Accuracy: ~89%
+```
+
+---
+
+# Next Steps
+
+The Expected Value system is complete. Potential improvements:
+1. **EV Optimization Script** - Combine both models for bid recommendations
+2. **Threshold Tuning** - Optimize probability threshold based on business needs
+3. **Segment-specific models** - Separate models per business segment
+4. **A/B Testing Framework** - Validate recommendations in production
