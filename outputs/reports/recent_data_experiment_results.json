@@ -1,0 +1,69 @@
+{
+  "timestamp": "2026-01-20 19:55:50",
+  "hypothesis": "Training on recent data improves generalization",
+  "test_cutoff": "2024-10-04",
+  "params_used": {
+    "objective": "regression",
+    "metric": "rmse",
+    "boosting_type": "gbdt",
+    "learning_rate": 0.05,
+    "feature_fraction": 0.8,
+    "bagging_fraction": 0.8,
+    "bagging_freq": 5,
+    "reg_alpha": 1.0,
+    "reg_lambda": 1.0,
+    "num_leaves": 25,
+    "max_depth": 8,
+    "min_child_samples": 30,
+    "random_state": 42,
+    "verbose": -1
+  },
+  "results": [
+    {
+      "experiment": "Very Recent (2023-2025)",
+      "start_date": "2023-01-01",
+      "train_samples": 23523,
+      "train_rmse": 149.37000907547014,
+      "valid_rmse": 315.88101406625077,
+      "test_rmse": 383.2928009166252,
+      "test_r2": 0.9684912526135349,
+      "overfit_ratio": 2.566062647308029,
+      "best_iter": 500
+    },
+    {
+      "experiment": "Full Data (2018-2025)",
+      "start_date": "2018-01-01",
+      "train_samples": 73279,
+      "train_rmse": 133.2402979212914,
+      "valid_rmse": 339.6075475587036,
+      "test_rmse": 385.01388381333436,
+      "test_r2": 0.9682076526214661,
+      "overfit_ratio": 2.8896204062885866,
+      "best_iter": 500
+    },
+    {
+      "experiment": "Last 2 Years (2024-2025)",
+      "start_date": "2024-01-01",
+      "train_samples": 10610,
+      "train_rmse": 254.7297044056883,
+      "valid_rmse": 446.48829852918396,
+      "test_rmse": 523.5282717650072,
+      "test_r2": 0.9412172238344798,
+      "overfit_ratio": 2.055230555016953,
+      "best_iter": 274
+    },
+    {
+      "experiment": "Recent (2022-2025)",
+      "start_date": "2022-01-01",
+      "train_samples": 38627,
+      "train_rmse": 179.42213380696043,
+      "valid_rmse": 496.06706870855027,
+      "test_rmse": 615.607704908608,
+      "test_r2": 0.9187210831702618,
+      "overfit_ratio": 3.431057762198603,
+      "best_iter": 498
+    }
+  ],
+  "best_experiment": "Very Recent (2023-2025)",
+  "conclusion": "Best: Very Recent (2023-2025) with Test RMSE $383.29"
+}

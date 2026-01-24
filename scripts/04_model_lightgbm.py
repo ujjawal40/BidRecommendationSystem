@@ -48,6 +48,9 @@ from config.model_config import (
     REPORTS_DIR,
     FIGURES_DIR,
     RANDOM_SEED,
+    DATA_START_DATE,
+    USE_RECENT_DATA_ONLY,
+    JOBDATA_FEATURES_TO_EXCLUDE,
 )
 
 
@@ -117,6 +120,15 @@ class LightGBMBidFeePredictor:
 
         # Convert BidDate to datetime
         df[DATE_COLUMN] = pd.to_datetime(df[DATE_COLUMN])
+
+        # Filter to recent data if configured (improves generalization)
+        if USE_RECENT_DATA_ONLY:
+            original_count = len(df)
+            start_date = pd.Timestamp(DATA_START_DATE)
+            df = df[df[DATE_COLUMN] >= start_date].copy()
+            print(f"✓ Filtered to {DATA_START_DATE}+ data")
+            print(f"  Removed: {original_count - len(df):,} older records")
+            print(f"  Remaining: {len(df):,} records")
 
         # Sort by date for time-aware split
         df = df.sort_values(DATE_COLUMN).reset_index(drop=True)
@@ -231,14 +243,22 @@ class LightGBMBidFeePredictor:
         print("PREPARING FEATURES")
         print("=" * 80)
 
-        # Identify feature columns
+        # Identify feature columns (exclude IDs, targets, dates)
         feature_cols = [col for col in df.columns if col not in EXCLUDE_COLUMNS]
+
+        # Exclude JobData features (they degrade performance - see documentation)
+        jobdata_excluded = [col for col in feature_cols if col in JOBDATA_FEATURES_TO_EXCLUDE]
+        feature_cols = [col for col in feature_cols if col not in JOBDATA_FEATURES_TO_EXCLUDE]
+
+        if jobdata_excluded:
+            print(f"✓ Excluded {len(jobdata_excluded)} JobData features (degrade performance)")
 
         # Remove any remaining non-numeric columns
         numeric_features = df[feature_cols].select_dtypes(include=[np.number]).columns.tolist()
 
         print(f"Total columns: {df.shape[1]}")
         print(f"Excluded columns: {len(EXCLUDE_COLUMNS)}")
+        print(f"JobData features excluded: {len(jobdata_excluded)}")
         print(f"Feature columns: {len(numeric_features)}")
 
         # Extract features and target
@@ -265,10 +285,12 @@ class LightGBMBidFeePredictor:
 
     def time_based_split(self, df, X, y):
         """
-        Perform time-based train/test split to prevent data leakage.
+        Perform time-based train/valid/test split to prevent data leakage.
 
-        Uses chronological ordering to split data, ensuring no future information
-        leaks into training set.
+        Uses 60/20/20 split for proper validation during training:
+        - Train (60%): Model fitting
+        - Valid (20%): Early stopping and hyperparameter tuning
+        - Test (20%): Final unbiased evaluation
 
         Parameters
         ----------
@@ -282,7 +304,7 @@ class LightGBMBidFeePredictor:
         Returns
         -------
         None
-            Sets self.X_train, self.X_test, self.y_train, self.y_test
+            Sets self.X_train, self.X_valid, self.X_test, self.y_train, self.y_valid, self.y_test
         """
         print("=" * 80)
         print("TIME-BASED TRAIN/VALIDATION/TEST SPLIT")
@@ -327,9 +349,10 @@ class LightGBMBidFeePredictor:
 
     def train_model(self):
         """
-        Train LightGBM model with early stopping.
+        Train LightGBM model with early stopping on validation set.
 
-        Uses configuration from LIGHTGBM_CONFIG for hyperparameters and training settings.
+        IMPORTANT: Uses validation set (not test set) for early stopping.
+        Test set is reserved for final unbiased evaluation only.
 
         Returns
         -------
@@ -394,14 +417,13 @@ class LightGBMBidFeePredictor:
 
     def evaluate_model(self):
         """
-        Evaluate model performance on test set.
+        Evaluate model performance on train, validation, and test sets.
 
-        Calculates multiple regression metrics:
+        Calculates metrics for all three sets to assess overfitting:
         - RMSE (Root Mean Squared Error)
         - MAE (Mean Absolute Error)
         - R² (R-squared)
-        - MAPE (Mean Absolute Percentage Error)
-        - Median Absolute Error
+        - Overfitting Ratio (Test RMSE / Train RMSE)
 
         Returns
         -------

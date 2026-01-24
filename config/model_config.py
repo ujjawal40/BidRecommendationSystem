@@ -26,6 +26,45 @@ DATA_DIR = ROOT_DIR / "data"
 FEATURES_DATA = DATA_DIR / "features" / "BidData_features.csv"  # Baseline: All JobData approaches failed (static, selective, competitive)
 PROCESSED_DATA = DATA_DIR / "processed" / "BidData_processed.csv"
 
+# ============================================================================
+# DATA FILTERING CONFIGURATION
+# ============================================================================
+# Training on recent data (2023+) improves generalization
+# See: outputs/reports/recent_data_experiment_results.json
+DATA_START_DATE = "2023-01-01"  # Filter training data to 2023+ only
+USE_RECENT_DATA_ONLY = True     # Set to False to use all historical data
+
+# JobData features to EXCLUDE (they degrade performance - see jobdata_enrichment_final_results.txt)
+JOBDATA_FEATURES_TO_EXCLUDE = [
+    "office_job_volume",
+    "office_avg_job_fee",
+    "office_median_job_fee",
+    "office_job_fee_std",
+    "office_min_job_fee",
+    "office_max_job_fee",
+    "office_avg_appraisal_fee",
+    "office_median_appraisal_fee",
+    "office_master_job_pct",
+    "office_fee_range",
+    "office_fee_cv",
+    "office_avg_profit_margin",
+    "region_avg_job_fee",
+    "region_median_job_fee",
+    "region_job_volume",
+    "office_vs_region_premium",
+    "office_vs_region_ratio",
+    "office_region_encoded",
+    "office_primary_client_type_encoded",
+    "office_market_tier_encoded",
+    "property_region_avg_fee",
+    "property_region_median_fee",
+    "office_region",
+    "office_primary_property_type",
+    "office_primary_client_type",
+    "office_market_tier",
+    "PropertyType_enriched",
+]
+
 # Output paths
 OUTPUTS_DIR = ROOT_DIR / "outputs"
 MODELS_DIR = OUTPUTS_DIR / "models"
