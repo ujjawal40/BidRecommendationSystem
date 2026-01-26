@@ -449,7 +449,9 @@ class LightGBMBidFeePredictor:
         test_mae = mean_absolute_error(self.y_test, self.predictions)
 
         test_r2 = r2_score(self.y_test, self.predictions)
-        test_mape = np.mean(np.abs((self.y_test - self.predictions) / self.y_test)) * 100
+        # MAPE: exclude zero values to avoid division by zero
+        non_zero_mask = self.y_test != 0
+        test_mape = np.mean(np.abs((self.y_test[non_zero_mask] - self.predictions[non_zero_mask]) / self.y_test[non_zero_mask])) * 100
         test_median_ae = median_absolute_error(self.y_test, self.predictions)
 
         # Overfitting ratios
