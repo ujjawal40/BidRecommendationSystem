@@ -434,10 +434,10 @@ class LightGBMBidFeePredictor:
         print("MODEL EVALUATION - OVERFITTING ANALYSIS")
         print("=" * 80)
 
-        # Generate predictions for all sets
-        train_preds = self.model.predict(self.X_train, num_iteration=self.model.best_iteration)
-        valid_preds = self.model.predict(self.X_valid, num_iteration=self.model.best_iteration)
-        self.predictions = self.model.predict(self.X_test, num_iteration=self.model.best_iteration)
+        # Generate predictions for all sets (clamp to 0 - fees can't be negative)
+        train_preds = np.maximum(0, self.model.predict(self.X_train, num_iteration=self.model.best_iteration))
+        valid_preds = np.maximum(0, self.model.predict(self.X_valid, num_iteration=self.model.best_iteration))
+        self.predictions = np.maximum(0, self.model.predict(self.X_test, num_iteration=self.model.best_iteration))
 
         # Calculate metrics for all sets
         train_rmse = np.sqrt(mean_squared_error(self.y_train, train_preds))
