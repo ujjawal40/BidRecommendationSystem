@@ -645,13 +645,15 @@ class LightGBMBidFeePredictor:
             json.dump(metadata, f, indent=2)
         print(f"✓ Metadata saved: {metadata_path}")
 
-        # Save predictions
+        # Save predictions (use np.where to handle division by zero)
+        actuals = self.y_test.values
+        pct_error = np.where(actuals != 0, np.abs((actuals - self.predictions) / actuals) * 100, 0)
         predictions_df = pd.DataFrame({
-            'Actual': self.y_test.values,
+            'Actual': actuals,
             'Predicted': self.predictions,
-            'Residual': self.y_test.values - self.predictions,
-            'Abs_Error': np.abs(self.y_test.values - self.predictions),
-            'Pct_Error': np.abs((self.y_test.values - self.predictions) / self.y_test.values) * 100
+            'Residual': actuals - self.predictions,
+            'Abs_Error': np.abs(actuals - self.predictions),
+            'Pct_Error': pct_error
         })
 
         predictions_path = REPORTS_DIR / "lightgbm_predictions.csv"
