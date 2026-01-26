@@ -434,10 +434,22 @@ class LightGBMBidFeePredictor:
         print("MODEL EVALUATION - OVERFITTING ANALYSIS")
         print("=" * 80)
 
-        # Generate predictions for all sets (clamp to 0 - fees can't be negative)
-        train_preds = np.maximum(0, self.model.predict(self.X_train, num_iteration=self.model.best_iteration))
-        valid_preds = np.maximum(0, self.model.predict(self.X_valid, num_iteration=self.model.best_iteration))
-        self.predictions = np.maximum(0, self.model.predict(self.X_test, num_iteration=self.model.best_iteration))
+        # Generate raw predictions
+        train_preds_raw = self.model.predict(self.X_train, num_iteration=self.model.best_iteration)
+        valid_preds_raw = self.model.predict(self.X_valid, num_iteration=self.model.best_iteration)
+        test_preds_raw = self.model.predict(self.X_test, num_iteration=self.model.best_iteration)
+
+        # Count negative predictions before clamping
+        neg_train = (train_preds_raw < 0).sum()
+        neg_valid = (valid_preds_raw < 0).sum()
+        neg_test = (test_preds_raw < 0).sum()
+        if neg_train + neg_valid + neg_test > 0:
+            print(f"⚠ Negative predictions clamped to 0: Train={neg_train}, Valid={neg_valid}, Test={neg_test}")
+
+        # Clamp to 0 (bid fees cannot be negative)
+        train_preds = np.maximum(0, train_preds_raw)
+        valid_preds = np.maximum(0, valid_preds_raw)
+        self.predictions = np.maximum(0, test_preds_raw)
 
         # Calculate metrics for all sets
         train_rmse = np.sqrt(mean_squared_error(self.y_train, train_preds))
