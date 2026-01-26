@@ -110,14 +110,31 @@ python -c "import pandas, numpy, sklearn, lightgbm, torch; print('Setup successf
 - **Explainability**: SHAP
 - **Code Quality**: black, flake8, pytest
 
-## Next Steps
+## Current Model Performance (Phase 1A)
+
+| Metric | Value |
+|--------|-------|
+| **Test RMSE** | $328.75 |
+| **Test MAE** | $102.44 |
+| **R²** | 0.9761 |
+| **Overfitting Ratio** | 1.99x |
+
+**Configuration**:
+- Data: 2023+ (52,308 records)
+- Features: 68 (optimized)
+- Split: 60% train / 20% valid / 20% test
+- Regularization: L1=1.0, L2=1.0
+
+## Progress
 
 - [x] Project setup
-- [ ] Exploratory Data Analysis
-- [ ] Feature engineering
-- [ ] Baseline model (LightGBM)
-- [ ] Model optimization
-- [ ] Win probability modeling (Phase 2)
+- [x] Exploratory Data Analysis
+- [x] Feature engineering (58 engineered features)
+- [x] Data leakage detection and fix
+- [x] Baseline model (LightGBM)
+- [x] Model optimization (regularization, 2023+ data)
+- [ ] Feature ablation study
+- [ ] Win probability modeling (Phase 1B)
 
 ## Contact
 
@@ -126,4 +143,4 @@ python -c "import pandas, numpy, sklearn, lightgbm, torch; print('Setup successf
 
 ---
 
-*Last Updated*: 2026-01-02
+*Last Updated*: 2026-01-23
