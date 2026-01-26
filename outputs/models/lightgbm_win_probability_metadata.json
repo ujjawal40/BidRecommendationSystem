@@ -2,8 +2,9 @@
   "model_type": "LightGBM Binary Classifier",
   "phase": "1B - Win Probability Prediction",
   "target_variable": "Won",
-  "purpose": "Predict P(Win) for Expected Value optimization: EV = P(Win) \u00d7 BidFee",
-  "num_features": 75,
+  "version": "2.0 - Clean (JobCount removed)",
+  "note": "JobCount was removed due to data leakage (presence correlated with outcome)",
+  "num_features": 74,
   "features": [
     "TargetTime",
     "BusinessSegmentDetail",
@@ -12,7 +13,6 @@
     "RooftopLongitude",
     "RooftopLatitude",
     "OfficeId",
-    "JobCount",
     "IECount",
     "LeaseCount",
     "SaleCount",
@@ -81,7 +81,8 @@
     "is_weekday",
     "targettime_ratio_to_proptype"
   ],
-  "excluded_leaky_features": [
+  "excluded_features": [
+    "JobCount",
     "win_rate_with_client",
     "office_win_rate",
     "propertytype_win_rate",
@@ -97,12 +98,7 @@
     "total_samples": 52308,
     "train_samples": 31384,
     "valid_samples": 10462,
-    "test_samples": 10462,
-    "class_distribution": {
-      "wins": 25494,
-      "losses": 26814,
-      "win_rate": 0.48738242716219315
-    }
+    "test_samples": 10462
   },
   "hyperparameters": {
     "objective": "binary",
@@ -121,150 +117,34 @@
     "min_child_weight": 5,
     "reg_alpha": 1.0,
     "reg_lambda": 1.0,
-    "scale_pos_weight": 1.0517768886796894,
     "random_state": 42,
     "verbose": -1
   },
   "training": {
-    "best_iteration": 336,
-    "early_stopping_rounds": 50
+    "best_iteration": 439
   },
   "metrics": {
     "train": {
-      "accuracy": 0.9114198317614071,
-      "precision": 0.8990679264555669,
-      "recall": 0.921541683025782,
-      "f1": 0.9101660957797454,
-      "auc_roc": 0.9783889564385633,
-      "avg_precision": 0.9783494192564446
+      "auc_roc": 0.9555808730695046,
+      "accuracy": 0.8801300025490696,
+      "precision": 0.9119582320125876,
+      "recall": 0.8343803167124721,
+      "f1": 0.8714461454346638
     },
     "valid": {
-      "accuracy": 0.9005926209137832,
-      "precision": 0.8895379713223579,
-      "recall": 0.9235434662745818,
-      "f1": 0.9062218214607755,
-      "auc_roc": 0.9671975570642268,
-      "avg_precision": 0.9696675712486231
+      "auc_roc": 0.9221029309274485,
+      "accuracy": 0.8440068820493214,
+      "precision": 0.8764333728746541,
+      "recall": 0.814889705882353,
+      "f1": 0.8445418174890457
     },
     "test": {
-      "accuracy": 0.8916077231886829,
-      "precision": 0.8594583909863609,
-      "recall": 0.911339341857053,
-      "f1": 0.8846388606307223,
-      "auc_roc": 0.961653481702347,
-      "avg_precision": 0.9550008365375207
+      "auc_roc": 0.8814790473721195,
+      "accuracy": 0.8102657235710189,
+      "precision": 0.8267291910902697,
+      "recall": 0.7388935456831517,
+      "f1": 0.7803474604404117
     }
   },
-  "confusion_matrix": {
-    "true_negatives": 4980,
-    "false_positives": 711,
-    "false_negatives": 423,
-    "true_positives": 4348
-  },
-  "calibration": {
-    "brier_score": 0.07793857981034019
-  },
-  "feature_importance": [
-    {
-      "feature": "JobCount",
-      "importance": 124588.86530399323,
-      "importance_pct": 47.114400848202344
-    },
-    {
-      "feature": "market_competitiveness",
-      "importance": 28532.335127830505,
-      "importance_pct": 10.78975935022634
-    },
-    {
-      "feature": "TargetTime_Original",
-      "importance": 9348.653714418411,
-      "importance_pct": 3.5352775500237876
-    },
-    {
-      "feature": "PropertyState_frequency",
-      "importance": 9169.81331372261,
-      "importance_pct": 3.4676474427451307
-    },
-    {
-      "feature": "RooftopLongitude",
-      "importance": 6630.510362625122,
-      "importance_pct": 2.50738717533586
-    },
-    {
-      "feature": "targettime_ratio_to_proptype",
-      "importance": 6107.350648880005,
-      "importance_pct": 2.309549620584262
-    },
-    {
-      "feature": "RooftopLatitude",
-      "importance": 5891.39609003067,
-      "importance_pct": 2.2278844603325925
-    },
-    {
-      "feature": "propertytype_std_fee",
-      "importance": 4064.5328884124756,
-      "importance_pct": 1.5370396969112563
-    },
-    {
-      "feature": "segment_std_fee",
-      "importance": 3967.2770586013794,
-      "importance_pct": 1.5002615294613462
-    },
-    {
-      "feature": "IECount",
-      "importance": 3884.384213924408,
-      "importance_pct": 1.4689148541221864
-    },
-    {
-      "feature": "state_std_fee",
-      "importance": 3689.148467063904,
-      "importance_pct": 1.3950846991156367
-    },
-    {
-      "feature": "total_bids_to_client",
-      "importance": 3660.905427455902,
-      "importance_pct": 1.3844043394702037
-    },
-    {
-      "feature": "office_avg_fee",
-      "importance": 3638.696813106537,
-      "importance_pct": 1.3760059520526275
-    },
-    {
-      "feature": "TargetTime",
-      "importance": 3498.8499925136566,
-      "importance_pct": 1.32312161807396
-    },
-    {
-      "feature": "segment_avg_fee",
-      "importance": 3052.0587503910065,
-      "importance_pct": 1.1541634882646017
-    },
-    {
-      "feature": "office_std_fee",
-      "importance": 2952.338223695755,
-      "importance_pct": 1.1164532735030315
-    },
-    {
-      "feature": "client_relationship_strength",
-      "importance": 2665.558576107025,
-      "importance_pct": 1.0080049684427512
-    },
-    {
-      "feature": "BidCompanyName_encoded",
-      "importance": 2050.358241081238,
-      "importance_pct": 0.7753614242894975
-    },
-    {
-      "feature": "OfficeLocation_frequency",
-      "importance": 2006.6813967227936,
-      "importance_pct": 0.7588446324568783
-    },
-    {
-      "feature": "OfficeId",
-      "importance": 1991.1892719268799,
-      "importance_pct": 0.7529861460195542
-    }
-  ],
-  "training_date": "2026-01-23 20:19:42"
+  "training_date": "2026-01-24 10:56:37"
 }
