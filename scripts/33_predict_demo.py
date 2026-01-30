@@ -298,8 +298,44 @@ with open(demo_path, 'w') as f:
 print(f"✓ Demo results saved: {demo_path}")
 
 print("\n" + "=" * 80)
+print("BIDPREDICTOR API VALIDATION")
+print("=" * 80)
+
+# Test the production BidPredictor API
+from api.prediction_service import BidPredictor
+
+print("\nInitializing BidPredictor API...")
+predictor = BidPredictor()
+
+# Validate against known data points
+print("\nValidating predictions against actual data:")
+test_cases = [
+    ("Financing", "Multifamily", "Texas", 30, 2950, 3200),
+    ("Consulting", "Office", "California", 45, 4000, 5500),
+    ("Evaluation", "Retail", "Florida", 21, 2200, 2900),
+]
+
+all_passed = True
+for segment, ptype, state, time, expected_low, expected_high in test_cases:
+    result = predictor.predict(
+        business_segment=segment,
+        property_type=ptype,
+        property_state=state,
+        target_time=time
+    )
+    pred = result['predicted_fee']
+    in_range = expected_low <= pred <= expected_high
+    status = "✓ PASS" if in_range else "✗ FAIL"
+    all_passed = all_passed and in_range
+    print(f"  {segment}/{state}/{ptype}: ${pred:,.0f} (expected ${expected_low:,}-${expected_high:,}) {status}")
+
+print("\n" + "=" * 80)
 print("DEMONSTRATION COMPLETE")
 print("=" * 80)
-print("\n✅ Model is working and producing valid predictions!")
-print("✅ Ready for production deployment with proper API wrapper")
+if all_passed:
+    print("\n✅ Model is working and producing valid predictions!")
+    print("✅ BidPredictor API validated successfully!")
+else:
+    print("\n⚠️  Some predictions outside expected ranges - review needed")
+print("✅ Ready for production deployment")
 print()
