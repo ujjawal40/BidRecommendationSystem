@@ -41,6 +41,8 @@ from config.model_config import (
     EXCLUDE_COLUMNS, JOBDATA_FEATURES_TO_EXCLUDE,
 )
 
+from api.empirical_bands import EmpiricalBandCalculator
+
 
 class BidPredictor:
     """
@@ -58,9 +60,11 @@ class BidPredictor:
         self.property_types = []
         self.states = []
         self.offices = []
+        self.band_calculator = EmpiricalBandCalculator()
 
         self._load_model()
         self._compute_feature_statistics()
+        self._load_empirical_bands()
 
     def _load_model(self):
         """Load the trained LightGBM model."""
@@ -142,6 +146,19 @@ class BidPredictor:
         self.feature_stats['state_segment_combo_freq'] = combo_stats.to_dict()
 
         print(f"[BidPredictor] Statistics computed for {len(self.segments)} segments, {len(self.states)} states")
+
+    def _load_empirical_bands(self):
+        """Load precomputed empirical confidence bands."""
+        bands_path = REPORTS_DIR / 'empirical_bands.json'
+        if bands_path.exists():
+            loaded = self.band_calculator.load_bands(bands_path)
+            if loaded:
+                print("[BidPredictor] Empirical bands loaded successfully")
+            else:
+                print("[BidPredictor] Warning: Could not load empirical bands, using defaults")
+        else:
+            print("[BidPredictor] Note: No empirical bands file found, using default intervals")
+            print(f"         Run 'python api/empirical_bands.py' to compute bands")
 
     def _generate_features(
         self,
@@ -360,17 +377,13 @@ class BidPredictor:
         # Ensure positive prediction
         prediction = max(prediction, 500)  # Minimum $500 fee
 
-        # Calculate confidence interval (using segment std as proxy)
-        segment_std = self.feature_stats['segment_std_fee'].get(
-            business_segment, self.feature_stats['global_std_fee']
+        # Calculate confidence interval using empirical bands (stratified by fee bucket)
+        low, high, band_metadata = self.band_calculator.get_confidence_interval(
+            predicted_fee=prediction,
+            segment=business_segment,
+            state=property_state,
+            confidence_level=0.80,  # 80% interval
         )
-        model_rmse = 328.75  # From our evaluation
-
-        # Combined uncertainty
-        uncertainty = np.sqrt(model_rmse**2 + (segment_std * 0.3)**2)
-
-        low = max(500, prediction - 1.96 * uncertainty)
-        high = prediction + 1.96 * uncertainty
 
         # Confidence level based on data availability
         segment_count = self.feature_stats['segment_count'].get(business_segment, 0)
