@@ -243,7 +243,7 @@ if __name__ == '__main__':
 
     print()
     print("Starting Flask server...")
-    print("API available at: http://localhost:5000")
+    print("API available at: http://localhost:5001")
     print()
     print("Endpoints:")
     print("  GET  /api/health          - Health check")
@@ -253,4 +253,4 @@ if __name__ == '__main__':
     print("  POST /api/batch-predict   - Batch predictions")
     print()
 
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5001, debug=True)
