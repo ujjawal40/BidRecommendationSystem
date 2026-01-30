@@ -56,6 +56,7 @@ class BidPredictor:
         self.model = None
         self.model_features = None
         self.feature_stats = {}
+        self.feature_defaults = {}  # Segment-specific defaults for missing features
         self.segments = []
         self.property_types = []
         self.states = []
@@ -65,6 +66,7 @@ class BidPredictor:
         self._load_model()
         self._compute_feature_statistics()
         self._load_empirical_bands()
+        self._load_feature_defaults()
 
     def _load_model(self):
         """Load the trained LightGBM model."""
@@ -82,59 +84,81 @@ class BidPredictor:
         """Precompute feature statistics from training data for lookup."""
         print("[BidPredictor] Computing feature statistics...")
 
-        df = pd.read_csv(FEATURES_DATA)
-        df['BidDate'] = pd.to_datetime(df['BidDate'])
+        df_all = pd.read_csv(FEATURES_DATA)
+        df_all['BidDate'] = pd.to_datetime(df_all['BidDate'])
 
-        # Filter to recent data
+        # IMPORTANT: Frequency features were computed from ALL data in training,
+        # so we need to use ALL data for frequency lookups
+        df_full = df_all.copy()
+
+        # Filter to recent data for other statistics (averages, etc.)
         if USE_RECENT_DATA_ONLY:
-            df = df[df['BidDate'] >= pd.Timestamp(DATA_START_DATE)].copy()
+            df = df_all[df_all['BidDate'] >= pd.Timestamp(DATA_START_DATE)].copy()
+        else:
+            df = df_all.copy()
 
-        # Store unique values for dropdowns
-        self.segments = sorted(df['BusinessSegment'].dropna().unique().tolist())
-        self.property_types = sorted(df['PropertyType'].dropna().unique().tolist())
-        self.states = sorted(df['PropertyState'].dropna().unique().tolist())
-        self.offices = sorted(df['OfficeId'].dropna().unique().astype(int).tolist())
+        # Store unique values for dropdowns (from full data)
+        self.segments = sorted(df_full['BusinessSegment'].dropna().unique().tolist())
+        self.property_types = sorted(df_full['PropertyType'].dropna().unique().tolist())
+        self.states = sorted(df_full['PropertyState'].dropna().unique().tolist())
+        self.offices = sorted(df_full['OfficeId'].dropna().unique().astype(int).tolist())
 
         # Compute aggregate statistics for feature generation
         # These are the lookup tables we'll use when a new bid comes in
 
-        # Segment statistics
+        # Segment statistics (use recent data for averages)
         self.feature_stats['segment'] = df.groupby('BusinessSegment').agg({
             'BidFee': ['mean', 'std', 'count'],
             'Won': 'mean',
             'TargetTime': 'mean',
         }).to_dict()
 
-        # Flatten segment stats
-        segment_stats = df.groupby('BusinessSegment')['BidFee'].agg(['mean', 'std', 'count'])
-        segment_win_rate = df.groupby('BusinessSegment')['Won'].mean()
-        self.feature_stats['segment_avg_fee'] = segment_stats['mean'].to_dict()
-        self.feature_stats['segment_std_fee'] = segment_stats['std'].fillna(0).to_dict()
-        self.feature_stats['segment_count'] = segment_stats['count'].to_dict()
-        self.feature_stats['segment_win_rate'] = segment_win_rate.to_dict()
+        # CRITICAL: segment_avg_fee, state_avg_fee, etc. must come from FULL data
+        # The model was trained with these as static aggregates from full dataset
+        # Using filtered data gives values the model never saw, causing erratic predictions
+        segment_stats_full = df_full.groupby('BusinessSegment')['BidFee'].agg(['mean', 'std', 'count'])
+        segment_win_rate_full = df_full.groupby('BusinessSegment')['Won'].mean()
+        self.feature_stats['segment_avg_fee'] = segment_stats_full['mean'].to_dict()
+        self.feature_stats['segment_std_fee'] = segment_stats_full['std'].fillna(0).to_dict()
+        self.feature_stats['segment_count'] = segment_stats_full['count'].to_dict()
+        self.feature_stats['segment_win_rate'] = segment_win_rate_full.to_dict()
 
-        # State statistics
-        state_stats = df.groupby('PropertyState')['BidFee'].agg(['mean', 'std', 'count'])
-        state_win_rate = df.groupby('PropertyState')['Won'].mean()
-        self.feature_stats['state_avg_fee'] = state_stats['mean'].to_dict()
-        self.feature_stats['state_std_fee'] = state_stats['std'].fillna(0).to_dict()
-        self.feature_stats['state_frequency'] = state_stats['count'].to_dict()
-        self.feature_stats['state_win_rate'] = state_win_rate.to_dict()
+        # CRITICAL: BusinessSegment_frequency must be PROPORTIONS (0-1), not raw counts
+        # The model was trained on proportions
+        total_count = len(df_full)
+        full_segment_counts = df_full.groupby('BusinessSegment').size()
+        self.feature_stats['segment_frequency'] = (full_segment_counts / total_count).to_dict()
 
-        # Office statistics
-        office_stats = df.groupby('OfficeId')['BidFee'].agg(['mean', 'std'])
-        office_win_rate = df.groupby('OfficeId')['Won'].mean()
-        self.feature_stats['office_avg_fee'] = office_stats['mean'].to_dict()
-        self.feature_stats['office_std_fee'] = office_stats['std'].fillna(0).to_dict()
-        self.feature_stats['office_win_rate'] = office_win_rate.to_dict()
+        # State statistics (from FULL data to match training)
+        state_stats_full = df_full.groupby('PropertyState')['BidFee'].agg(['mean', 'std', 'count'])
+        state_win_rate_full = df_full.groupby('PropertyState')['Won'].mean()
+        self.feature_stats['state_avg_fee'] = state_stats_full['mean'].to_dict()
+        self.feature_stats['state_std_fee'] = state_stats_full['std'].fillna(0).to_dict()
+        self.feature_stats['state_win_rate'] = state_win_rate_full.to_dict()
 
-        # Property type statistics
-        proptype_stats = df.groupby('PropertyType')['BidFee'].agg(['mean', 'std', 'count'])
-        proptype_win_rate = df.groupby('PropertyType')['Won'].mean()
-        self.feature_stats['propertytype_avg_fee'] = proptype_stats['mean'].to_dict()
-        self.feature_stats['propertytype_std_fee'] = proptype_stats['std'].fillna(0).to_dict()
-        self.feature_stats['PropertyType_frequency'] = proptype_stats['count'].to_dict()
-        self.feature_stats['propertytype_win_rate'] = proptype_win_rate.to_dict()
+        # CRITICAL: PropertyState_frequency must be PROPORTIONS (0-1), not raw counts
+        # The model was trained on proportions
+        full_state_counts = df_full.groupby('PropertyState').size()
+        self.feature_stats['state_frequency'] = (full_state_counts / total_count).to_dict()
+
+        # Office statistics (from FULL data to match training)
+        office_stats_full = df_full.groupby('OfficeId')['BidFee'].agg(['mean', 'std'])
+        office_win_rate_full = df_full.groupby('OfficeId')['Won'].mean()
+        self.feature_stats['office_avg_fee'] = office_stats_full['mean'].to_dict()
+        self.feature_stats['office_std_fee'] = office_stats_full['std'].fillna(0).to_dict()
+        self.feature_stats['office_win_rate'] = office_win_rate_full.to_dict()
+
+        # Property type statistics (from FULL data to match training)
+        proptype_stats_full = df_full.groupby('PropertyType')['BidFee'].agg(['mean', 'std', 'count'])
+        proptype_win_rate_full = df_full.groupby('PropertyType')['Won'].mean()
+        self.feature_stats['propertytype_avg_fee'] = proptype_stats_full['mean'].to_dict()
+        self.feature_stats['propertytype_std_fee'] = proptype_stats_full['std'].fillna(0).to_dict()
+        self.feature_stats['propertytype_win_rate'] = proptype_win_rate_full.to_dict()
+
+        # CRITICAL: PropertyType_frequency must be PROPORTIONS (0-1), not raw counts
+        # The model was trained on proportions
+        full_proptype_counts = df_full.groupby('PropertyType').size()
+        self.feature_stats['PropertyType_frequency'] = (full_proptype_counts / total_count).to_dict()
 
         # Global statistics (for defaults)
         self.feature_stats['global_avg_fee'] = df['BidFee'].mean()
@@ -160,6 +184,41 @@ class BidPredictor:
             print("[BidPredictor] Note: No empirical bands file found, using default intervals")
             print(f"         Run 'python api/empirical_bands.py' to compute bands")
 
+    def _load_feature_defaults(self):
+        """Load segment-specific default values for features."""
+        defaults_path = REPORTS_DIR / 'feature_defaults.json'
+        if defaults_path.exists():
+            with open(defaults_path, 'r') as f:
+                self.feature_defaults = json.load(f)
+            print(f"[BidPredictor] Feature defaults loaded: {len(self.feature_defaults)} features")
+        else:
+            print("[BidPredictor] Warning: No feature defaults found, predictions may be inaccurate")
+            print(f"         Run the feature defaults generation script first")
+
+        # Load state-specific coordinates
+        coords_path = REPORTS_DIR / 'state_coordinates.json'
+        if coords_path.exists():
+            with open(coords_path, 'r') as f:
+                coords = json.load(f)
+                self.feature_stats['state_latitude'] = coords.get('state_latitude', {})
+                self.feature_stats['state_longitude'] = coords.get('state_longitude', {})
+                self.feature_stats['state_distance_km'] = coords.get('state_distance_km', {})
+
+        # Load rolling stats
+        rolling_path = REPORTS_DIR / 'rolling_stats.json'
+        if rolling_path.exists():
+            with open(rolling_path, 'r') as f:
+                rolling = json.load(f)
+                self.feature_stats['office_rolling_bid_count'] = rolling.get('office_rolling_bid_count', {})
+                self.feature_stats['office_rolling_std_fee'] = rolling.get('office_rolling_std_fee', {})
+                self.feature_stats['office_rolling_win_rate'] = rolling.get('office_rolling_win_rate', {})
+                self.feature_stats['segment_target_time'] = rolling.get('segment_target_time', {})
+                self.feature_stats['proptype_target_time'] = rolling.get('proptype_target_time', {})
+                self.feature_stats['global_rolling_bid_count'] = rolling.get('global_rolling_bid_count', 226)
+                self.feature_stats['state_distance_miles'] = rolling.get('state_distance_miles', {})
+                self.feature_stats['propertytype_std_fee'] = rolling.get('propertytype_std_fee', {})
+                self.feature_stats['state_std_fee_median'] = rolling.get('state_std_fee', {})
+
     def _generate_features(
         self,
         business_segment: str,
@@ -180,8 +239,25 @@ class BidPredictor:
 
         # Raw features
         features['TargetTime'] = target_time
-        features['DistanceInKM'] = distance_km
+        features['TargetTime_Original'] = target_time  # Model uses this too
+
+        # Distance - use state median if not provided (0 is unrealistic)
+        if distance_km > 0:
+            features['DistanceInKM'] = distance_km
+        else:
+            features['DistanceInKM'] = self.feature_stats.get('state_distance_km', {}).get(property_state, 35)
+
         features['OnDueDate'] = on_due_date
+
+        # State-specific location (for location-based features)
+        features['RooftopLatitude'] = self.feature_stats.get('state_latitude', {}).get(property_state, 35.0)
+        features['RooftopLongitude'] = self.feature_stats.get('state_longitude', {}).get(property_state, -95.0)
+
+        # Distance in miles (model uses this for distance_x_volume)
+        if distance_km > 0:
+            features['DistanceInMiles'] = distance_km * 0.621371
+        else:
+            features['DistanceInMiles'] = self.feature_stats.get('state_distance_miles', {}).get(property_state, 25)
 
         # Segment features
         features['segment_avg_fee'] = self.feature_stats['segment_avg_fee'].get(
@@ -194,6 +270,9 @@ class BidPredictor:
             business_segment, self.feature_stats['global_win_rate']
         )
         features['segment_bid_density'] = self.feature_stats['segment_count'].get(business_segment, 100)
+        # BusinessSegment_frequency is a PROPORTION (0-1), not raw count
+        # Model was trained on proportions
+        features['BusinessSegment_frequency'] = self.feature_stats['segment_frequency'].get(business_segment, 0.1)
 
         # State features
         features['state_avg_fee'] = self.feature_stats['state_avg_fee'].get(
@@ -202,7 +281,9 @@ class BidPredictor:
         features['state_win_rate'] = self.feature_stats['state_win_rate'].get(
             property_state, self.feature_stats['global_win_rate']
         )
-        features['PropertyState_frequency'] = self.feature_stats['state_frequency'].get(property_state, 100)
+        # PropertyState_frequency is a PROPORTION (0-1), not raw count
+        # Model was trained on proportions
+        features['PropertyState_frequency'] = self.feature_stats['state_frequency'].get(property_state, 0.05)
 
         # Property type features
         features['propertytype_avg_fee'] = self.feature_stats['propertytype_avg_fee'].get(
@@ -211,7 +292,23 @@ class BidPredictor:
         features['propertytype_win_rate'] = self.feature_stats['propertytype_win_rate'].get(
             property_type, self.feature_stats['global_win_rate']
         )
-        features['PropertyType_frequency'] = self.feature_stats['PropertyType_frequency'].get(property_type, 100)
+        # PropertyType_frequency is a PROPORTION (0-1), not raw count
+        # Model was trained on proportions
+        features['PropertyType_frequency'] = self.feature_stats['PropertyType_frequency'].get(property_type, 0.1)
+
+        # Target time ratio to property type median
+        proptype_median_time = self.feature_stats.get('proptype_target_time', {}).get(property_type, 21)
+        features['targettime_ratio_to_proptype'] = target_time / max(proptype_median_time, 1)
+
+        # Property type standard deviation
+        features['propertytype_std_fee'] = self.feature_stats.get('propertytype_std_fee', {}).get(
+            property_type, features['segment_std_fee']
+        )
+
+        # State standard deviation
+        features['state_std_fee'] = self.feature_stats.get('state_std_fee_median', {}).get(
+            property_state, features['segment_std_fee']
+        )
 
         # Office features
         if office_id and office_id in self.feature_stats['office_avg_fee']:
@@ -220,10 +317,26 @@ class BidPredictor:
             features['office_win_rate'] = self.feature_stats['office_win_rate'].get(
                 office_id, self.feature_stats['global_win_rate']
             )
+            # Rolling stats for this office
+            features['rolling_bid_count_office'] = self.feature_stats.get('office_rolling_bid_count', {}).get(
+                office_id, self.feature_stats.get('global_rolling_bid_count', 226)
+            )
+            features['rolling_std_fee_office'] = self.feature_stats.get('office_rolling_std_fee', {}).get(
+                office_id, features['office_std_fee']
+            )
+            features['rolling_win_rate_office'] = self.feature_stats.get('office_rolling_win_rate', {}).get(
+                office_id, features['office_win_rate']
+            )
         else:
             features['office_avg_fee'] = self.feature_stats['global_avg_fee']
             features['office_std_fee'] = self.feature_stats['global_std_fee']
             features['office_win_rate'] = self.feature_stats['global_win_rate']
+            features['rolling_bid_count_office'] = self.feature_stats.get('global_rolling_bid_count', 226)
+            features['rolling_std_fee_office'] = features['office_std_fee']
+            features['rolling_win_rate_office'] = features['office_win_rate']
+
+        # Computed feature: distance_x_volume = DistanceInMiles * rolling_bid_count_office
+        features['distance_x_volume'] = features['DistanceInMiles'] * features['rolling_bid_count_office']
 
         # Rolling features (use segment averages as proxy for new bids)
         features['rolling_avg_fee_segment'] = features['segment_avg_fee']
@@ -245,17 +358,17 @@ class BidPredictor:
             features['lag1_targettime_client'] = client_history.get('last_target_time', target_time)
             features['client_bid_count'] = client_history.get('total_bids', 0)
         else:
-            # New client defaults
+            # New client defaults - use segment statistics as reasonable defaults
             features['client_avg_fee'] = features['segment_avg_fee']
-            features['client_std_fee'] = 0
+            features['client_std_fee'] = features['segment_std_fee'] * 0.7  # New clients typically have less variance
             features['client_win_rate'] = self.feature_stats['global_win_rate']
-            features['cumulative_bids_client'] = 0
-            features['cumulative_wins_client'] = 0
-            features['cumulative_winrate_client'] = 0
-            features['lag1_bidfee_client'] = 0
-            features['lag2_bidfee_client'] = 0
-            features['lag1_targettime_client'] = 0
-            features['client_bid_count'] = 0
+            features['cumulative_bids_client'] = 5  # Assume typical client
+            features['cumulative_wins_client'] = 2  # Typical win rate
+            features['cumulative_winrate_client'] = 0.4  # Typical win rate
+            features['lag1_bidfee_client'] = features['segment_avg_fee']  # Assume previous bid was average
+            features['lag2_bidfee_client'] = features['segment_avg_fee']
+            features['lag1_targettime_client'] = target_time
+            features['client_bid_count'] = 5
 
         # Competitiveness features (will be computed relative to segment)
         # These are computed AFTER we know the predicted fee
@@ -300,8 +413,9 @@ class BidPredictor:
         features['competitiveness_x_winrate'] = features['bid_vs_segment_ratio'] * features['cumulative_winrate_client']
         features['time_x_density'] = target_time * features['segment_bid_density']
 
-        # Categorical encodings
-        features['BusinessSegment_frequency'] = features['segment_bid_density']
+        # Note: Categorical frequency encodings (BusinessSegment_frequency,
+        # PropertyState_frequency, PropertyType_frequency) are already set above
+        # as proportions (0-1), which is what the model expects.
 
         return features
 
@@ -362,13 +476,21 @@ class BidPredictor:
             client_history=client_history,
         )
 
-        # Create feature vector in correct order
+        # Create feature vector in correct order, using segment-specific defaults
         feature_vector = []
         for feat_name in self.model_features:
             if feat_name in features:
                 feature_vector.append(features[feat_name])
+            elif feat_name in self.feature_defaults:
+                # Use segment-specific median if available, else global median
+                defaults = self.feature_defaults[feat_name]
+                segment_key = f'segment_{business_segment}_median'
+                if segment_key in defaults:
+                    feature_vector.append(defaults[segment_key])
+                else:
+                    feature_vector.append(defaults.get('global_median', 0))
             else:
-                feature_vector.append(0)  # Default for missing features
+                feature_vector.append(0)  # Last resort default
 
         # Make prediction
         X = np.array([feature_vector])
