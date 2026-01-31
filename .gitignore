@@ -78,3 +78,18 @@ htmlcov/
 *.bak
 *.tmp
 .cadence/
+
+# Frontend
+frontend/node_modules/
+frontend/build/
+frontend/.env.local
+frontend/.env.production.local
+frontend/npm-debug.log*
+
+# Keep model files (needed for deployment)
+!outputs/models/*.txt
+!outputs/models/*.json
+
+# Temporary files
+/tmp/
+*.pyc
