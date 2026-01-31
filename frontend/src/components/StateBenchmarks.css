@@ -1,0 +1,135 @@
+/* State Benchmarks Styles */
+.state-benchmarks {
+  display: flex;
+  flex-direction: column;
+}
+
+.benchmarks-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+}
+
+.benchmarks-header h3 {
+  font-size: var(--font-size-lg);
+  margin: 0;
+}
+
+.state-select {
+  width: auto;
+  min-width: 150px;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: var(--font-size-sm);
+}
+
+.selected-state-stats {
+  background-color: var(--color-bg-secondary);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.state-stat-row {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--spacing-xs) 0;
+}
+
+.state-stat-row:not(:last-child) {
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.state-stat-label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.state-stat-value {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.top-states {
+  margin-top: var(--spacing-md);
+}
+
+.top-states h4 {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-md);
+}
+
+.top-states-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.top-state-item {
+  display: grid;
+  grid-template-columns: 32px 80px 1fr 50px;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-xs) 0;
+}
+
+.top-state-item.active {
+  background-color: var(--color-bg-accent);
+  margin: 0 calc(-1 * var(--spacing-sm));
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-sm);
+}
+
+.state-rank {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-muted);
+}
+
+.state-name {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+}
+
+.state-bar-container {
+  height: 6px;
+  background-color: var(--color-bg-accent);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.state-bar {
+  height: 100%;
+  background-color: var(--color-accent);
+  border-radius: 3px;
+  transition: width var(--transition-normal);
+}
+
+.top-state-item.active .state-bar {
+  background-color: var(--color-success);
+}
+
+.state-volume {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  text-align: right;
+}
+
+.illinois-note {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-xs);
+  margin-top: var(--spacing-lg);
+  padding-top: var(--spacing-md);
+  border-top: 1px solid var(--color-border-light);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.note-icon {
+  color: var(--color-info);
+  font-weight: var(--font-weight-bold);
+}

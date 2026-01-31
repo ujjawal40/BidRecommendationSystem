@@ -1,146 +1,225 @@
 # Bid Recommendation System
 
-A production-grade machine learning system for optimizing commercial real estate appraisal bid recommendations.
+**Global Stat Solutions** | AI-Powered Bid Fee Prediction Platform
 
-## Project Overview
+A machine learning system that predicts optimal bid fees for commercial real estate appraisal services, helping appraisers make data-driven pricing decisions.
 
-This project develops a data-driven recommendation engine for a CRE valuation firm to maximize expected revenue while maintaining high win probability on appraisal bids.
+---
 
-**Client**: Commercial Real Estate Valuation Firm
-**Developer**: Global Stat Solutions (GSS)
+## System Architecture
 
-## Business Objective
-
-Recommend optimal bid fees that maximize:
 ```
-Expected Value = Win Probability × Bid Fee
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           BID RECOMMENDATION SYSTEM                         │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ┌──────────────┐    ┌──────────────────┐    ┌────────────────────────────┐ │
+│  │   FRONTEND   │    │    REST API      │    │      ML MODELS             │ │
+│  │   (React)    │───▶│    (Flask)       │───▶│                            │ │
+│  │              │    │                  │    │  ┌────────────────────┐    │ │
+│  │  - Form UI   │    │  /api/predict    │    │  │ LightGBM Regressor │    │ │
+│  │  - Results   │    │  /api/options    │    │  │ (Bid Fee Model)    │    │ │
+│  │  - Charts    │◀───│  /api/health     │◀───│  │ - 500 trees        │    │ │
+│  │              │    │                  │    │  │ - 68 features      │    │ │
+│  └──────────────┘    └──────────────────┘    │  │ - RMSE: $328       │    │ │
+│        │                     │               │  └────────────────────┘    │ │
+│        │                     │               │                            │ │
+│        ▼                     ▼               │  ┌────────────────────┐    │ │
+│   ┌─────────┐         ┌─────────────┐        │  │ Win Probability    │    │ │
+│   │ Vercel  │         │   Render    │        │  │ (Experimental)     │    │ │
+│   │ (Host)  │         │   (Host)    │        │  └────────────────────┘    │ │
+│   └─────────┘         └─────────────┘        └────────────────────────────┘ │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-## Current Phase
+## Features
 
-**Phase 1**: Bid Fee Time Series Modeling
-- Model bid fee behavior over time using historical bid data
-- Incorporate critical drivers (TargetTime, property type, market, client, etc.)
-- Build foundation for future win probability modeling
+- **Bid Fee Prediction**: ML-powered predictions based on 68 features
+- **Confidence Intervals**: Empirical quantile bands (80% coverage)
+- **Win Probability**: Experimental competitive positioning indicator
+- **Market Benchmarks**: Compare against segment and state averages
+- **Real-time API**: RESTful endpoints for integration
+
+---
 
 ## Project Structure
 
 ```
 BidRecommendationSystem/
-├── data/
-│   ├── raw/                    # Original data (read-only)
-│   └── processed/              # Cleaned data with headers
-├── notebooks/
-│   └── 01_EDA.ipynb           # Exploratory Data Analysis
-├── src/
-│   └── utils/                 # Reusable utilities
+├── api/                          # Flask REST API
+│   ├── app.py                    # API endpoints
+│   ├── prediction_service.py    # Core prediction logic
+│   └── empirical_bands.py       # Confidence interval calculator
+│
+├── frontend/                     # React UI
+│   ├── src/
+│   │   ├── components/          # React components
+│   │   │   ├── BidForm.js       # Input form
+│   │   │   ├── ResultDisplay.js # Prediction results
+│   │   │   └── Header.js        # Navigation
+│   │   ├── services/            # API client
+│   │   └── App.js               # Main app
+│   └── package.json
+│
+├── config/                       # Configuration
+│   └── model_config.py          # Model paths & settings
+│
 ├── outputs/
-│   ├── figures/               # Visualizations
-│   └── reports/               # Analysis reports
-├── requirements.txt           # Python dependencies
-└── README.md                  # This file
+│   ├── models/                  # Trained models
+│   │   ├── lightgbm_bidfee_model.txt
+│   │   └── lightgbm_win_probability.txt
+│   └── reports/                 # Precomputed statistics
+│       ├── empirical_bands.json
+│       ├── feature_defaults.json
+│       └── rolling_stats.json
+│
+├── scripts/                     # Training & analysis scripts
+│
+├── data/                        # Data directory (not in repo)
+│   ├── raw/                     # Original data
+│   ├── processed/               # Cleaned data
+│   └── features/                # Feature-engineered data
+│
+├── requirements.txt             # Python dependencies
+├── render.yaml                  # Render deployment config
+└── README.md
 ```
-
-## Setup Instructions
-
-### 1. Create Virtual Environment
-```bash
-python3.10 -m venv venv
-source venv/bin/activate  # On Mac/Linux
-# or
-venv\Scripts\activate     # On Windows
-```
-
-### 2. Install Dependencies
-```bash
-pip install --upgrade pip
-pip install -r requirements.txt
-```
-
-### 3. Verify Setup
-```bash
-python -c "import pandas, numpy, sklearn, lightgbm, torch; print('Setup successful!')"
-```
-
-## Data Description
-
-**Primary Dataset**: `data/processed/BidData_cleaned.csv`
-- **166,372 rows** (bid records from 2018-2025)
-- **55 columns** including:
-  - **Target**: BidFee (fee amount)
-  - **Key Driver**: TargetTime (turnaround days)
-  - **Time Index**: BidDate
-  - **Categories**: Property type, client, office, market
-  - **Demographics**: Population, income, housing values by ZIP
-  - **Outcomes**: BidStatusName (Won/Lost/Active/Declined/Placed)
-
-**Data Dictionary**: `data/raw/BidDataDictionary.xlsx`
-
-## Key Features
-
-### Time Series Modeling
-- Bid date as temporal index
-- Rolling/lag features for historical patterns
-- Seasonality and trend analysis
-
-### Feature Engineering
-- Categorical encoding (client, property type, office, market)
-- Rolling aggregations (3-month avg fee by client/office/property type)
-- Temporal features (day of week, month, quarter)
-- Geographic features (location, distance)
-
-### Model Explainability
-- SHAP values for stakeholder communication
-- Feature importance analysis
-- Bid-level predictions with explanations
-
-## Development Approach
-
-**Iterative & Production-Focused**:
-1. Start with EDA in notebooks
-2. Extract reusable code to `src/` modules
-3. Build incrementally with proper structure
-4. Write tests for critical components
-5. Maintain clean, documented code
-
-## Technology Stack
-
-- **Core ML**: pandas, numpy, scikit-learn, LightGBM, PyTorch
-- **Visualization**: matplotlib, seaborn, plotly
-- **Explainability**: SHAP
-- **Code Quality**: black, flake8, pytest
-
-## Current Model Performance (Phase 1A)
-
-| Metric | Value |
-|--------|-------|
-| **Test RMSE** | $328.75 |
-| **Test MAE** | $102.44 |
-| **R²** | 0.9761 |
-| **Overfitting Ratio** | 1.99x |
-
-**Configuration**:
-- Data: 2023+ (52,308 records)
-- Features: 68 (optimized)
-- Split: 60% train / 20% valid / 20% test
-- Regularization: L1=1.0, L2=1.0
-
-## Progress
-
-- [x] Project setup
-- [x] Exploratory Data Analysis
-- [x] Feature engineering (58 engineered features)
-- [x] Data leakage detection and fix
-- [x] Baseline model (LightGBM)
-- [x] Model optimization (regularization, 2023+ data)
-- [ ] Feature ablation study
-- [ ] Win probability modeling (Phase 1B)
-
-## Contact
-
-**Developer**: Ujjawal Dwivedi
-**Organization**: Global Stat Solutions (GSS)
 
 ---
 
-*Last Updated*: 2026-01-23
+## Quick Start
+
+### Prerequisites
+- Python 3.11+
+- Node.js 18+
+
+### 1. Clone & Setup Backend
+
+```bash
+git clone https://github.com/ujjawal40/BidRecommendationSystem.git
+cd BidRecommendationSystem
+
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+```
+
+### 2. Start API Server
+
+```bash
+cd api
+python app.py
+# API runs at http://localhost:5001
+```
+
+### 3. Start Frontend
+
+```bash
+cd frontend
+npm install
+npm start
+# UI runs at http://localhost:3000
+```
+
+---
+
+## API Reference
+
+### Health Check
+```
+GET /api/health
+```
+
+### Get Options
+```
+GET /api/options
+```
+
+### Predict Bid Fee
+```
+POST /api/predict
+Content-Type: application/json
+
+{
+  "business_segment": "Financing",
+  "property_type": "Multifamily",
+  "property_state": "Texas",
+  "target_time": 30
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "prediction": {
+    "predicted_fee": 3127.98,
+    "confidence_interval": {"low": 3056.05, "high": 3188.72},
+    "segment_benchmark": 3215.48
+  }
+}
+```
+
+---
+
+## Deployment
+
+### Frontend → Vercel
+
+1. Connect repo to Vercel
+2. Set root directory: `frontend`
+3. Add environment variable:
+   ```
+   REACT_APP_API_URL=https://your-api.onrender.com
+   ```
+
+### Backend → Render
+
+1. Connect repo to Render
+2. Uses `render.yaml` config automatically
+3. Deploys at `https://bid-recommendation-api.onrender.com`
+
+---
+
+## Model Performance
+
+| Metric | Value |
+|--------|-------|
+| Algorithm | LightGBM |
+| Trees | 500 |
+| Features | 68 |
+| Test RMSE | $328.75 |
+| Test MAE | $215.42 |
+
+### Top Features
+
+1. `segment_avg_fee` (63%)
+2. `state_avg_fee` (10%)
+3. `propertytype_avg_fee` (5%)
+4. `TargetTime` (4%)
+5. `rolling_avg_fee_segment` (3%)
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|------------|
+| Frontend | React 18 |
+| Backend | Flask, Python 3.11 |
+| ML | LightGBM, scikit-learn |
+| Deployment | Vercel, Render |
+
+---
+
+## License
+
+Proprietary - Global Stat Solutions
+
+---
+
+**Global Stat Solutions** | Bid Recommendation System v1.0

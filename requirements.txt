@@ -39,3 +39,8 @@ pytest==7.4.2
 
 # Data Validation
 openpyxl==3.1.2  # For reading Excel files
+
+# API
+flask==3.0.0
+flask-cors==4.0.0
+gunicorn==21.2.0
