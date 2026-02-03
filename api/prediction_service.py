@@ -556,6 +556,16 @@ class BidPredictor:
         else:
             recommendation = "Predicted fee is within normal range for this segment."
 
+        # Predict win probability using classification model
+        win_prob_result = self.predict_win_probability(
+            features=features,
+            predicted_fee=prediction,
+            segment_benchmark=segment_avg,
+        )
+
+        # Calculate expected value: EV = P(Win) × Bid Fee
+        expected_value = win_prob_result['probability'] * prediction
+
         return {
             "predicted_fee": round(prediction, 2),
             "confidence_interval": {
@@ -563,6 +573,8 @@ class BidPredictor:
                 "high": round(high, 2),
             },
             "confidence_level": confidence,
+            "win_probability": win_prob_result,
+            "expected_value": round(expected_value, 2),
             "segment_benchmark": round(segment_avg, 2),
             "state_benchmark": round(
                 self.feature_stats['state_avg_fee'].get(property_state, segment_avg), 2
