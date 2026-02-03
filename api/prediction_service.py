@@ -55,6 +55,8 @@ class BidPredictor:
         """Initialize predictor with model and feature statistics."""
         self.model = None
         self.model_features = None
+        self.win_prob_model = None
+        self.win_prob_features = None
         self.feature_stats = {}
         self.feature_defaults = {}  # Segment-specific defaults for missing features
         self.segments = []
@@ -64,6 +66,7 @@ class BidPredictor:
         self.band_calculator = EmpiricalBandCalculator()
 
         self._load_model()
+        self._load_win_probability_model()
         self._compute_feature_statistics()
         self._load_empirical_bands()
         self._load_feature_defaults()
@@ -79,6 +82,27 @@ class BidPredictor:
         self.model_features = self.model.feature_name()
 
         print(f"[BidPredictor] Model loaded: {self.model.num_trees()} trees, {len(self.model_features)} features")
+
+    def _load_win_probability_model(self):
+        """Load the trained LightGBM win probability model."""
+        model_path = MODELS_DIR / "lightgbm_win_probability.txt"
+        metadata_path = MODELS_DIR / "lightgbm_win_probability_metadata.json"
+
+        if not model_path.exists():
+            print(f"[BidPredictor] Warning: Win probability model not found at {model_path}")
+            print(f"[BidPredictor] Win probability predictions will use fallback heuristic")
+            return
+
+        self.win_prob_model = lgb.Booster(model_file=str(model_path))
+        self.win_prob_features = self.win_prob_model.feature_name()
+
+        # Load metadata for feature info
+        if metadata_path.exists():
+            with open(metadata_path, 'r') as f:
+                self.win_prob_metadata = json.load(f)
+            print(f"[BidPredictor] Win probability model loaded: AUC={self.win_prob_metadata['metrics']['test']['auc_roc']:.4f}")
+        else:
+            print(f"[BidPredictor] Win probability model loaded: {self.win_prob_model.num_trees()} trees")
 
     def _compute_feature_statistics(self):
         """Precompute feature statistics from training data for lookup."""
