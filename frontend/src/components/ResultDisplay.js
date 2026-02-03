@@ -66,7 +66,9 @@ function ResultDisplay({ prediction, formData }) {
       <div className="card result-winprob">
         <div className="winprob-header">
           <h4>Win Probability</h4>
-          <span className="experimental-tag">Experimental</span>
+          <span className={`confidence-tag confidence-${winProbConfidence}`}>
+            {winProbConfidence} confidence
+          </span>
         </div>
 
         <div className="winprob-display">
@@ -90,11 +92,16 @@ function ResultDisplay({ prediction, formData }) {
                 strokeDasharray={`${winProbability}, 100`}
               />
             </svg>
-            <span className="winprob-value">{winProbability}%</span>
+            <span className="winprob-value">{Math.round(winProbability)}%</span>
           </div>
           <p className="winprob-note">
-            Based on historical patterns. Treat as directional guidance only.
+            {modelUsed}
           </p>
+          {expected_value && (
+            <p className="expected-value">
+              Expected Value: <strong>${expected_value.toLocaleString()}</strong>
+            </p>
+          )}
         </div>
       </div>
 
