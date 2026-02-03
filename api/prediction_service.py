@@ -55,6 +55,8 @@ class BidPredictor:
         """Initialize predictor with model and feature statistics."""
         self.model = None
         self.model_features = None
+        self.win_prob_model = None
+        self.win_prob_features = None
         self.feature_stats = {}
         self.feature_defaults = {}  # Segment-specific defaults for missing features
         self.segments = []
@@ -64,6 +66,7 @@ class BidPredictor:
         self.band_calculator = EmpiricalBandCalculator()
 
         self._load_model()
+        self._load_win_probability_model()
         self._compute_feature_statistics()
         self._load_empirical_bands()
         self._load_feature_defaults()
@@ -79,6 +82,27 @@ class BidPredictor:
         self.model_features = self.model.feature_name()
 
         print(f"[BidPredictor] Model loaded: {self.model.num_trees()} trees, {len(self.model_features)} features")
+
+    def _load_win_probability_model(self):
+        """Load the trained LightGBM win probability model."""
+        model_path = MODELS_DIR / "lightgbm_win_probability.txt"
+        metadata_path = MODELS_DIR / "lightgbm_win_probability_metadata.json"
+
+        if not model_path.exists():
+            print(f"[BidPredictor] Warning: Win probability model not found at {model_path}")
+            print(f"[BidPredictor] Win probability predictions will use fallback heuristic")
+            return
+
+        self.win_prob_model = lgb.Booster(model_file=str(model_path))
+        self.win_prob_features = self.win_prob_model.feature_name()
+
+        # Load metadata for feature info
+        if metadata_path.exists():
+            with open(metadata_path, 'r') as f:
+                self.win_prob_metadata = json.load(f)
+            print(f"[BidPredictor] Win probability model loaded: AUC={self.win_prob_metadata['metrics']['test']['auc_roc']:.4f}")
+        else:
+            print(f"[BidPredictor] Win probability model loaded: {self.win_prob_model.num_trees()} trees")
 
     def _compute_feature_statistics(self):
         """Precompute feature statistics from training data for lookup."""
@@ -532,6 +556,16 @@ class BidPredictor:
         else:
             recommendation = "Predicted fee is within normal range for this segment."
 
+        # Predict win probability using classification model
+        win_prob_result = self.predict_win_probability(
+            features=features,
+            predicted_fee=prediction,
+            segment_benchmark=segment_avg,
+        )
+
+        # Calculate expected value: EV = P(Win) × Bid Fee
+        expected_value = win_prob_result['probability'] * prediction
+
         return {
             "predicted_fee": round(prediction, 2),
             "confidence_interval": {
@@ -539,6 +573,8 @@ class BidPredictor:
                 "high": round(high, 2),
             },
             "confidence_level": confidence,
+            "win_probability": win_prob_result,
+            "expected_value": round(expected_value, 2),
             "segment_benchmark": round(segment_avg, 2),
             "state_benchmark": round(
                 self.feature_stats['state_avg_fee'].get(property_state, segment_avg), 2
@@ -577,6 +613,98 @@ class BidPredictor:
             "std_fee": self.feature_stats['segment_std_fee'].get(segment, 0),
             "win_rate": self.feature_stats['segment_win_rate'].get(segment, 0),
             "count": self.feature_stats['segment_count'].get(segment, 0),
+        }
+
+    def predict_win_probability(
+        self,
+        features: Dict[str, float],
+        predicted_fee: float,
+        segment_benchmark: float,
+    ) -> Dict[str, Any]:
+        """
+        Predict win probability using the trained classification model.
+
+        Parameters:
+        -----------
+        features : dict
+            Generated features from _generate_features
+        predicted_fee : float
+            The predicted bid fee
+        segment_benchmark : float
+            Average fee for the segment (for fallback heuristic)
+
+        Returns:
+        --------
+        dict : Win probability results
+            {
+                "probability": float (0-1),
+                "confidence": str,
+                "model_used": str,
+            }
+        """
+        # If no win probability model, use improved heuristic
+        if self.win_prob_model is None:
+            return self._fallback_win_probability(predicted_fee, segment_benchmark)
+
+        # Build feature vector for win probability model
+        feature_vector = []
+        for feat_name in self.win_prob_features:
+            if feat_name in features:
+                feature_vector.append(features[feat_name])
+            elif feat_name in self.feature_defaults:
+                defaults = self.feature_defaults[feat_name]
+                feature_vector.append(defaults.get('global_median', 0))
+            else:
+                feature_vector.append(0)
+
+        # Predict probability
+        X = np.array([feature_vector])
+        probability = self.win_prob_model.predict(X)[0]
+
+        # Clamp to valid range
+        probability = max(0.05, min(0.95, probability))
+
+        # Confidence based on how close to 0.5 (more extreme = more confident)
+        distance_from_uncertain = abs(probability - 0.5)
+        if distance_from_uncertain > 0.3:
+            confidence = "high"
+        elif distance_from_uncertain > 0.15:
+            confidence = "medium"
+        else:
+            confidence = "low"
+
+        return {
+            "probability": round(probability, 4),
+            "probability_pct": round(probability * 100, 1),
+            "confidence": confidence,
+            "model_used": "LightGBM Classifier (AUC: 0.88)",
+        }
+
+    def _fallback_win_probability(
+        self,
+        predicted_fee: float,
+        segment_benchmark: float,
+    ) -> Dict[str, Any]:
+        """
+        Fallback heuristic when win probability model is not available.
+        Uses fee-to-benchmark ratio with smoother curve.
+        """
+        ratio = predicted_fee / max(segment_benchmark, 1)
+
+        # Smooth sigmoid-like function instead of hard buckets
+        # Lower ratio (more competitive) = higher win probability
+        # probability = 1 / (1 + exp(k * (ratio - 1)))
+        k = 5  # Steepness
+        probability = 1 / (1 + np.exp(k * (ratio - 1)))
+
+        # Scale to realistic range (20% - 75%)
+        probability = 0.20 + (probability * 0.55)
+
+        return {
+            "probability": round(probability, 4),
+            "probability_pct": round(probability * 100, 1),
+            "confidence": "low",
+            "model_used": "Heuristic (model not loaded)",
         }
 
 
