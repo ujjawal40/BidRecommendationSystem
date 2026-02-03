@@ -10,15 +10,18 @@ function ResultDisplay({ prediction, formData }) {
     state_benchmark,
     recommendation,
     factors,
+    win_probability,
+    expected_value,
   } = prediction;
 
   // Calculate how prediction compares to benchmarks
   const vsSegment = ((predicted_fee - segment_benchmark) / segment_benchmark * 100).toFixed(1);
   const vsState = ((predicted_fee - state_benchmark) / state_benchmark * 100).toFixed(1);
 
-  // Simulated win probability (experimental)
-  // In production, this would come from the classification model
-  const winProbability = calculateExperimentalWinProb(predicted_fee, segment_benchmark);
+  // Use win probability from ML model (or fallback if not available)
+  const winProbability = win_probability?.probability_pct || calculateFallbackWinProb(predicted_fee, segment_benchmark);
+  const winProbConfidence = win_probability?.confidence || 'low';
+  const modelUsed = win_probability?.model_used || 'Fallback Heuristic';
 
   return (
     <div className="result-display">
