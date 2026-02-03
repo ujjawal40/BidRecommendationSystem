@@ -169,18 +169,19 @@ function ResultDisplay({ prediction, formData }) {
 }
 
 /**
- * Calculate experimental win probability
- * This is a placeholder until the win probability model is validated
+ * Fallback win probability calculation when API doesn't return model prediction.
+ * Uses smooth sigmoid curve instead of hard buckets.
  */
-function calculateExperimentalWinProb(predicted, benchmark) {
-  // Simple heuristic: lower bids relative to benchmark have higher win prob
+function calculateFallbackWinProb(predicted, benchmark) {
   const ratio = predicted / benchmark;
 
-  if (ratio < 0.85) return 72;
-  if (ratio < 0.95) return 58;
-  if (ratio < 1.05) return 45;
-  if (ratio < 1.15) return 32;
-  return 22;
+  // Smooth sigmoid-like function
+  // Lower ratio (more competitive) = higher win probability
+  const k = 5; // Steepness
+  const probability = 1 / (1 + Math.exp(k * (ratio - 1)));
+
+  // Scale to realistic range (20% - 75%)
+  return 20 + (probability * 55);
 }
 
 export default ResultDisplay;
