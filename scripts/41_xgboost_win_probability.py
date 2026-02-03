@@ -41,7 +41,9 @@ warnings.filterwarnings('ignore')
 # ============================================================================
 
 # Features that LEAK future information for classification
+# Must match LightGBM excluded features for fair comparison
 LEAKY_CLASSIFICATION_FEATURES = [
+    'JobCount',                   # Data leakage: presence correlated with outcome
     'win_rate_with_client',
     'office_win_rate',
     'propertytype_win_rate',
