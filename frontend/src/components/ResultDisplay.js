@@ -10,15 +10,18 @@ function ResultDisplay({ prediction, formData }) {
     state_benchmark,
     recommendation,
     factors,
+    win_probability,
+    expected_value,
   } = prediction;
 
   // Calculate how prediction compares to benchmarks
   const vsSegment = ((predicted_fee - segment_benchmark) / segment_benchmark * 100).toFixed(1);
   const vsState = ((predicted_fee - state_benchmark) / state_benchmark * 100).toFixed(1);
 
-  // Simulated win probability (experimental)
-  // In production, this would come from the classification model
-  const winProbability = calculateExperimentalWinProb(predicted_fee, segment_benchmark);
+  // Use win probability from ML model (or fallback if not available)
+  const winProbability = win_probability?.probability_pct || calculateFallbackWinProb(predicted_fee, segment_benchmark);
+  const winProbConfidence = win_probability?.confidence || 'low';
+  const modelUsed = win_probability?.model_used || 'Fallback Heuristic';
 
   return (
     <div className="result-display">
@@ -63,7 +66,9 @@ function ResultDisplay({ prediction, formData }) {
       <div className="card result-winprob">
         <div className="winprob-header">
           <h4>Win Probability</h4>
-          <span className="experimental-tag">Experimental</span>
+          <span className={`confidence-tag confidence-${winProbConfidence}`}>
+            {winProbConfidence} confidence
+          </span>
         </div>
 
         <div className="winprob-display">
@@ -87,11 +92,16 @@ function ResultDisplay({ prediction, formData }) {
                 strokeDasharray={`${winProbability}, 100`}
               />
             </svg>
-            <span className="winprob-value">{winProbability}%</span>
+            <span className="winprob-value">{Math.round(winProbability)}%</span>
           </div>
           <p className="winprob-note">
-            Based on historical patterns. Treat as directional guidance only.
+            {modelUsed}
           </p>
+          {expected_value && (
+            <p className="expected-value">
+              Expected Value: <strong>${expected_value.toLocaleString()}</strong>
+            </p>
+          )}
         </div>
       </div>
 
@@ -159,18 +169,19 @@ function ResultDisplay({ prediction, formData }) {
 }
 
 /**
- * Calculate experimental win probability
- * This is a placeholder until the win probability model is validated
+ * Fallback win probability calculation when API doesn't return model prediction.
+ * Uses smooth sigmoid curve instead of hard buckets.
  */
-function calculateExperimentalWinProb(predicted, benchmark) {
-  // Simple heuristic: lower bids relative to benchmark have higher win prob
+function calculateFallbackWinProb(predicted, benchmark) {
   const ratio = predicted / benchmark;
 
-  if (ratio < 0.85) return 72;
-  if (ratio < 0.95) return 58;
-  if (ratio < 1.05) return 45;
-  if (ratio < 1.15) return 32;
-  return 22;
+  // Smooth sigmoid-like function
+  // Lower ratio (more competitive) = higher win probability
+  const k = 5; // Steepness
+  const probability = 1 / (1 + Math.exp(k * (ratio - 1)));
+
+  // Scale to realistic range (20% - 75%)
+  return 20 + (probability * 55);
 }
 
 export default ResultDisplay;
