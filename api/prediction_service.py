@@ -603,6 +603,98 @@ class BidPredictor:
             "count": self.feature_stats['segment_count'].get(segment, 0),
         }
 
+    def predict_win_probability(
+        self,
+        features: Dict[str, float],
+        predicted_fee: float,
+        segment_benchmark: float,
+    ) -> Dict[str, Any]:
+        """
+        Predict win probability using the trained classification model.
+
+        Parameters:
+        -----------
+        features : dict
+            Generated features from _generate_features
+        predicted_fee : float
+            The predicted bid fee
+        segment_benchmark : float
+            Average fee for the segment (for fallback heuristic)
+
+        Returns:
+        --------
+        dict : Win probability results
+            {
+                "probability": float (0-1),
+                "confidence": str,
+                "model_used": str,
+            }
+        """
+        # If no win probability model, use improved heuristic
+        if self.win_prob_model is None:
+            return self._fallback_win_probability(predicted_fee, segment_benchmark)
+
+        # Build feature vector for win probability model
+        feature_vector = []
+        for feat_name in self.win_prob_features:
+            if feat_name in features:
+                feature_vector.append(features[feat_name])
+            elif feat_name in self.feature_defaults:
+                defaults = self.feature_defaults[feat_name]
+                feature_vector.append(defaults.get('global_median', 0))
+            else:
+                feature_vector.append(0)
+
+        # Predict probability
+        X = np.array([feature_vector])
+        probability = self.win_prob_model.predict(X)[0]
+
+        # Clamp to valid range
+        probability = max(0.05, min(0.95, probability))
+
+        # Confidence based on how close to 0.5 (more extreme = more confident)
+        distance_from_uncertain = abs(probability - 0.5)
+        if distance_from_uncertain > 0.3:
+            confidence = "high"
+        elif distance_from_uncertain > 0.15:
+            confidence = "medium"
+        else:
+            confidence = "low"
+
+        return {
+            "probability": round(probability, 4),
+            "probability_pct": round(probability * 100, 1),
+            "confidence": confidence,
+            "model_used": "LightGBM Classifier (AUC: 0.88)",
+        }
+
+    def _fallback_win_probability(
+        self,
+        predicted_fee: float,
+        segment_benchmark: float,
+    ) -> Dict[str, Any]:
+        """
+        Fallback heuristic when win probability model is not available.
+        Uses fee-to-benchmark ratio with smoother curve.
+        """
+        ratio = predicted_fee / max(segment_benchmark, 1)
+
+        # Smooth sigmoid-like function instead of hard buckets
+        # Lower ratio (more competitive) = higher win probability
+        # probability = 1 / (1 + exp(k * (ratio - 1)))
+        k = 5  # Steepness
+        probability = 1 / (1 + np.exp(k * (ratio - 1)))
+
+        # Scale to realistic range (20% - 75%)
+        probability = 0.20 + (probability * 0.55)
+
+        return {
+            "probability": round(probability, 4),
+            "probability_pct": round(probability * 100, 1),
+            "confidence": "low",
+            "model_used": "Heuristic (model not loaded)",
+        }
+
 
 # Singleton instance for API
 _predictor_instance = None
