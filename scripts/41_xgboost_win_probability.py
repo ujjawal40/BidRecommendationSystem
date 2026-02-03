@@ -169,17 +169,23 @@ def main():
         if key not in ['random_state', 'n_jobs', 'verbosity']:
             print(f"  {key}: {value}")
 
-    model = xgb.XGBClassifier(**params)
+    # Add early stopping
+    params_with_es = params.copy()
+    params_with_es['early_stopping_rounds'] = early_stopping
+    params_with_es['callbacks'] = [xgb.callback.EvaluationMonitor(period=100)]
+
+    model = xgb.XGBClassifier(**params_with_es)
 
     print("\nTraining...")
     model.fit(
         X_train, y_train,
         eval_set=[(X_train, y_train), (X_valid, y_valid)],
-        verbose=100,
+        verbose=False,
     )
 
+    best_iter = getattr(model, 'best_iteration', model.n_estimators)
     print(f"\n✓ Training complete")
-    print(f"  Best iteration: {model.best_iteration}")
+    print(f"  Best iteration: {best_iter}")
 
     # ========================================================================
     # EVALUATION
