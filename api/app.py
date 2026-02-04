@@ -26,10 +26,27 @@ sys.path.append(str(Path(__file__).parent.parent))
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from datetime import datetime
-
-from api.prediction_service import get_predictor, BidPredictor
+import os
 
 app = Flask(__name__)
+
+
+@app.route('/api/ping', methods=['GET'])
+def ping():
+    """Ultra-simple endpoint - no imports needed."""
+    return jsonify({
+        "pong": True,
+        "cwd": os.getcwd(),
+        "files_in_cwd": os.listdir('.')[:20],
+    })
+
+
+# Lazy import to catch import errors
+def get_predictor_lazy():
+    from api.prediction_service import get_predictor
+    return get_predictor()
+
+BidPredictor = None  # Will be set on first use
 CORS(app)  # Enable CORS for React frontend
 
 # Initialize predictor on startup
@@ -74,14 +91,14 @@ def initialize_predictor():
     """Lazy-load the predictor on first request."""
     global predictor, init_error
 
-    # Skip initialization for debug endpoint
-    if request.endpoint == 'debug_info':
+    # Skip initialization for debug/ping endpoints
+    if request.endpoint in ('debug_info', 'ping'):
         return
 
     if predictor is None and init_error is None:
         try:
             print("[API] Initializing predictor...")
-            predictor = get_predictor()
+            predictor = get_predictor_lazy()
             print("[API] Predictor ready!")
         except Exception as e:
             init_error = f"{type(e).__name__}: {e}"
