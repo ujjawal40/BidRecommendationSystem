@@ -3,7 +3,7 @@ services:
     name: bid-recommendation-api
     runtime: python
     buildCommand: pip install -r requirements-api.txt
-    startCommand: cd api && gunicorn app:app --bind 0.0.0.0:$PORT
+    startCommand: gunicorn api.app:app --bind 0.0.0.0:$PORT --timeout 120
     envVars:
       - key: PYTHON_VERSION
         value: "3.11.0"
