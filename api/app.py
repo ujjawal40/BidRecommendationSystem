@@ -41,9 +41,15 @@ def initialize_predictor():
     """Lazy-load the predictor on first request."""
     global predictor
     if predictor is None:
-        print("[API] Initializing predictor...")
-        predictor = get_predictor()
-        print("[API] Predictor ready!")
+        try:
+            print("[API] Initializing predictor...")
+            predictor = get_predictor()
+            print("[API] Predictor ready!")
+        except Exception as e:
+            print(f"[API] FATAL ERROR initializing predictor: {type(e).__name__}: {e}")
+            import traceback
+            traceback.print_exc()
+            raise
 
 
 @app.route('/api/health', methods=['GET'])
@@ -226,9 +232,14 @@ def not_found(e):
 
 @app.errorhandler(500)
 def server_error(e):
+    import traceback
+    error_details = str(e)
+    print(f"[API] 500 Error: {error_details}")
+    traceback.print_exc()
     return jsonify({
         "success": False,
         "error": "Internal server error",
+        "details": error_details,
     }), 500
 
 
