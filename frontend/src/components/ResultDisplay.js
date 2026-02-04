@@ -11,7 +11,6 @@ function ResultDisplay({ prediction, formData }) {
     recommendation,
     factors,
     win_probability,
-    expected_value,
   } = prediction;
 
   // Calculate how prediction compares to benchmarks
@@ -95,13 +94,8 @@ function ResultDisplay({ prediction, formData }) {
             <span className="winprob-value">{Math.round(winProbability)}%</span>
           </div>
           <p className="winprob-note">
-            {modelUsed}
+            Probability of winning this bid at the recommended fee
           </p>
-          {expected_value && (
-            <p className="expected-value">
-              Expected Value: <strong>${expected_value.toLocaleString()}</strong>
-            </p>
-          )}
         </div>
       </div>
 
