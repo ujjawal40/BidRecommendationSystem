@@ -1,10 +1,5 @@
 {
   "model_type": "LightGBM Binary Classifier",
-  "phase": "1B - Win Probability Prediction",
-  "target_variable": "Won",
-  "version": "2.0 - Clean (JobCount removed)",
-  "note": "JobCount was removed due to data leakage (presence correlated with outcome)",
-  "num_features": 74,
   "features": [
     "TargetTime",
     "BusinessSegmentDetail",
@@ -12,10 +7,10 @@
     "DistanceInMiles",
     "RooftopLongitude",
     "RooftopLatitude",
-    "OfficeId",
     "IECount",
     "LeaseCount",
     "SaleCount",
+    "JobId",
     "PopulationEstimate",
     "AverageHouseValue",
     "IncomePerHousehold",
@@ -24,6 +19,7 @@
     "NumberofBusinesses",
     "NumberofEmployees",
     "ZipPopulation",
+    "BidFee_Original",
     "TargetTime_Original",
     "Year",
     "Quarter",
@@ -40,22 +36,31 @@
     "rolling_avg_fee_state",
     "rolling_avg_fee_segment",
     "rolling_bid_count_office",
+    "rolling_win_rate_office",
     "rolling_std_fee_office",
     "prev_fee_same_client",
+    "prev_won_same_client",
     "days_since_last_bid_client",
     "same_proptype_as_last_client",
     "total_bids_to_client",
+    "total_wins_with_client",
+    "win_rate_with_client",
     "avg_historical_fee_client",
     "office_avg_fee",
     "office_std_fee",
+    "office_win_rate",
     "propertytype_avg_fee",
     "propertytype_std_fee",
+    "propertytype_win_rate",
     "state_avg_fee",
     "state_std_fee",
+    "state_win_rate",
     "segment_avg_fee",
     "segment_std_fee",
+    "segment_win_rate",
     "client_avg_fee",
     "client_std_fee",
+    "client_win_rate",
     "building_size_numeric",
     "targettime_x_size",
     "distance_x_volume",
@@ -81,70 +86,10 @@
     "is_weekday",
     "targettime_ratio_to_proptype"
   ],
-  "excluded_features": [
-    "JobCount",
-    "win_rate_with_client",
-    "office_win_rate",
-    "propertytype_win_rate",
-    "state_win_rate",
-    "segment_win_rate",
-    "client_win_rate",
-    "rolling_win_rate_office",
-    "total_wins_with_client",
-    "prev_won_same_client"
-  ],
-  "data_config": {
-    "start_date": "2023-01-01",
-    "total_samples": 52308,
-    "train_samples": 31384,
-    "valid_samples": 10462,
-    "test_samples": 10462
-  },
-  "hyperparameters": {
-    "objective": "binary",
-    "metric": [
-      "binary_logloss",
-      "auc"
-    ],
-    "boosting_type": "gbdt",
-    "num_leaves": 20,
-    "learning_rate": 0.05,
-    "feature_fraction": 0.8,
-    "bagging_fraction": 0.8,
-    "bagging_freq": 5,
-    "max_depth": 8,
-    "min_child_samples": 30,
-    "min_child_weight": 5,
-    "reg_alpha": 1.0,
-    "reg_lambda": 1.0,
-    "random_state": 42,
-    "verbose": -1
-  },
-  "training": {
-    "best_iteration": 439
-  },
+  "num_features": 84,
   "metrics": {
-    "train": {
-      "auc_roc": 0.9555808730695046,
-      "accuracy": 0.8801300025490696,
-      "precision": 0.9119582320125876,
-      "recall": 0.8343803167124721,
-      "f1": 0.8714461454346638
-    },
-    "valid": {
-      "auc_roc": 0.9221029309274485,
-      "accuracy": 0.8440068820493214,
-      "precision": 0.8764333728746541,
-      "recall": 0.814889705882353,
-      "f1": 0.8445418174890457
-    },
     "test": {
-      "auc_roc": 0.8814790473721195,
-      "accuracy": 0.8102657235710189,
-      "precision": 0.8267291910902697,
-      "recall": 0.7388935456831517,
-      "f1": 0.7803474604404117
+      "auc_roc": 0.88
     }
-  },
-  "training_date": "2026-01-24 10:56:37"
+  }
 }
