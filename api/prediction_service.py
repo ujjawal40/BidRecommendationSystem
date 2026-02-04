@@ -105,95 +105,116 @@ class BidPredictor:
             print(f"[BidPredictor] Win probability model loaded: {self.win_prob_model.num_trees()} trees")
 
     def _compute_feature_statistics(self):
-        """Precompute feature statistics from training data for lookup."""
-        print("[BidPredictor] Computing feature statistics...")
+        """Load pre-computed feature statistics from JSON file."""
+        print("[BidPredictor] Loading pre-computed feature statistics...")
+
+        # Try to load from pre-computed JSON file (for production/Render deployment)
+        precomputed_path = REPORTS_DIR / "api_precomputed_stats.json"
+
+        if precomputed_path.exists():
+            with open(precomputed_path, 'r') as f:
+                stats = json.load(f)
+
+            # Load dropdown options
+            self.segments = stats['segments']
+            self.property_types = stats['property_types']
+            self.states = stats['states']
+            self.offices = stats['offices']
+
+            # Load global statistics
+            self.feature_stats['global_avg_fee'] = stats['global_avg_fee']
+            self.feature_stats['global_std_fee'] = stats['global_std_fee']
+            self.feature_stats['global_win_rate'] = stats['global_win_rate']
+
+            # Load segment statistics
+            self.feature_stats['segment_avg_fee'] = stats['segment_avg_fee']
+            self.feature_stats['segment_std_fee'] = stats['segment_std_fee']
+            self.feature_stats['segment_count'] = {k: int(v) for k, v in stats['segment_count'].items()}
+            self.feature_stats['segment_win_rate'] = stats['segment_win_rate']
+            self.feature_stats['segment_frequency'] = stats['segment_frequency']
+
+            # Load state statistics
+            self.feature_stats['state_avg_fee'] = stats['state_avg_fee']
+            self.feature_stats['state_std_fee'] = stats['state_std_fee']
+            self.feature_stats['state_win_rate'] = stats['state_win_rate']
+            self.feature_stats['state_frequency'] = stats['state_frequency']
+
+            # Load property type statistics
+            self.feature_stats['propertytype_avg_fee'] = stats['propertytype_avg_fee']
+            self.feature_stats['propertytype_std_fee'] = stats['propertytype_std_fee']
+            self.feature_stats['propertytype_win_rate'] = stats['propertytype_win_rate']
+            self.feature_stats['PropertyType_frequency'] = stats['PropertyType_frequency']
+
+            # Load office statistics
+            self.feature_stats['office_avg_fee'] = {int(k): v for k, v in stats['office_avg_fee'].items()}
+            self.feature_stats['office_std_fee'] = {int(k): v for k, v in stats['office_std_fee'].items()}
+            self.feature_stats['office_win_rate'] = {int(k): v for k, v in stats['office_win_rate'].items()}
+
+            # Load state-segment combo frequency
+            self.feature_stats['state_segment_combo_freq'] = {
+                tuple(k.split('|')): v for k, v in stats['state_segment_combo_freq'].items()
+            }
+
+            print(f"[BidPredictor] Loaded stats for {len(self.segments)} segments, {len(self.states)} states")
+            return
+
+        # Fallback: compute from CSV if available (for local development)
+        print("[BidPredictor] Pre-computed stats not found, trying to load from CSV...")
+
+        if not FEATURES_DATA.exists():
+            raise FileNotFoundError(
+                f"Neither pre-computed stats nor feature data found. "
+                f"Please run: python -c \"from api.prediction_service import *\" locally first, "
+                f"or ensure {REPORTS_DIR / 'api_precomputed_stats.json'} exists."
+            )
 
         df_all = pd.read_csv(FEATURES_DATA)
         df_all['BidDate'] = pd.to_datetime(df_all['BidDate'])
-
-        # IMPORTANT: Frequency features were computed from ALL data in training,
-        # so we need to use ALL data for frequency lookups
         df_full = df_all.copy()
 
-        # Filter to recent data for other statistics (averages, etc.)
         if USE_RECENT_DATA_ONLY:
             df = df_all[df_all['BidDate'] >= pd.Timestamp(DATA_START_DATE)].copy()
         else:
             df = df_all.copy()
 
-        # Store unique values for dropdowns (from full data)
         self.segments = sorted(df_full['BusinessSegment'].dropna().unique().tolist())
         self.property_types = sorted(df_full['PropertyType'].dropna().unique().tolist())
         self.states = sorted(df_full['PropertyState'].dropna().unique().tolist())
         self.offices = sorted(df_full['OfficeId'].dropna().unique().astype(int).tolist())
 
-        # Compute aggregate statistics for feature generation
-        # These are the lookup tables we'll use when a new bid comes in
-
-        # Segment statistics (use recent data for averages)
-        self.feature_stats['segment'] = df.groupby('BusinessSegment').agg({
-            'BidFee': ['mean', 'std', 'count'],
-            'Won': 'mean',
-            'TargetTime': 'mean',
-        }).to_dict()
-
-        # CRITICAL: segment_avg_fee, state_avg_fee, etc. must come from FULL data
-        # The model was trained with these as static aggregates from full dataset
-        # Using filtered data gives values the model never saw, causing erratic predictions
-        segment_stats_full = df_full.groupby('BusinessSegment')['BidFee'].agg(['mean', 'std', 'count'])
-        segment_win_rate_full = df_full.groupby('BusinessSegment')['Won'].mean()
-        self.feature_stats['segment_avg_fee'] = segment_stats_full['mean'].to_dict()
-        self.feature_stats['segment_std_fee'] = segment_stats_full['std'].fillna(0).to_dict()
-        self.feature_stats['segment_count'] = segment_stats_full['count'].to_dict()
-        self.feature_stats['segment_win_rate'] = segment_win_rate_full.to_dict()
-
-        # CRITICAL: BusinessSegment_frequency must be PROPORTIONS (0-1), not raw counts
-        # The model was trained on proportions
-        total_count = len(df_full)
-        full_segment_counts = df_full.groupby('BusinessSegment').size()
-        self.feature_stats['segment_frequency'] = (full_segment_counts / total_count).to_dict()
-
-        # State statistics (from FULL data to match training)
-        state_stats_full = df_full.groupby('PropertyState')['BidFee'].agg(['mean', 'std', 'count'])
-        state_win_rate_full = df_full.groupby('PropertyState')['Won'].mean()
-        self.feature_stats['state_avg_fee'] = state_stats_full['mean'].to_dict()
-        self.feature_stats['state_std_fee'] = state_stats_full['std'].fillna(0).to_dict()
-        self.feature_stats['state_win_rate'] = state_win_rate_full.to_dict()
-
-        # CRITICAL: PropertyState_frequency must be PROPORTIONS (0-1), not raw counts
-        # The model was trained on proportions
-        full_state_counts = df_full.groupby('PropertyState').size()
-        self.feature_stats['state_frequency'] = (full_state_counts / total_count).to_dict()
-
-        # Office statistics (from FULL data to match training)
-        office_stats_full = df_full.groupby('OfficeId')['BidFee'].agg(['mean', 'std'])
-        office_win_rate_full = df_full.groupby('OfficeId')['Won'].mean()
-        self.feature_stats['office_avg_fee'] = office_stats_full['mean'].to_dict()
-        self.feature_stats['office_std_fee'] = office_stats_full['std'].fillna(0).to_dict()
-        self.feature_stats['office_win_rate'] = office_win_rate_full.to_dict()
-
-        # Property type statistics (from FULL data to match training)
-        proptype_stats_full = df_full.groupby('PropertyType')['BidFee'].agg(['mean', 'std', 'count'])
-        proptype_win_rate_full = df_full.groupby('PropertyType')['Won'].mean()
-        self.feature_stats['propertytype_avg_fee'] = proptype_stats_full['mean'].to_dict()
-        self.feature_stats['propertytype_std_fee'] = proptype_stats_full['std'].fillna(0).to_dict()
-        self.feature_stats['propertytype_win_rate'] = proptype_win_rate_full.to_dict()
-
-        # CRITICAL: PropertyType_frequency must be PROPORTIONS (0-1), not raw counts
-        # The model was trained on proportions
-        full_proptype_counts = df_full.groupby('PropertyType').size()
-        self.feature_stats['PropertyType_frequency'] = (full_proptype_counts / total_count).to_dict()
-
-        # Global statistics (for defaults)
         self.feature_stats['global_avg_fee'] = df['BidFee'].mean()
         self.feature_stats['global_std_fee'] = df['BidFee'].std()
         self.feature_stats['global_win_rate'] = df['Won'].mean()
 
-        # State-segment combinations
+        total_count = len(df_full)
+        segment_stats = df_full.groupby('BusinessSegment')['BidFee'].agg(['mean', 'std', 'count'])
+        self.feature_stats['segment_avg_fee'] = segment_stats['mean'].to_dict()
+        self.feature_stats['segment_std_fee'] = segment_stats['std'].fillna(0).to_dict()
+        self.feature_stats['segment_count'] = segment_stats['count'].to_dict()
+        self.feature_stats['segment_win_rate'] = df_full.groupby('BusinessSegment')['Won'].mean().to_dict()
+        self.feature_stats['segment_frequency'] = (df_full.groupby('BusinessSegment').size() / total_count).to_dict()
+
+        state_stats = df_full.groupby('PropertyState')['BidFee'].agg(['mean', 'std'])
+        self.feature_stats['state_avg_fee'] = state_stats['mean'].to_dict()
+        self.feature_stats['state_std_fee'] = state_stats['std'].fillna(0).to_dict()
+        self.feature_stats['state_win_rate'] = df_full.groupby('PropertyState')['Won'].mean().to_dict()
+        self.feature_stats['state_frequency'] = (df_full.groupby('PropertyState').size() / total_count).to_dict()
+
+        office_stats = df_full.groupby('OfficeId')['BidFee'].agg(['mean', 'std'])
+        self.feature_stats['office_avg_fee'] = office_stats['mean'].to_dict()
+        self.feature_stats['office_std_fee'] = office_stats['std'].fillna(0).to_dict()
+        self.feature_stats['office_win_rate'] = df_full.groupby('OfficeId')['Won'].mean().to_dict()
+
+        proptype_stats = df_full.groupby('PropertyType')['BidFee'].agg(['mean', 'std'])
+        self.feature_stats['propertytype_avg_fee'] = proptype_stats['mean'].to_dict()
+        self.feature_stats['propertytype_std_fee'] = proptype_stats['std'].fillna(0).to_dict()
+        self.feature_stats['propertytype_win_rate'] = df_full.groupby('PropertyType')['Won'].mean().to_dict()
+        self.feature_stats['PropertyType_frequency'] = (df_full.groupby('PropertyType').size() / total_count).to_dict()
+
         combo_stats = df.groupby(['PropertyState', 'BusinessSegment']).size()
         self.feature_stats['state_segment_combo_freq'] = combo_stats.to_dict()
 
-        print(f"[BidPredictor] Statistics computed for {len(self.segments)} segments, {len(self.states)} states")
+        print(f"[BidPredictor] Computed stats for {len(self.segments)} segments, {len(self.states)} states")
 
     def _load_empirical_bands(self):
         """Load precomputed empirical confidence bands."""
