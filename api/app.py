@@ -34,19 +34,58 @@ CORS(app)  # Enable CORS for React frontend
 
 # Initialize predictor on startup
 predictor: BidPredictor = None
+init_error: str = None
+
+
+@app.route('/api/debug', methods=['GET'])
+def debug_info():
+    """Debug endpoint - no predictor needed."""
+    import os
+    from pathlib import Path
+
+    cwd = os.getcwd()
+    base = Path(__file__).parent.parent
+
+    # Check critical files
+    files_to_check = [
+        base / "outputs/models/lightgbm_bidfee_model.txt",
+        base / "outputs/models/lightgbm_win_probability.txt",
+        base / "outputs/reports/api_precomputed_stats.json",
+        base / "outputs/reports/empirical_bands.json",
+        base / "outputs/reports/feature_defaults.json",
+        base / "config/model_config.py",
+    ]
+
+    file_status = {}
+    for f in files_to_check:
+        file_status[str(f.relative_to(base))] = f.exists()
+
+    return jsonify({
+        "cwd": cwd,
+        "base_dir": str(base),
+        "files": file_status,
+        "init_error": init_error,
+        "predictor_loaded": predictor is not None,
+    })
 
 
 @app.before_request
 def initialize_predictor():
     """Lazy-load the predictor on first request."""
-    global predictor
-    if predictor is None:
+    global predictor, init_error
+
+    # Skip initialization for debug endpoint
+    if request.endpoint == 'debug_info':
+        return
+
+    if predictor is None and init_error is None:
         try:
             print("[API] Initializing predictor...")
             predictor = get_predictor()
             print("[API] Predictor ready!")
         except Exception as e:
-            print(f"[API] FATAL ERROR initializing predictor: {type(e).__name__}: {e}")
+            init_error = f"{type(e).__name__}: {e}"
+            print(f"[API] FATAL ERROR initializing predictor: {init_error}")
             import traceback
             traceback.print_exc()
             raise
