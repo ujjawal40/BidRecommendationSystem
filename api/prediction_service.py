@@ -437,6 +437,40 @@ class BidPredictor:
         features['competitiveness_x_winrate'] = features['bid_vs_segment_ratio'] * features['cumulative_winrate_client']
         features['time_x_density'] = target_time * features['segment_bid_density']
 
+        # Win probability model features (with realistic defaults based on historical medians)
+        features['IECount'] = 0  # Median is 0
+        features['LeaseCount'] = 0  # Median is 0
+        features['SaleCount'] = 0  # Median is 0
+        features['market_competitiveness'] = 142  # Historical median
+        features['building_size_numeric'] = 1  # Typical property
+        features['client_relationship_strength'] = 65  # Historical median
+        features['targettime_x_size'] = target_time * features['building_size_numeric']
+
+        # Additional demographic features (use reasonable defaults)
+        features['PopulationEstimate'] = 50000  # Typical metro area
+        features['AverageHouseValue'] = 350000  # US median
+        features['IncomePerHousehold'] = 75000  # US median
+        features['MedianAge'] = 38  # US median
+        features['DeliveryTotal'] = 1  # Standard delivery
+        features['NumberofBusinesses'] = 500  # Typical area
+        features['NumberofEmployees'] = 5000  # Typical area
+        features['ZipPopulation'] = 30000  # Typical zip
+
+        # Temporal encoding features
+        features['Year'] = now.year
+        features['Month'] = now.month
+        features['Quarter'] = features['quarter']
+        features['DayOfWeek'] = features['day_of_week']
+        features['DayOfMonth'] = now.day
+        features['WeekOfYear'] = now.isocalendar()[1]
+        features['Month_sin'] = np.sin(2 * np.pi * now.month / 12)
+        features['Month_cos'] = np.cos(2 * np.pi * now.month / 12)
+        features['DayOfWeek_sin'] = np.sin(2 * np.pi * now.weekday() / 7)
+        features['DayOfWeek_cos'] = np.cos(2 * np.pi * now.weekday() / 7)
+        features['days_since_start'] = (now - datetime(2023, 1, 1)).days
+        features['is_peak_season'] = 1 if now.month in [3, 4, 5, 9, 10, 11] else 0
+        features['is_weekday'] = 1 if now.weekday() < 5 else 0
+
         # Note: Categorical frequency encodings (BusinessSegment_frequency,
         # PropertyState_frequency, PropertyType_frequency) are already set above
         # as proportions (0-1), which is what the model expects.
