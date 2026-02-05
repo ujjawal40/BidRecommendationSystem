@@ -159,7 +159,10 @@ Content-Type: application/json
   "prediction": {
     "predicted_fee": 3127.98,
     "confidence_interval": {"low": 3056.05, "high": 3188.72},
-    "segment_benchmark": 3215.48
+    "segment_benchmark": 3215.48,
+    "win_probability": 0.72,
+    "expected_value": 2252.15,
+    "recommendation": "Predicted fee is within ±10% of segment average. Good competitive position."
   }
 }
 ```
