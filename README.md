@@ -188,6 +188,15 @@ Content-Type: application/json
 
 ---
 
+## Data & Training
+
+- **Training Data**: 2023+ bids only (recent market conditions)
+- **Split Strategy**: Time-based 60/20/20 (train/validation/test)
+- **Total Samples**: ~52,000 bid records
+- **Feature Engineering**: 68+ features including rolling averages, client history, market benchmarks
+
+---
+
 ## Model Performance
 
 ### Bid Fee Prediction (Phase 1A)
