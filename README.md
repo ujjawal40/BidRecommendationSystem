@@ -2,7 +2,10 @@
 
 **Global Stat Solutions** | AI-Powered Bid Fee Prediction Platform
 
-A machine learning system that predicts optimal bid fees for commercial real estate appraisal services, helping appraisers make data-driven pricing decisions.
+A dual-model machine learning system for commercial real estate appraisal pricing:
+- **Bid Fee Prediction**: LightGBM regressor with 68 engineered features
+- **Win Probability**: Binary classifier (AUC: 0.96) for bid success estimation
+- **Expected Value Optimization**: EV = P(Win) × BidFee for revenue-maximizing decisions
 
 ---
 
