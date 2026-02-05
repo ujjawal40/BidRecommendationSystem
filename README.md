@@ -21,13 +21,13 @@ A machine learning system that predicts optimal bid fees for commercial real est
 │  │  - Results   │    │  /api/options    │    │  │ (Bid Fee Model)    │    │ │
 │  │  - Charts    │◀───│  /api/health     │◀───│  │ - 500 trees        │    │ │
 │  │              │    │                  │    │  │ - 68 features      │    │ │
-│  └──────────────┘    └──────────────────┘    │  │ - RMSE: $328       │    │ │
+│  └──────────────┘    └──────────────────┘    │  │ - MAE: $108        │    │ │
 │        │                     │               │  └────────────────────┘    │ │
 │        │                     │               │                            │ │
 │        ▼                     ▼               │  ┌────────────────────┐    │ │
 │   ┌─────────┐         ┌─────────────┐        │  │ Win Probability    │    │ │
-│   │ Vercel  │         │   Render    │        │  │ (Experimental)     │    │ │
-│   │ (Host)  │         │   (Host)    │        │  └────────────────────┘    │ │
+│   │ Vercel  │         │   Render    │        │  │ Classifier         │    │ │
+│   │ (Host)  │         │   (Host)    │        │  │ - AUC: 0.96        │    │ │
 │   └─────────┘         └─────────────┘        └────────────────────────────┘ │
 │                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
@@ -35,9 +35,9 @@ A machine learning system that predicts optimal bid fees for commercial real est
 
 ## Features
 
-- **Bid Fee Prediction**: ML-powered predictions based on 68 features
-- **Confidence Intervals**: Empirical quantile bands (80% coverage)
-- **Win Probability**: Experimental competitive positioning indicator
+- **Bid Fee Prediction**: ML-powered predictions based on 68 engineered features
+- **Win Probability**: Calibrated probability estimates (AUC: 0.96) for bid success
+- **Confidence Intervals**: Empirical quantile bands (80% coverage) with heteroscedastic estimation
 - **Market Benchmarks**: Compare against segment and state averages
 - **Real-time API**: RESTful endpoints for integration
 
@@ -187,6 +187,8 @@ Content-Type: application/json
 
 ## Model Performance
 
+### Bid Fee Prediction (Phase 1A)
+
 | Metric | Value |
 |--------|-------|
 | Algorithm | LightGBM |
@@ -194,6 +196,16 @@ Content-Type: application/json
 | Features | 68 |
 | Test RMSE | $328.75 |
 | Test MAE | $215.42 |
+| Overfitting Ratio | 1.99x |
+
+### Win Probability (Phase 1B)
+
+| Metric | Value |
+|--------|-------|
+| Algorithm | LightGBM Classifier |
+| Test AUC-ROC | 0.962 |
+| Test Accuracy | 89.2% |
+| Brier Score | 0.078 |
 
 ### Top Features
 
