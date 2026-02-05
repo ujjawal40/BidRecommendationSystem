@@ -249,10 +249,20 @@ Content-Type: application/json
 
 ---
 
+## Anti-Overfitting Measures
+
+- **L1/L2 Regularization**: reg_alpha=2.0, reg_lambda=2.0
+- **Tree Constraints**: max_depth=8, num_leaves=18, min_child_samples=30
+- **Sampling**: feature_fraction=0.8, bagging_fraction=0.8
+- **Early Stopping**: 50 rounds patience on validation set
+- **Recent Data Only**: Training on 2023+ data for better generalization
+
+---
+
 ## License
 
 Proprietary - Global Stat Solutions
 
 ---
 
-**Global Stat Solutions** | Bid Recommendation System v1.0
+**Global Stat Solutions** | Bid Recommendation System v2.0
