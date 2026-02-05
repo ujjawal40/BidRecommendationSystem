@@ -207,13 +207,21 @@ Content-Type: application/json
 | Test Accuracy | 89.2% |
 | Brier Score | 0.078 |
 
-### Top Features
+### Top Features (Bid Fee Model)
 
-1. `segment_avg_fee` (63%)
-2. `state_avg_fee` (10%)
-3. `propertytype_avg_fee` (5%)
-4. `TargetTime` (4%)
-5. `rolling_avg_fee_segment` (3%)
+1. `segment_avg_fee` (63%) - Average fee for business segment
+2. `state_avg_fee` (10%) - State-level market pricing
+3. `propertytype_avg_fee` (5%) - Property type benchmarks
+4. `TargetTime` (4%) - Delivery timeline
+5. `rolling_avg_fee_segment` (3%) - Recent segment trends
+
+### Top Features (Win Probability)
+
+1. `JobCount` (47%) - Office workload capacity
+2. `market_competitiveness` (11%) - Market competition level
+3. `TargetTime_Original` (4%) - Delivery requirements
+4. `PropertyState_frequency` (3%) - State market activity
+5. `RooftopLongitude` (3%) - Geographic positioning
 
 ---
 
