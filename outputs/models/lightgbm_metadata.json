@@ -77,21 +77,21 @@
   "test_samples": 10462,
   "best_iteration": 500,
   "metrics": {
-    "train_rmse": 163.66571566607337,
-    "valid_rmse": 356.6205657089495,
-    "test_rmse": 342.60505172410467,
-    "rmse": 342.60505172410467,
-    "mae": 107.70993580368336,
-    "r2": 0.9740674676123734,
-    "mape": 73.13316579625616,
-    "median_ae": 34.557928740413104,
-    "overfitting_ratio": 2.093322051779743
+    "train_rmse": 177.62828011235487,
+    "valid_rmse": 361.10102690315955,
+    "test_rmse": 353.98535442790416,
+    "rmse": 353.98535442790416,
+    "mae": 108.62514783557543,
+    "r2": 0.9723160540556319,
+    "mape": 71.18267786862539,
+    "median_ae": 35.159588797045444,
+    "overfitting_ratio": 1.992843449275073
   },
   "hyperparameters": {
     "objective": "regression",
     "metric": "rmse",
     "boosting_type": "gbdt",
-    "num_leaves": 20,
+    "num_leaves": 18,
     "learning_rate": 0.05,
     "feature_fraction": 0.8,
     "bagging_fraction": 0.8,
@@ -99,11 +99,11 @@
     "max_depth": 8,
     "min_child_samples": 30,
     "min_child_weight": 5,
-    "reg_alpha": 1.0,
-    "reg_lambda": 1.0,
+    "reg_alpha": 2.0,
+    "reg_lambda": 2.0,
     "random_state": 42,
     "n_jobs": -1,
     "verbose": -1
   },
-  "training_date": "2026-02-04 19:22:03"
+  "training_date": "2026-02-04 20:10:20"
 }

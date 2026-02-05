@@ -113,21 +113,22 @@ TRAIN_TEST_SPLIT = {
 # ============================================================================
 
 LIGHTGBM_CONFIG = {
-    # Model hyperparameters - MODERATE REGULARIZATION + Recent data (2023+)
+    # Model hyperparameters - OPTIMIZED for reduced overfitting (ratio < 2.0)
+    # Tested configurations in model-improvement branch
     "params": {
         "objective": "regression",
         "metric": "rmse",
         "boosting_type": "gbdt",
-        "num_leaves": 20,  # Moderate (was 31 originally, 15 was too aggressive)
+        "num_leaves": 18,  # Reduced from 20 to reduce overfitting (1.99x vs 2.09x)
         "learning_rate": 0.05,
         "feature_fraction": 0.8,
         "bagging_fraction": 0.8,
         "bagging_freq": 5,
-        "max_depth": 8,  # Moderate (was unlimited, 6 was too restrictive)
-        "min_child_samples": 30,  # Moderate (was 20 originally, 50 was too aggressive)
-        "min_child_weight": 5,  # Moderate weight-based regularization
-        "reg_alpha": 1.0,  # 10x increase from 0.1 (was 5.0 - too aggressive)
-        "reg_lambda": 1.0,  # 10x increase from 0.1 (was 5.0 - too aggressive)
+        "max_depth": 8,
+        "min_child_samples": 30,
+        "min_child_weight": 5,
+        "reg_alpha": 2.0,  # Increased from 1.0 for stronger regularization
+        "reg_lambda": 2.0,  # Increased from 1.0 for stronger regularization
         "random_state": 42,
         "n_jobs": -1,
         "verbose": -1,
