@@ -37,6 +37,7 @@ A machine learning system that predicts optimal bid fees for commercial real est
 
 - **Bid Fee Prediction**: ML-powered predictions based on 68 engineered features
 - **Win Probability**: Calibrated probability estimates (AUC: 0.96) for bid success
+- **Expected Value**: EV = P(Win) × BidFee for revenue optimization
 - **Confidence Intervals**: Empirical quantile bands (80% coverage) with heteroscedastic estimation
 - **Market Benchmarks**: Compare against segment and state averages
 - **Real-time API**: RESTful endpoints for integration
