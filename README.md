@@ -177,14 +177,16 @@ Content-Type: application/json
 2. Set root directory: `frontend`
 3. Add environment variable:
    ```
-   REACT_APP_API_URL=https://your-api.onrender.com
+   REACT_APP_API_URL=https://bid-recommendation-api.onrender.com/api
    ```
 
 ### Backend → Render
 
 1. Connect repo to Render
 2. Uses `render.yaml` config automatically
-3. Deploys at `https://bid-recommendation-api.onrender.com`
+3. Build Command: `pip install -r requirements-api.txt`
+4. Start Command: `gunicorn api.app:app --bind 0.0.0.0:$PORT --timeout 120`
+5. Live at: `https://bid-recommendation-api.onrender.com`
 
 ---
 
