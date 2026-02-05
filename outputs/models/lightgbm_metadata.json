@@ -77,15 +77,15 @@
   "test_samples": 10462,
   "best_iteration": 500,
   "metrics": {
-    "train_rmse": 165.4220809525318,
-    "valid_rmse": 350.94705706296463,
-    "test_rmse": 328.74641093771106,
-    "rmse": 328.74641093771106,
-    "mae": 102.44306272001461,
-    "r2": 0.9761151265056154,
-    "mape": Infinity,
-    "median_ae": 31.795107050247225,
-    "overfitting_ratio": 1.987318797132322
+    "train_rmse": 163.66571566607337,
+    "valid_rmse": 356.6205657089495,
+    "test_rmse": 342.60505172410467,
+    "rmse": 342.60505172410467,
+    "mae": 107.70993580368336,
+    "r2": 0.9740674676123734,
+    "mape": 73.13316579625616,
+    "median_ae": 34.557928740413104,
+    "overfitting_ratio": 2.093322051779743
   },
   "hyperparameters": {
     "objective": "regression",
@@ -105,5 +105,5 @@
     "n_jobs": -1,
     "verbose": -1
   },
-  "training_date": "2026-01-23 17:35:30"
+  "training_date": "2026-02-04 19:22:03"
 }
