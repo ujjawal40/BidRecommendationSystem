@@ -602,14 +602,14 @@ class BidPredictor:
             business_segment, self.feature_stats['global_avg_fee']
         )
 
-        # Generate recommendation
+        # Generate recommendation - ±10% of benchmark is considered normal
         diff_pct = ((prediction - segment_avg) / segment_avg) * 100
         if diff_pct > 10:
-            recommendation = f"Predicted fee is {diff_pct:.1f}% above segment average. Consider competitive positioning."
+            recommendation = f"Predicted fee is {diff_pct:.1f}% above segment average. May be priced high for this market."
         elif diff_pct < -10:
-            recommendation = f"Predicted fee is {abs(diff_pct):.1f}% below segment average. Good competitive position."
+            recommendation = f"Predicted fee is {abs(diff_pct):.1f}% below segment average. May be underpriced - verify inputs."
         else:
-            recommendation = "Predicted fee is within normal range for this segment."
+            recommendation = f"Predicted fee is within ±10% of segment average. Good competitive position."
 
         # Predict win probability using classification model
         win_prob_result = self.predict_win_probability(
