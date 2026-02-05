@@ -241,10 +241,11 @@ Content-Type: application/json
 
 | Layer | Technology |
 |-------|------------|
-| Frontend | React 18 |
-| Backend | Flask, Python 3.11 |
-| ML | LightGBM, scikit-learn |
-| Deployment | Vercel, Render |
+| Frontend | React 18, Axios |
+| Backend | Flask, Gunicorn, Python 3.11 |
+| ML | LightGBM 4.6, scikit-learn, pandas |
+| Deployment | Vercel (frontend), Render (API) |
+| CI/CD | GitHub Actions |
 
 ---
 
