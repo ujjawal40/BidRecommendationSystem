@@ -69,11 +69,13 @@ BidRecommendationSystem/
 ├── outputs/
 │   ├── models/                  # Trained models
 │   │   ├── lightgbm_bidfee_model.txt
-│   │   └── lightgbm_win_probability.txt
-│   └── reports/                 # Precomputed statistics
-│       ├── empirical_bands.json
-│       ├── feature_defaults.json
-│       └── rolling_stats.json
+│   │   ├── lightgbm_win_probability.txt
+│   │   └── lightgbm_win_probability_metadata.json
+│   ├── reports/                 # Precomputed statistics
+│   │   ├── empirical_bands.json
+│   │   ├── feature_defaults.json
+│   │   └── rolling_stats.json
+│   └── figures/                 # Training visualizations
 │
 ├── scripts/                     # Training & analysis scripts
 │
