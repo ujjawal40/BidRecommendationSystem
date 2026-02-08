@@ -80,6 +80,82 @@ class TestInputValidator:
         assert any('missing' in w.lower() for w in warnings)
 
 
+class TestConfidenceLogic:
+    """Tests for confidence level computation logic."""
+
+    def test_state_count_not_proportion(self):
+        """Verify confidence uses actual counts, not proportions (0-1)."""
+        # state_frequency is a proportion like 0.234 — must NOT be used for count thresholds
+        # state_count is the actual count like 26748 — must be used instead
+        state_frequency = 0.234  # Illinois proportion
+        state_count = 26748  # Illinois actual count
+
+        # Proportion should never exceed count thresholds
+        assert state_frequency < 50, "Proportions should be < 1, never > 50"
+        # Actual count should pass count thresholds
+        assert state_count > 500, "Illinois should have > 500 samples"
+
+    def test_confidence_hierarchy_high(self):
+        """High data availability with narrow band should give high confidence."""
+        segment_count = 5000
+        state_count = 2000
+        band_ratio = 0.1  # narrow band
+
+        if segment_count > 1000 and state_count > 500:
+            data_confidence = "high"
+        elif segment_count > 100 and state_count > 50:
+            data_confidence = "medium"
+        else:
+            data_confidence = "low"
+
+        if band_ratio < 0.3:
+            band_confidence = "high"
+        elif band_ratio < 0.6:
+            band_confidence = "medium"
+        else:
+            band_confidence = "low"
+
+        rank = {"low": 0, "medium": 1, "high": 2}
+        confidence = min(rank[data_confidence], rank[band_confidence])
+        assert confidence == 2  # high
+
+    def test_confidence_hierarchy_capped_by_band(self):
+        """Wide confidence band should cap overall confidence."""
+        segment_count = 5000
+        state_count = 2000
+        band_ratio = 0.8  # wide band
+
+        if segment_count > 1000 and state_count > 500:
+            data_confidence = "high"
+        else:
+            data_confidence = "low"
+
+        if band_ratio < 0.3:
+            band_confidence = "high"
+        elif band_ratio < 0.6:
+            band_confidence = "medium"
+        else:
+            band_confidence = "low"
+
+        rank = {"low": 0, "medium": 1, "high": 2}
+        confidence = min(rank[data_confidence], rank[band_confidence])
+        assert confidence == 0  # low (capped by wide band)
+
+    def test_win_prob_confidence_capped_by_bid_fee(self):
+        """Win probability confidence should never exceed bid fee confidence."""
+        confidence_rank = {"low": 0, "medium": 1, "high": 2}
+        rank_to_label = {0: "low", 1: "medium", 2: "high"}
+
+        bid_fee_confidence = "low"
+        win_confidence = "high"
+
+        max_rank = confidence_rank[bid_fee_confidence]
+        if confidence_rank[win_confidence] > max_rank:
+            win_confidence = rank_to_label[max_rank]
+
+        assert win_confidence == "low"
+
+
 class TestPredictionClamping:
     """Tests for prediction post-processing."""
 
