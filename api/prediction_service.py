@@ -831,11 +831,16 @@ if __name__ == "__main__":
         distance_km=50,
     )
 
-    print(f"\nTest Prediction:")
+    print(f"\nTest 1: Financing / Multifamily / Illinois (common)")
     print(f"  Predicted Fee: ${result['predicted_fee']:,.2f}")
     print(f"  Confidence Interval: ${result['confidence_interval']['low']:,.2f} - ${result['confidence_interval']['high']:,.2f}")
-    print(f"  Confidence Level: {result['confidence_level']}")
+    print(f"  Bid Fee Confidence: {result['confidence_level']}")
+    print(f"  Win Probability: {result['win_probability']['probability_pct']}%")
+    print(f"  Win Prob Confidence: {result['win_probability']['confidence']}")
+    print(f"  Win Prob Model: {result['win_probability']['model_used']}")
+    print(f"  Expected Value: ${result['expected_value']:,.2f}")
     print(f"  Segment Benchmark: ${result['segment_benchmark']:,.2f}")
+    print(f"  Data Coverage: {result['metadata']['data_coverage']}")
     print(f"  Recommendation: {result['recommendation']}")
 
     # Test with client history
@@ -852,6 +857,24 @@ if __name__ == "__main__":
         }
     )
 
-    print(f"\nTest Prediction with Client History:")
+    print(f"\nTest 2: Consulting / Office / Texas (with client history)")
     print(f"  Predicted Fee: ${result2['predicted_fee']:,.2f}")
-    print(f"  Confidence: {result2['confidence_level']}")
+    print(f"  Bid Fee Confidence: {result2['confidence_level']}")
+    print(f"  Win Probability: {result2['win_probability']['probability_pct']}%")
+    print(f"  Win Prob Confidence: {result2['win_probability']['confidence']}")
+    print(f"  Expected Value: ${result2['expected_value']:,.2f}")
+
+    # Test with rare state
+    result3 = predictor.predict(
+        business_segment="Financing",
+        property_type="Multifamily",
+        property_state="Alaska",
+        target_time=30,
+    )
+
+    print(f"\nTest 3: Financing / Multifamily / Alaska (rare state)")
+    print(f"  Predicted Fee: ${result3['predicted_fee']:,.2f}")
+    print(f"  Bid Fee Confidence: {result3['confidence_level']}")
+    print(f"  Win Probability: {result3['win_probability']['probability_pct']}%")
+    print(f"  Win Prob Confidence: {result3['win_probability']['confidence']}")
+    print(f"  Data Coverage: {result3['metadata']['data_coverage']}")
