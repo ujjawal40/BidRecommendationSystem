@@ -294,5 +294,35 @@ class TestPredictionResponseStructure:
         assert ev == pytest.approx(2275.0)
 
 
+class TestPredictionConfig:
+    """Tests for prediction config constants."""
+
+    def test_prediction_config_importable(self):
+        """PREDICTION_CONFIG should be importable from model_config."""
+        from config.model_config import PREDICTION_CONFIG
+        assert isinstance(PREDICTION_CONFIG, dict)
+
+    def test_prediction_config_required_keys(self):
+        """PREDICTION_CONFIG must have all required keys."""
+        from config.model_config import PREDICTION_CONFIG
+        required = {
+            'fee_sensitivity_k', 'confidence_segment_high', 'confidence_state_high',
+            'confidence_segment_medium', 'confidence_state_medium',
+            'band_ratio_high', 'band_ratio_medium',
+            'win_prob_min', 'win_prob_max', 'min_fee',
+        }
+        assert required.issubset(set(PREDICTION_CONFIG.keys()))
+
+    def test_prediction_config_values_reasonable(self):
+        """Config values should be within reasonable ranges."""
+        from config.model_config import PREDICTION_CONFIG
+        assert PREDICTION_CONFIG['fee_sensitivity_k'] > 0
+        assert PREDICTION_CONFIG['win_prob_min'] > 0
+        assert PREDICTION_CONFIG['win_prob_max'] < 1
+        assert PREDICTION_CONFIG['win_prob_min'] < PREDICTION_CONFIG['win_prob_max']
+        assert PREDICTION_CONFIG['min_fee'] > 0
+        assert PREDICTION_CONFIG['band_ratio_high'] < PREDICTION_CONFIG['band_ratio_medium']
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
