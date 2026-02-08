@@ -588,16 +588,32 @@ class BidPredictor:
             confidence_level=0.80,  # 80% interval
         )
 
-        # Confidence level based on data availability
+        # Confidence level based on data availability AND confidence band width
         segment_count = self.feature_stats['segment_count'].get(business_segment, 0)
         state_count = self.feature_stats.get('state_count', {}).get(property_state, 0)
 
+        # Data availability score
         if segment_count > 1000 and state_count > 500:
-            confidence = "high"
+            data_confidence = "high"
         elif segment_count > 100 and state_count > 50:
-            confidence = "medium"
+            data_confidence = "medium"
         else:
-            confidence = "low"
+            data_confidence = "low"
+
+        # Band width score: narrow band relative to prediction = higher confidence
+        band_width = high - low
+        band_ratio = band_width / max(prediction, 1)
+        if band_ratio < 0.3:
+            band_confidence = "high"
+        elif band_ratio < 0.6:
+            band_confidence = "medium"
+        else:
+            band_confidence = "low"
+
+        # Overall bid fee confidence = minimum of data and band confidence
+        confidence_rank = {"low": 0, "medium": 1, "high": 2}
+        rank_to_label = {0: "low", 1: "medium", 2: "high"}
+        confidence = rank_to_label[min(confidence_rank[data_confidence], confidence_rank[band_confidence])]
 
         # Segment benchmark
         segment_avg = self.feature_stats['segment_avg_fee'].get(
@@ -618,6 +634,7 @@ class BidPredictor:
             features=features,
             predicted_fee=prediction,
             segment_benchmark=segment_avg,
+            bid_fee_confidence=confidence,
         )
 
         # Calculate expected value: EV = P(Win) × Bid Fee
@@ -677,6 +694,7 @@ class BidPredictor:
         features: Dict[str, float],
         predicted_fee: float,
         segment_benchmark: float,
+        bid_fee_confidence: str = "medium",
     ) -> Dict[str, Any]:
         """
         Predict win probability using the trained classification model.
@@ -689,6 +707,9 @@ class BidPredictor:
             The predicted bid fee
         segment_benchmark : float
             Average fee for the segment (for fallback heuristic)
+        bid_fee_confidence : str
+            Confidence level of the bid fee prediction ("low", "medium", "high").
+            Win probability confidence is capped at this level.
 
         Returns:
         --------
@@ -724,16 +745,23 @@ class BidPredictor:
         # Confidence based on how close to 0.5 (more extreme = more confident)
         distance_from_uncertain = abs(probability - 0.5)
         if distance_from_uncertain > 0.3:
-            confidence = "high"
+            win_confidence = "high"
         elif distance_from_uncertain > 0.15:
-            confidence = "medium"
+            win_confidence = "medium"
         else:
-            confidence = "low"
+            win_confidence = "low"
+
+        # Cap win probability confidence at bid fee confidence level
+        confidence_rank = {"low": 0, "medium": 1, "high": 2}
+        rank_to_label = {0: "low", 1: "medium", 2: "high"}
+        max_rank = confidence_rank[bid_fee_confidence]
+        if confidence_rank[win_confidence] > max_rank:
+            win_confidence = rank_to_label[max_rank]
 
         return {
             "probability": round(probability, 4),
             "probability_pct": round(probability * 100, 1),
-            "confidence": confidence,
+            "confidence": win_confidence,
             "model_used": "LightGBM Classifier (AUC: 0.88)",
         }
 
