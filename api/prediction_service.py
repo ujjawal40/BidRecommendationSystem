@@ -138,6 +138,7 @@ class BidPredictor:
             self.feature_stats['state_std_fee'] = stats['state_std_fee']
             self.feature_stats['state_win_rate'] = stats['state_win_rate']
             self.feature_stats['state_frequency'] = stats['state_frequency']
+            self.feature_stats['state_count'] = {k: int(v) for k, v in stats.get('state_count', {}).items()}
 
             # Load property type statistics
             self.feature_stats['propertytype_avg_fee'] = stats['propertytype_avg_fee']
@@ -199,6 +200,7 @@ class BidPredictor:
         self.feature_stats['state_std_fee'] = state_stats['std'].fillna(0).to_dict()
         self.feature_stats['state_win_rate'] = df_full.groupby('PropertyState')['Won'].mean().to_dict()
         self.feature_stats['state_frequency'] = (df_full.groupby('PropertyState').size() / total_count).to_dict()
+        self.feature_stats['state_count'] = df_full.groupby('PropertyState').size().to_dict()
 
         office_stats = df_full.groupby('OfficeId')['BidFee'].agg(['mean', 'std'])
         self.feature_stats['office_avg_fee'] = office_stats['mean'].to_dict()
@@ -588,11 +590,11 @@ class BidPredictor:
 
         # Confidence level based on data availability
         segment_count = self.feature_stats['segment_count'].get(business_segment, 0)
-        state_freq = self.feature_stats['state_frequency'].get(property_state, 0)
+        state_count = self.feature_stats.get('state_count', {}).get(property_state, 0)
 
-        if segment_count > 1000 and state_freq > 500:
+        if segment_count > 1000 and state_count > 500:
             confidence = "high"
-        elif segment_count > 100 and state_freq > 50:
+        elif segment_count > 100 and state_count > 50:
             confidence = "medium"
         else:
             confidence = "low"
@@ -643,11 +645,11 @@ class BidPredictor:
                 "client_history_effect": round(features['client_avg_fee'], 2) if client_history else None,
             },
             "metadata": {
-                "model_version": "1.0",
+                "model_version": "1.1",
                 "prediction_date": datetime.now().isoformat(),
                 "data_coverage": {
                     "segment_samples": segment_count,
-                    "state_samples": state_freq,
+                    "state_samples": state_count,
                 }
             }
         }
