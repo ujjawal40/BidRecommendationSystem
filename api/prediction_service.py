@@ -777,6 +777,11 @@ class BidPredictor:
             "probability_pct": round(probability * 100, 1),
             "confidence": win_confidence,
             "model_used": "LightGBM Classifier + fee adjustment (AUC: 0.88)",
+            "fee_adjustment": {
+                "raw_probability": round(float(raw_probability), 4),
+                "adjustment_factor": round(fee_adjustment, 4),
+                "fee_to_segment_ratio": round(ratio, 4),
+            },
         }
 
     def _fallback_win_probability(
