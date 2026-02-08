@@ -7,6 +7,8 @@ This service:
 1. Loads the trained model and feature statistics
 2. Computes all necessary features from raw inputs
 3. Returns predictions with confidence intervals
+4. Predicts win probability with fee-sensitivity adjustment
+5. Computes Expected Value (EV = P(Win) x Fee) for bid optimization
 
 Usage:
     from api.prediction_service import BidPredictor
