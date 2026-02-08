@@ -624,15 +624,6 @@ class BidPredictor:
             business_segment, self.feature_stats['global_avg_fee']
         )
 
-        # Generate recommendation - ±10% of benchmark is considered normal
-        diff_pct = ((prediction - segment_avg) / segment_avg) * 100
-        if diff_pct > 10:
-            recommendation = f"Predicted fee is {diff_pct:.1f}% above segment average. May be priced high for this market."
-        elif diff_pct < -10:
-            recommendation = f"Predicted fee is {abs(diff_pct):.1f}% below segment average. May be underpriced - verify inputs."
-        else:
-            recommendation = f"Predicted fee is within ±10% of segment average. Good competitive position."
-
         # Predict win probability using classification model
         win_prob_result = self.predict_win_probability(
             features=features,
@@ -643,6 +634,25 @@ class BidPredictor:
 
         # Calculate expected value: EV = P(Win) × Bid Fee
         expected_value = win_prob_result['probability'] * prediction
+
+        # Generate recommendation incorporating fee position and EV
+        diff_pct = ((prediction - segment_avg) / segment_avg) * 100
+        win_pct = win_prob_result['probability_pct']
+        if diff_pct > 10:
+            recommendation = (
+                f"Predicted fee is {diff_pct:.1f}% above segment average. "
+                f"Win probability is {win_pct}% at this price (EV: ${expected_value:,.0f})."
+            )
+        elif diff_pct < -10:
+            recommendation = (
+                f"Predicted fee is {abs(diff_pct):.1f}% below segment average. "
+                f"Win probability is {win_pct}% (EV: ${expected_value:,.0f}). Verify inputs are correct."
+            )
+        else:
+            recommendation = (
+                f"Predicted fee is within ±10% of segment average. "
+                f"Win probability is {win_pct}% (EV: ${expected_value:,.0f}). Good competitive position."
+            )
 
         return {
             "predicted_fee": round(prediction, 2),
