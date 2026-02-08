@@ -41,6 +41,7 @@ from config.model_config import (
     MODELS_DIR, FEATURES_DATA, REPORTS_DIR,
     DATA_START_DATE, USE_RECENT_DATA_ONLY,
     EXCLUDE_COLUMNS, JOBDATA_FEATURES_TO_EXCLUDE,
+    PREDICTION_CONFIG,
 )
 
 from api.empirical_bands import EmpiricalBandCalculator
@@ -580,7 +581,7 @@ class BidPredictor:
         prediction = self.model.predict(X)[0]
 
         # Ensure positive prediction
-        prediction = max(prediction, 500)  # Minimum $500 fee
+        prediction = max(prediction, PREDICTION_CONFIG['min_fee'])
 
         # Calculate confidence interval using empirical bands (stratified by fee bucket)
         low, high, band_metadata = self.band_calculator.get_confidence_interval(
@@ -595,9 +596,10 @@ class BidPredictor:
         state_count = self.feature_stats.get('state_count', {}).get(property_state, 0)
 
         # Data availability score
-        if segment_count > 1000 and state_count > 500:
+        cfg = PREDICTION_CONFIG
+        if segment_count > cfg['confidence_segment_high'] and state_count > cfg['confidence_state_high']:
             data_confidence = "high"
-        elif segment_count > 100 and state_count > 50:
+        elif segment_count > cfg['confidence_segment_medium'] and state_count > cfg['confidence_state_medium']:
             data_confidence = "medium"
         else:
             data_confidence = "low"
@@ -605,9 +607,9 @@ class BidPredictor:
         # Band width score: narrow band relative to prediction = higher confidence
         band_width = high - low
         band_ratio = band_width / max(prediction, 1)
-        if band_ratio < 0.3:
+        if band_ratio < cfg['band_ratio_high']:
             band_confidence = "high"
-        elif band_ratio < 0.6:
+        elif band_ratio < cfg['band_ratio_medium']:
             band_confidence = "medium"
         else:
             band_confidence = "low"
@@ -746,13 +748,13 @@ class BidPredictor:
         # ratio < 1 means below-average fee (more competitive) → boost win prob
         # ratio > 1 means above-average fee (less competitive) → penalize win prob
         ratio = predicted_fee / max(segment_benchmark, 1)
-        k = 3.0  # Moderate sensitivity
+        k = PREDICTION_CONFIG['fee_sensitivity_k']
         fee_adjustment = 2.0 / (1.0 + np.exp(k * (ratio - 1.0)))
 
         probability = raw_probability * fee_adjustment
 
         # Clamp to valid range
-        probability = max(0.05, min(0.95, probability))
+        probability = max(PREDICTION_CONFIG['win_prob_min'], min(PREDICTION_CONFIG['win_prob_max'], probability))
 
         # Confidence based on how close to 0.5 (more extreme = more confident)
         distance_from_uncertain = abs(probability - 0.5)

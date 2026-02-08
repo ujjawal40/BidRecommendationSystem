@@ -160,6 +160,34 @@ LIGHTGBM_CONFIG = {
 }
 
 # ============================================================================
+# PREDICTION SERVICE CONFIGURATION
+# ============================================================================
+
+PREDICTION_CONFIG = {
+    # Fee-sensitivity adjustment for win probability
+    # The classification model doesn't include BidFee features, so we apply a
+    # post-prediction sigmoid: adjustment = 2 / (1 + exp(k * (ratio - 1)))
+    "fee_sensitivity_k": 3.0,  # Sigmoid steepness (higher = more sensitive to fee)
+
+    # Confidence thresholds for bid fee
+    "confidence_segment_high": 1000,  # Min segment count for "high" data confidence
+    "confidence_state_high": 500,     # Min state count for "high" data confidence
+    "confidence_segment_medium": 100,
+    "confidence_state_medium": 50,
+
+    # Band width thresholds (ratio of band width to predicted fee)
+    "band_ratio_high": 0.3,    # Below this = "high" band confidence
+    "band_ratio_medium": 0.6,  # Below this = "medium" band confidence
+
+    # Win probability clamp range
+    "win_prob_min": 0.05,
+    "win_prob_max": 0.95,
+
+    # Minimum bid fee floor
+    "min_fee": 500,
+}
+
+# ============================================================================
 # EVALUATION METRICS
 # ============================================================================
 
