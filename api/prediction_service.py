@@ -737,7 +737,17 @@ class BidPredictor:
 
         # Predict probability
         X = np.array([feature_vector])
-        probability = self.win_prob_model.predict(X)[0]
+        raw_probability = self.win_prob_model.predict(X)[0]
+
+        # Fee-sensitivity adjustment: model doesn't know the predicted fee,
+        # so we adjust based on how competitive the fee is vs segment average.
+        # ratio < 1 means below-average fee (more competitive) → boost win prob
+        # ratio > 1 means above-average fee (less competitive) → penalize win prob
+        ratio = predicted_fee / max(segment_benchmark, 1)
+        k = 3.0  # Moderate sensitivity
+        fee_adjustment = 2.0 / (1.0 + np.exp(k * (ratio - 1.0)))
+
+        probability = raw_probability * fee_adjustment
 
         # Clamp to valid range
         probability = max(0.05, min(0.95, probability))
@@ -762,7 +772,7 @@ class BidPredictor:
             "probability": round(probability, 4),
             "probability_pct": round(probability * 100, 1),
             "confidence": win_confidence,
-            "model_used": "LightGBM Classifier (AUC: 0.88)",
+            "model_used": "LightGBM Classifier + fee adjustment (AUC: 0.88)",
         }
 
     def _fallback_win_probability(
