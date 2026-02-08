@@ -759,7 +759,9 @@ class BidPredictor:
         # ratio > 1 means above-average fee (less competitive) → penalize win prob
         ratio = predicted_fee / max(segment_benchmark, 1)
         k = PREDICTION_CONFIG['fee_sensitivity_k']
-        fee_adjustment = 2.0 / (1.0 + np.exp(k * (ratio - 1.0)))
+        # Clamp exponent to avoid overflow for extreme ratios
+        exponent = min(k * (ratio - 1.0), 500)
+        fee_adjustment = 2.0 / (1.0 + np.exp(exponent))
 
         probability = raw_probability * fee_adjustment
 

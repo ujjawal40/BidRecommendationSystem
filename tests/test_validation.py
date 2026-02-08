@@ -201,6 +201,35 @@ class TestFeeSensitivityAdjustment:
         assert 0.05 <= clamped <= 0.95
 
 
+class TestFeeAdjustmentEdgeCases:
+    """Edge case tests for fee-sensitivity adjustment."""
+
+    def test_zero_segment_benchmark(self):
+        """Fee adjustment should handle zero segment benchmark gracefully."""
+        predicted_fee = 3000
+        segment_benchmark = 0
+        ratio = predicted_fee / max(segment_benchmark, 1)
+        k = 3.0
+        adjustment = 2.0 / (1.0 + np.exp(k * (ratio - 1.0)))
+        # Very high ratio should produce a very small adjustment (close to 0)
+        assert adjustment >= 0
+        assert adjustment < 0.01  # Extreme penalization for massive ratio
+
+    def test_very_low_fee(self):
+        """Extremely low fee should not produce adjustment > 2.0."""
+        ratio = 0.01
+        k = 3.0
+        adjustment = 2.0 / (1.0 + np.exp(k * (ratio - 1.0)))
+        assert adjustment <= 2.0
+
+    def test_equal_fee_and_benchmark(self):
+        """When fee equals benchmark exactly, adjustment should be 1.0."""
+        ratio = 1.0
+        k = 3.0
+        adjustment = 2.0 / (1.0 + np.exp(k * (ratio - 1.0)))
+        assert abs(adjustment - 1.0) < 0.001
+
+
 class TestPredictionClamping:
     """Tests for prediction post-processing."""
 
