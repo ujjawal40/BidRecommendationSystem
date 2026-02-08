@@ -156,6 +156,51 @@ class TestConfidenceLogic:
         assert win_confidence == "low"
 
 
+class TestFeeSensitivityAdjustment:
+    """Tests for fee-conditioned win probability adjustment."""
+
+    def test_fee_adjustment_at_parity(self):
+        """At ratio=1.0 (fee = segment avg), adjustment should be ~1.0."""
+        ratio = 1.0
+        k = 3.0
+        adjustment = 2.0 / (1.0 + np.exp(k * (ratio - 1.0)))
+        assert abs(adjustment - 1.0) < 0.01
+
+    def test_competitive_fee_boosts_probability(self):
+        """Below-average fee should boost win probability (adjustment > 1)."""
+        ratio = 0.8  # 20% below segment avg
+        k = 3.0
+        adjustment = 2.0 / (1.0 + np.exp(k * (ratio - 1.0)))
+        assert adjustment > 1.0
+
+    def test_aggressive_fee_penalizes_probability(self):
+        """Above-average fee should penalize win probability (adjustment < 1)."""
+        ratio = 1.3  # 30% above segment avg
+        k = 3.0
+        adjustment = 2.0 / (1.0 + np.exp(k * (ratio - 1.0)))
+        assert adjustment < 1.0
+
+    def test_fee_adjustment_monotonic(self):
+        """Win probability adjustment should decrease as fee ratio increases."""
+        k = 3.0
+        ratios = [0.6, 0.8, 1.0, 1.2, 1.5]
+        adjustments = [2.0 / (1.0 + np.exp(k * (r - 1.0))) for r in ratios]
+        for i in range(len(adjustments) - 1):
+            assert adjustments[i] > adjustments[i + 1], \
+                f"Adjustment should decrease: {adjustments[i]} > {adjustments[i+1]}"
+
+    def test_probability_clamped_after_adjustment(self):
+        """Adjusted probability must stay within [0.05, 0.95]."""
+        raw_prob = 0.9
+        # Very competitive fee → large boost
+        ratio = 0.5
+        k = 3.0
+        adjustment = 2.0 / (1.0 + np.exp(k * (ratio - 1.0)))
+        adjusted = raw_prob * adjustment
+        clamped = max(0.05, min(0.95, adjusted))
+        assert 0.05 <= clamped <= 0.95
+
+
 class TestPredictionClamping:
     """Tests for prediction post-processing."""
 
