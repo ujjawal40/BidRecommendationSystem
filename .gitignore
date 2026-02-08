@@ -90,6 +90,13 @@ frontend/npm-debug.log*
 !outputs/models/*.txt
 !outputs/models/*.json
 
+# Claude Code local files
+CLAUDE.md
+LEARNINGS.md
+api/CLAUDE.md
+scripts/CLAUDE.md
+frontend/CLAUDE.md
+
 # Temporary files
 /tmp/
 *.pyc
