@@ -39,6 +39,7 @@ import warnings
 from config.model_config import (
     FEATURES_DATA, DATE_COLUMN, TARGET_COLUMN,
     EXCLUDE_COLUMNS, JOBDATA_FEATURES_TO_EXCLUDE,
+    LEAKY_JOB_DERIVED_FEATURES,
     DATA_START_DATE, USE_RECENT_DATA_ONLY,
     MODELS_DIR, REPORTS_DIR, FIGURES_DIR, RANDOM_SEED,
 )
@@ -128,13 +129,22 @@ def main():
     print("=" * 80)
 
     # Start with all columns, exclude non-features
-    feature_cols = [col for col in df.columns if col not in EXCLUDE_COLUMNS]
+    # Override: keep BidFee for win probability model — the model needs to learn
+    # fee-sensitivity directly from data instead of relying on post-prediction sigmoid.
+    # BidFee is in EXCLUDE_COLUMNS because it's the Phase 1A target, but for Phase 1B
+    # it's a legitimate input feature (at inference, we inject the predicted fee).
+    win_prob_exclude = [col for col in EXCLUDE_COLUMNS if col != "BidFee"]
+    feature_cols = [col for col in df.columns if col not in win_prob_exclude]
 
     # Exclude JobData features (same as regression)
     feature_cols = [col for col in feature_cols if col not in JOBDATA_FEATURES_TO_EXCLUDE]
 
     # CRITICAL: Exclude leaky classification features
     feature_cols = [col for col in feature_cols if col not in LEAKY_CLASSIFICATION_FEATURES]
+
+    # CRITICAL: Exclude job-derived features (JobCount, IECount, LeaseCount, SaleCount)
+    # These leak target info: NULL for lost bids, populated for won bids
+    feature_cols = [col for col in feature_cols if col not in LEAKY_JOB_DERIVED_FEATURES]
 
     # Keep only numeric
     numeric_features = df[feature_cols].select_dtypes(include=[np.number]).columns.tolist()
@@ -146,6 +156,12 @@ def main():
     print(f"After excluding IDs/targets: {len(feature_cols)}")
     print(f"After excluding JobData: {len([c for c in feature_cols if c not in JOBDATA_FEATURES_TO_EXCLUDE])}")
     print(f"After excluding leaky win_rate features: {len(numeric_features)}")
+
+    # Confirm BidFee is included
+    if 'BidFee' in numeric_features:
+        print(f"\n✓ BidFee INCLUDED as feature (model will learn fee-sensitivity from data)")
+    else:
+        print(f"\n⚠ BidFee NOT in numeric features — check exclusion logic")
 
     print(f"\n⚠ Excluded {len(LEAKY_CLASSIFICATION_FEATURES)} leaky features:")
     for feat in LEAKY_CLASSIFICATION_FEATURES:
@@ -419,6 +435,7 @@ def main():
         "num_features": len(numeric_features),
         "features": numeric_features,
         "excluded_leaky_features": LEAKY_CLASSIFICATION_FEATURES,
+        "excluded_job_derived_features": LEAKY_JOB_DERIVED_FEATURES,
         "data_config": {
             "start_date": DATA_START_DATE,
             "total_samples": len(df),
