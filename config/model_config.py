@@ -65,6 +65,17 @@ JOBDATA_FEATURES_TO_EXCLUDE = [
     "PropertyType_enriched",
 ]
 
+# Job-derived features that leak target information for win probability classification.
+# JobCount is NULL for lost bids (no job created) and populated for won bids.
+# When filled with 0, the model learns "JobCount=0 → lost" — 47% of model importance
+# was this leaky signal. IECount, LeaseCount, SaleCount have the same pattern.
+LEAKY_JOB_DERIVED_FEATURES = [
+    "JobCount",
+    "IECount",
+    "LeaseCount",
+    "SaleCount",
+]
+
 # Output paths
 OUTPUTS_DIR = ROOT_DIR / "outputs"
 MODELS_DIR = OUTPUTS_DIR / "models"
