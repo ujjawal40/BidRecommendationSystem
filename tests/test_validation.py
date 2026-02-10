@@ -269,16 +269,12 @@ class TestPredictionResponseStructure:
         assert len(required_keys) == 10
 
     def test_win_probability_response_keys(self):
-        """Verify win probability sub-response includes fee_adjustment transparency."""
+        """Verify win probability sub-response keys (model has BidFee feature, no sigmoid hack)."""
         required_keys = {
             "probability", "probability_pct", "confidence",
-            "model_used", "fee_adjustment",
+            "model_used",
         }
-        fee_adj_keys = {
-            "raw_probability", "adjustment_factor", "fee_to_segment_ratio",
-        }
-        assert len(required_keys) == 5
-        assert len(fee_adj_keys) == 3
+        assert len(required_keys) == 4
 
     def test_confidence_levels_valid(self):
         """Confidence level must be one of the three valid values."""
