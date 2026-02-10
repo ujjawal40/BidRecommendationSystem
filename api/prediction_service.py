@@ -650,22 +650,23 @@ class BidPredictor:
         # Calculate expected value: EV = P(Win) × Bid Fee
         expected_value = win_prob_result['probability'] * prediction
 
-        # Generate recommendation incorporating fee position and EV
-        diff_pct = ((prediction - segment_avg) / segment_avg) * 100
+        # Generate recommendation using blended benchmark for contextual comparison
+        diff_pct = ((prediction - blended_benchmark) / blended_benchmark) * 100
         win_pct = win_prob_result['probability_pct']
-        if diff_pct > 10:
+        if diff_pct > 15:
             recommendation = (
-                f"Predicted fee is {diff_pct:.1f}% above segment average. "
+                f"Predicted fee is {diff_pct:.1f}% above market context. "
                 f"Win probability is {win_pct}% at this price (EV: ${expected_value:,.0f})."
             )
-        elif diff_pct < -10:
+        elif diff_pct < -15:
             recommendation = (
-                f"Predicted fee is {abs(diff_pct):.1f}% below segment average. "
-                f"Win probability is {win_pct}% (EV: ${expected_value:,.0f}). Verify inputs are correct."
+                f"Predicted fee is {abs(diff_pct):.1f}% below market context. "
+                f"Win probability is {win_pct}% (EV: ${expected_value:,.0f}). "
+                f"Consider if deal conditions justify this positioning."
             )
         else:
             recommendation = (
-                f"Predicted fee is within ±10% of segment average. "
+                f"Fee aligns with market context for this combination. "
                 f"Win probability is {win_pct}% (EV: ${expected_value:,.0f}). Good competitive position."
             )
 
