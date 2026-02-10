@@ -619,16 +619,31 @@ class BidPredictor:
         rank_to_label = {0: "low", 1: "medium", 2: "high"}
         confidence = rank_to_label[min(confidence_rank[data_confidence], confidence_rank[band_confidence])]
 
-        # Segment benchmark
+        # Segment benchmark (for display in Market Comparison)
         segment_avg = self.feature_stats['segment_avg_fee'].get(
             business_segment, self.feature_stats['global_avg_fee']
         )
+
+        # Blended benchmark for win probability fee adjustment
+        # Uses segment + state + property type context instead of flat segment average.
+        # This prevents systematic distortion when deal context differs from segment mean
+        # (e.g., cheap state in expensive segment, or vice versa).
+        blended_benchmark = (
+            0.4 * features['segment_avg_fee']
+            + 0.3 * features['state_avg_fee']
+            + 0.3 * features['propertytype_avg_fee']
+        )
+
+        # Inject predicted fee as BidFee for the win probability model.
+        # The model was trained with BidFee as a feature, so it learns
+        # fee-sensitivity from data rather than relying on post-prediction sigmoid.
+        features['BidFee'] = prediction
 
         # Predict win probability using classification model
         win_prob_result = self.predict_win_probability(
             features=features,
             predicted_fee=prediction,
-            segment_benchmark=segment_avg,
+            segment_benchmark=blended_benchmark,
             bid_fee_confidence=confidence,
         )
 
