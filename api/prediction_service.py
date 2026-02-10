@@ -765,20 +765,10 @@ class BidPredictor:
                 feature_vector.append(0)
 
         # Predict probability
+        # Model was trained WITH BidFee as a feature, so fee-sensitivity
+        # is learned from data. No post-prediction sigmoid adjustment needed.
         X = np.array([feature_vector])
-        raw_probability = self.win_prob_model.predict(X)[0]
-
-        # Fee-sensitivity adjustment: model doesn't know the predicted fee,
-        # so we adjust based on how competitive the fee is vs segment average.
-        # ratio < 1 means below-average fee (more competitive) → boost win prob
-        # ratio > 1 means above-average fee (less competitive) → penalize win prob
-        ratio = predicted_fee / max(segment_benchmark, 1)
-        k = PREDICTION_CONFIG['fee_sensitivity_k']
-        # Clamp exponent to avoid overflow for extreme ratios
-        exponent = min(k * (ratio - 1.0), 500)
-        fee_adjustment = 2.0 / (1.0 + np.exp(exponent))
-
-        probability = raw_probability * fee_adjustment
+        probability = self.win_prob_model.predict(X)[0]
 
         # Clamp to valid range
         probability = max(PREDICTION_CONFIG['win_prob_min'], min(PREDICTION_CONFIG['win_prob_max'], probability))
@@ -803,12 +793,7 @@ class BidPredictor:
             "probability": round(probability, 4),
             "probability_pct": round(probability * 100, 1),
             "confidence": win_confidence,
-            "model_used": "LightGBM Classifier + fee adjustment (AUC: 0.88)",
-            "fee_adjustment": {
-                "raw_probability": round(float(raw_probability), 4),
-                "adjustment_factor": round(fee_adjustment, 4),
-                "fee_to_segment_ratio": round(ratio, 4),
-            },
+            "model_used": "LightGBM Classifier with BidFee feature (AUC: 0.87)",
         }
 
     def _fallback_win_probability(
