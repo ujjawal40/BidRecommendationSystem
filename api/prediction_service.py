@@ -580,8 +580,16 @@ class BidPredictor:
         X = np.array([feature_vector])
         prediction = self.model.predict(X)[0]
 
-        # Ensure positive prediction
-        prediction = max(prediction, PREDICTION_CONFIG['min_fee'])
+        # Inverse transform: model was trained on log1p(BidFee)
+        prediction = np.expm1(prediction)
+
+        # Benchmark-aware floor: log-transform models can severely underpredict
+        # for rare segment/state/property combinations with sparse training data.
+        # Use 30% of segment average as minimum to avoid implausible predictions.
+        segment_floor = 0.3 * self.feature_stats['segment_avg_fee'].get(
+            business_segment, self.feature_stats['global_avg_fee']
+        )
+        prediction = max(prediction, PREDICTION_CONFIG['min_fee'], segment_floor)
 
         # Calculate confidence interval using empirical bands (stratified by fee bucket)
         low, high, band_metadata = self.band_calculator.get_confidence_interval(
