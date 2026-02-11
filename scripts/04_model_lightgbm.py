@@ -363,17 +363,27 @@ class LightGBMBidFeePredictor:
         print("TRAINING LIGHTGBM MODEL")
         print("=" * 80)
 
+        # Apply target transform if configured (e.g., log1p for proportional errors)
+        self.target_transform = self.config.get("target_transform", None)
+        if self.target_transform == "log1p":
+            y_train_transformed = np.log1p(self.y_train)
+            y_valid_transformed = np.log1p(self.y_valid)
+            print(f"  Target transform: log1p(BidFee)")
+        else:
+            y_train_transformed = self.y_train
+            y_valid_transformed = self.y_valid
+
         # Create LightGBM datasets
         train_data = lgb.Dataset(
             self.X_train,
-            label=self.y_train,
+            label=y_train_transformed,
             feature_name=self.feature_names,
         )
 
         # CRITICAL: Use validation set for early stopping, NOT test set
         valid_data = lgb.Dataset(
             self.X_valid,
-            label=self.y_valid,
+            label=y_valid_transformed,
             feature_name=self.feature_names,
             reference=train_data,
         )
@@ -439,12 +449,19 @@ class LightGBMBidFeePredictor:
         valid_preds_raw = self.model.predict(self.X_valid, num_iteration=self.model.best_iteration)
         test_preds_raw = self.model.predict(self.X_test, num_iteration=self.model.best_iteration)
 
+        # Inverse transform if log1p was applied
+        if getattr(self, 'target_transform', None) == "log1p":
+            train_preds_raw = np.expm1(train_preds_raw)
+            valid_preds_raw = np.expm1(valid_preds_raw)
+            test_preds_raw = np.expm1(test_preds_raw)
+            print(f"  Applied expm1 inverse transform to predictions")
+
         # Count negative predictions before clamping
         neg_train = (train_preds_raw < 0).sum()
         neg_valid = (valid_preds_raw < 0).sum()
         neg_test = (test_preds_raw < 0).sum()
         if neg_train + neg_valid + neg_test > 0:
-            print(f"⚠ Negative predictions clamped to 0: Train={neg_train}, Valid={neg_valid}, Test={neg_test}")
+            print(f"  Negative predictions clamped to 0: Train={neg_train}, Valid={neg_valid}, Test={neg_test}")
 
         # Clamp to 0 (bid fees cannot be negative)
         train_preds = np.maximum(0, train_preds_raw)
@@ -642,6 +659,7 @@ class LightGBMBidFeePredictor:
             "model_type": "LightGBM",
             "phase": "1A - Bid Fee Prediction",
             "target_variable": TARGET_COLUMN,
+            "target_transform": getattr(self, 'target_transform', None),
             "num_features": len(self.feature_names),
             "features": self.feature_names,
             "training_samples": len(self.X_train),
