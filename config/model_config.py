@@ -113,14 +113,14 @@ TRAIN_TEST_SPLIT = {
 # ============================================================================
 
 LIGHTGBM_CONFIG = {
-    # Model hyperparameters - OPTIMIZED for reduced overfitting (ratio < 2.0)
-    # Tested configurations in model-improvement branch
+    # Model hyperparameters - OPTIMIZED via experiment A9 (log-transform + lower LR)
+    # MAPE improved from 71% to 16%, overfitting from 1.99x to 1.60x
     "params": {
         "objective": "regression",
         "metric": "rmse",
         "boosting_type": "gbdt",
-        "num_leaves": 18,  # Reduced from 20 to reduce overfitting (1.99x vs 2.09x)
-        "learning_rate": 0.05,
+        "num_leaves": 18,
+        "learning_rate": 0.02,  # Lowered from 0.05 (experiment A9)
         "feature_fraction": 0.8,
         "bagging_fraction": 0.8,
         "bagging_freq": 5,
@@ -134,11 +134,14 @@ LIGHTGBM_CONFIG = {
         "verbose": -1,
     },
 
-    # Training parameters - Moderate number of trees
+    # Target transform (applied before training, inverted after prediction)
+    "target_transform": "log1p",  # log1p(BidFee) for proportional errors
+
+    # Training parameters - More rounds needed with lower LR
     "training": {
-        "num_boost_round": 500,  # Moderate (was 1000 originally, 300 was too few)
-        "early_stopping_rounds": 50,
-        "verbose_eval": 50,  # Report every 50 rounds
+        "num_boost_round": 1500,  # Increased from 500 (needed with LR 0.02)
+        "early_stopping_rounds": 100,
+        "verbose_eval": 100,
     },
 
     # Feature importance
