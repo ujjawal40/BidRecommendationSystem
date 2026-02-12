@@ -2,6 +2,7 @@
   "model_type": "LightGBM",
   "phase": "1A - Bid Fee Prediction",
   "target_variable": "BidFee",
+  "target_transform": "log1p",
   "num_features": 68,
   "features": [
     "segment_avg_fee",
@@ -75,24 +76,24 @@
   ],
   "training_samples": 31384,
   "test_samples": 10462,
-  "best_iteration": 500,
+  "best_iteration": 1500,
   "metrics": {
-    "train_rmse": 177.62828011235487,
-    "valid_rmse": 361.10102690315955,
-    "test_rmse": 353.98535442790416,
-    "rmse": 353.98535442790416,
-    "mae": 108.62514783557543,
-    "r2": 0.9723160540556319,
-    "mape": 71.18267786862539,
-    "median_ae": 35.159588797045444,
-    "overfitting_ratio": 1.992843449275073
+    "train_rmse": 331.24953586919014,
+    "valid_rmse": 524.4048757457907,
+    "test_rmse": 530.9929313217798,
+    "rmse": 530.9929313217798,
+    "mae": 146.9822080069975,
+    "r2": 0.937707625821893,
+    "mape": 15.675691008144172,
+    "median_ae": 39.19148397611343,
+    "overfitting_ratio": 1.6029997745610969
   },
   "hyperparameters": {
     "objective": "regression",
     "metric": "rmse",
     "boosting_type": "gbdt",
     "num_leaves": 18,
-    "learning_rate": 0.05,
+    "learning_rate": 0.02,
     "feature_fraction": 0.8,
     "bagging_fraction": 0.8,
     "bagging_freq": 5,
@@ -105,5 +106,5 @@
     "n_jobs": -1,
     "verbose": -1
   },
-  "training_date": "2026-02-04 20:10:20"
+  "training_date": "2026-02-11 15:16:30"
 }
