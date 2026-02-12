@@ -141,19 +141,24 @@ class TestConfidenceLogic:
         confidence = min(rank[data_confidence], rank[band_confidence])
         assert confidence == 0  # low (capped by wide band)
 
-    def test_win_prob_confidence_capped_by_bid_fee(self):
-        """Win probability confidence should never exceed bid fee confidence."""
-        confidence_rank = {"low": 0, "medium": 1, "high": 2}
-        rank_to_label = {0: "low", 1: "medium", 2: "high"}
+    def test_win_prob_confidence_independent_of_bid_fee(self):
+        """Win probability confidence is based purely on distance from 0.5.
 
-        bid_fee_confidence = "low"
-        win_confidence = "high"
+        Since the win prob model includes BidFee as a direct feature,
+        its confidence stands on its own — no cap from bid fee confidence.
+        """
+        probability = 0.86  # High probability
+        distance_from_uncertain = abs(probability - 0.5)  # 0.36
 
-        max_rank = confidence_rank[bid_fee_confidence]
-        if confidence_rank[win_confidence] > max_rank:
-            win_confidence = rank_to_label[max_rank]
+        if distance_from_uncertain > 0.3:
+            win_confidence = "high"
+        elif distance_from_uncertain > 0.15:
+            win_confidence = "medium"
+        else:
+            win_confidence = "low"
 
-        assert win_confidence == "low"
+        # 86% probability should be "high" confidence regardless of bid fee confidence
+        assert win_confidence == "high"
 
 
 class TestFeeSensitivityAdjustment:

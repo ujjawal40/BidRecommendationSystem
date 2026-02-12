@@ -652,7 +652,6 @@ class BidPredictor:
             features=features,
             predicted_fee=prediction,
             segment_benchmark=blended_benchmark,
-            bid_fee_confidence=confidence,
         )
 
         # Calculate expected value: EV = P(Win) × Bid Fee
@@ -732,7 +731,6 @@ class BidPredictor:
         features: Dict[str, float],
         predicted_fee: float,
         segment_benchmark: float,
-        bid_fee_confidence: str = "medium",
     ) -> Dict[str, Any]:
         """
         Predict win probability using the trained classification model.
@@ -745,9 +743,6 @@ class BidPredictor:
             The predicted bid fee
         segment_benchmark : float
             Average fee for the segment (for fallback heuristic)
-        bid_fee_confidence : str
-            Confidence level of the bid fee prediction ("low", "medium", "high").
-            Win probability confidence is capped at this level.
 
         Returns:
         --------
@@ -783,6 +778,8 @@ class BidPredictor:
         probability = max(PREDICTION_CONFIG['win_prob_min'], min(PREDICTION_CONFIG['win_prob_max'], probability))
 
         # Confidence based on how close to 0.5 (more extreme = more confident)
+        # The win prob model includes BidFee as a direct feature, so its
+        # confidence is independent of bid fee confidence — no cap needed.
         distance_from_uncertain = abs(probability - 0.5)
         if distance_from_uncertain > 0.3:
             win_confidence = "high"
@@ -790,13 +787,6 @@ class BidPredictor:
             win_confidence = "medium"
         else:
             win_confidence = "low"
-
-        # Cap win probability confidence at bid fee confidence level
-        confidence_rank = {"low": 0, "medium": 1, "high": 2}
-        rank_to_label = {0: "low", 1: "medium", 2: "high"}
-        max_rank = confidence_rank[bid_fee_confidence]
-        if confidence_rank[win_confidence] > max_rank:
-            win_confidence = rank_to_label[max_rank]
 
         return {
             "probability": round(probability, 4),
