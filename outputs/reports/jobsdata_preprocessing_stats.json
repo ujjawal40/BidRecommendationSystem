@@ -1,0 +1,15 @@
+{
+  "initial_rows": 700820,
+  "after_closed_filter": 687795,
+  "after_year_filter": 226493,
+  "netfee_p99_cap": 12500.0,
+  "netfee_capped_count": 2051,
+  "after_netfee_clean": 215670,
+  "after_dedup": 215330,
+  "joblength_null_count": 23409,
+  "joblength_capped_below": 3131,
+  "joblength_capped_above": 1491,
+  "final_rows": 215330,
+  "final_columns": 59,
+  "processing_date": "2026-02-14 21:49:17"
+}
