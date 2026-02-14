@@ -1,0 +1,2186 @@
+{
+  "generated_at": "2026-02-14 17:48:10",
+  "total_rows": 700820,
+  "total_columns": 143,
+  "column_names": [
+    "JobId",
+    "JobName",
+    "JobType",
+    "JobStatus",
+    "StartDate",
+    "EndDate",
+    "DueDate",
+    "NetFee",
+    "JobPurpose",
+    "Deliverable",
+    "AppraisalFileType",
+    "BusinessSegment",
+    "BusinessSegmentDetail",
+    "PortfolioMultiProperty",
+    "PotentialLitigation",
+    "Year",
+    "WeekNumber",
+    "DayOfWeek",
+    "YearWeek",
+    "YearMonth",
+    "YearQuarter",
+    "WeekOfYear",
+    "MonthNumber",
+    "YearMonthNum",
+    "YearWeekNum",
+    "YearWeekConcat",
+    "WeekNum2",
+    "MonthNum2",
+    "JobDistanceMiles",
+    "OfficeJobTerritory",
+    "JobLength_Days",
+    "PropertyID",
+    "PropertyType",
+    "SubType",
+    "SpecificUse",
+    "GrossLandAreaAcres",
+    "GrossLandAreaSF",
+    "Shape",
+    "Topography",
+    "BuildingClass",
+    "YearBuilt",
+    "PropertyCondition",
+    "CityMunicipality",
+    "StateName",
+    "Market",
+    "Submarket",
+    "CountyID",
+    "MarketOrientation",
+    "PhotosCount",
+    "SaleCount",
+    "IECount",
+    "LeaseCount",
+    "RentSurveyCount",
+    "IRRRegion",
+    "RooftopLatitude",
+    "RooftopLongitude",
+    "GrossBuildingSF",
+    "GLARentableSF",
+    "OfficeID",
+    "OfficeCode",
+    "CompanyLocation",
+    "Office_Region",
+    "ClientCompanyID",
+    "CompanyName",
+    "ClientContactID",
+    "ContactType",
+    "CompanyType",
+    "ZipCode",
+    "Zip_Latitude",
+    "Zip_Longitude",
+    "Zip_StateAbbr",
+    "Zip_StateName",
+    "Zip_DecommissionedFlag",
+    "Zip_CityName",
+    "Zip_CountyName",
+    "Zip_CountyFIPS",
+    "Zip_Congressional",
+    "Zip_MSA",
+    "Zip_CBSA",
+    "Zip_CBSA2",
+    "Zip_Congressional2",
+    "Zip_Congressional3",
+    "Zip_MultiCounty",
+    "Zip_FIPS",
+    "Zip_CityType",
+    "Zip_CityAliasAbbr",
+    "Zip_PreferredFlag",
+    "Zip_DecommFlag2",
+    "Zip_CBSAName",
+    "Zip_CBSAType",
+    "Zip_Population",
+    "Zip_HousingUnits",
+    "Zip_CSAName",
+    "Zip_CSACode",
+    "Zip_CBSACode2",
+    "Zip_Combined_Code",
+    "Zip_CensusTract",
+    "Zip_MSAName",
+    "Zip_CMSAName",
+    "Zip_PMSAName",
+    "Zip_CensusRegion",
+    "Zip_CensusDivision",
+    "Zip_CensusDivisionCode",
+    "Zip_CountyFIPS2",
+    "Zip_PopulationEstimate",
+    "Zip_HouseholdsPerZip",
+    "Zip_AverageHouseValue",
+    "Zip_IncomePerHousehold",
+    "Zip_PersonsPerHousehold",
+    "Zip_AverageHouseholdSize",
+    "Zip_MedianAge",
+    "Zip_MedianAgeMale",
+    "Zip_MedianAgeFemale",
+    "Zip_DeliveryTotal",
+    "Zip_SingleDelivery",
+    "Zip_MultiDelivery",
+    "Zip_GrowthRank",
+    "Zip_GrowthIncrease",
+    "Zip_MedianHouseValue",
+    "Zip_AvgIncomePerHousehold",
+    "Zip_AvgHouseValue2",
+    "Zip_MedianIncome",
+    "Zip_NumberOfBusinesses",
+    "Zip_NumberOfEmployees",
+    "Zip_BusinessFirst8",
+    "Zip_BusinessSecond8",
+    "Zip_CompanyEmployees1k",
+    "Zip_CompanyEmployees1kPct",
+    "Zip_CompanyEmployeesAll",
+    "Zip_CompanyEmployeesAllPct",
+    "Zip_WorkersInZip",
+    "Zip_WorkersOutZip",
+    "Zip_WhiteCollar",
+    "Zip_BlueCollar",
+    "Zip_DeliveryResidential",
+    "Zip_DeliveryBusiness",
+    "Zip_DeliveryOther",
+    "Zip_DeliveryAll",
+    "Zip_LandArea",
+    "Zip_WaterArea",
+    "Zip_TotalDensity",
+    "Zip_PopDensity",
+    "Zip_PopCount"
+  ],
+  "validation": {
+    "JobId (col 0) is numeric": "True",
+    "JobStatus (col 3) has 'Closed'": true,
+    "NetFee (col 7) is numeric": "True",
+    "Year (col 15) is valid year": "True",
+    "PropertyType (col 32) has known types": true,
+    "StateName (col 43) has known states": true,
+    "RooftopLatitude (col 54) in US range": "True",
+    "Office_Region (col 61) has known regions": true
+  },
+  "subtype_analysis": {
+    "unique_count": 70,
+    "null_pct": 14.3,
+    "distribution": {
+      "Single User": 77978,
+      "Conventional": 55794,
+      "Warehouse": 51218,
+      "Specialty": 47581,
+      "General Purpose": 40212,
+      "Single Family Residence": 38220,
+      "Residential": 37172,
+      "Commercial": 36779,
+      "Shopping Center": 30726,
+      "Mixed Use": 25771,
+      "Medical Office": 21664,
+      "Manufacturing": 12436,
+      "Condo/Townhome/Co-op": 11604,
+      "Governmental/Institutional": 10484,
+      "Flex Space": 10325,
+      "Government Subsidized": 8964,
+      "Assembly/Meeting Place": 6224,
+      "Assisted Living Facility": 6008,
+      "Skilled Nursing Facility": 5476,
+      "Special Purpose Industrial": 5004,
+      "Limited Service": 4947,
+      "Miscellaneous": 4699,
+      "Sport & Entertainment": 4527,
+      "Other": 4302,
+      "Agricultural": 4147,
+      "Health Care": 3680,
+      "Mobile/Manufactured Home Park": 3226,
+      "Student Housing": 3070,
+      "Multi-building Business Park": 2909,
+      "Two-Four Family Residence": 2755,
+      "Multi-building Office Park": 2295,
+      "Full Service": 2290,
+      "Assisted Living & Memory Care Facility": 2169,
+      "Independent Living Facility": 1850,
+      "Parking Facility": 1442,
+      "Research & Development": 1374,
+      "Veterinary Clinic": 1306,
+      "Independent, Assisted and Memory Care Facility": 1015,
+      "Independent and Assisted Living Facility": 1000,
+      "Continuing Care Retirement Community": 774
+    },
+    "by_property_type": {
+      "Land": {
+        "Specialty": 47581,
+        "Residential": 37172,
+        "Commercial": 36779
+      },
+      "Retail": {
+        "Single User": 77978,
+        "Shopping Center": 30726,
+        "Mixed Use": 10965,
+        "Parking Facility": 1442,
+        "Cannabis Related": 83
+      },
+      "Multifamily": {
+        "Conventional": 55794,
+        "Government Subsidized": 8818,
+        "Mixed Use": 6885,
+        "Mobile/Manufactured Home Park": 3226,
+        "Student Housing": 3070,
+        "Build To Rent": 215,
+        "Co-Living": 32,
+        "Single Room Occupancy": 26
+      },
+      "Office": {
+        "General Purpose": 40212,
+        "Medical Office": 21664,
+        "Mixed Use": 7653,
+        "Multi-building Office Park": 2295,
+        "Governmental/Institutional": 1961,
+        "Veterinary Clinic": 1306,
+        "Research & Development": 733,
+        "Creative/Loft": 456,
+        "Life Science": 251,
+        "Call Center": 122
+      },
+      "Industrial": {
+        "Warehouse": 51218,
+        "Manufacturing": 12436,
+        "Flex Space": 10325,
+        "Special Purpose Industrial": 5004,
+        "Multi-building Business Park": 2909,
+        "Research & Development": 641,
+        "Loft/Multistory": 235,
+        "Cannabis Related": 39
+      },
+      "Residential 1-4 Family": {
+        "Single Family Residence": 38220,
+        "Condo/Townhome/Co-op": 11604,
+        "Two-Four Family Residence": 2755,
+        "Other": 277,
+        "Manufactured/Mobile Home": 88,
+        "Equestrian Estate": 10
+      },
+      "Special Purpose": {
+        "Governmental/Institutional": 8523,
+        "Assembly/Meeting Place": 6224,
+        "Miscellaneous": 4699,
+        "Sport & Entertainment": 4527,
+        "Agricultural": 4147,
+        "Health Care": 3680,
+        "Other": 3250,
+        "Theater": 529
+      },
+      "Senior Housing": {
+        "Assisted Living Facility": 6008,
+        "Skilled Nursing Facility": 5476,
+        "Assisted Living & Memory Care Facility": 2169,
+        "Independent Living Facility": 1850,
+        "Independent, Assisted and Memory Care Facility": 1015,
+        "Independent and Assisted Living Facility": 1000,
+        "Continuing Care Retirement Community": 774,
+        "Other": 711,
+        "Memory Care Facility": 597,
+        "Skilled Nursing & Assisted Living Facility": 382
+      },
+      "Hotel": {
+        "Limited Service": 4947,
+        "Full Service": 2290,
+        "Extended Stay": 696,
+        "Motel": 593,
+        "Resort": 507,
+        "All-Suites": 424,
+        "Bed & Breakfast": 317,
+        "Mixed Use": 268,
+        "Select Service": 179,
+        "Convention Hotel": 168
+      },
+      "Self Storage": {
+        "Climate & Non-Climate Controlled": 548,
+        "Non-Climate Controlled": 357,
+        "Climate Controlled": 211
+      }
+    }
+  },
+  "key_features": {
+    "JobLength_Days": {
+      "valid_pct": 83.72,
+      "min": -361558.0,
+      "max": 1095794.0,
+      "mean": 68.7,
+      "median": 32.0,
+      "p5": 7.0,
+      "p95": 216.0
+    },
+    "CompanyLocation": {
+      "unique": 105,
+      "null_pct": 0.0,
+      "top_10": {
+        "Chicago": 58260,
+        "CHARLOTTE, NC": 34032,
+        "DETROIT, MI": 29751,
+        "INDIANAPOLIS, IN": 28664,
+        "HOUSTON, TX": 27516,
+        "SALT LAKE CITY, UT": 21430,
+        "TAMPA, FL": 21065,
+        "CINCINNATI, OH": 19643,
+        "DALLAS, TX": 19406,
+        "ORLANDO, FL": 18298
+      }
+    },
+    "Office_Region": {
+      "unique": 6,
+      "null_pct": 0.12,
+      "top_10": {
+        "Central": 202588,
+        "Southeast": 164319,
+        "Southwest": 146741,
+        "Northeast": 99479,
+        "West": 81506,
+        "Other": 5316
+      }
+    },
+    "GrossBuildingSF": {
+      "valid_pct": 67.97,
+      "median": 14556.0,
+      "p99": 666372.0
+    },
+    "GLARentableSF": {
+      "valid_pct": 74.22,
+      "median": 11594.0,
+      "p99": 608675.5
+    },
+    "GrossLandAreaAcres": {
+      "valid_pct": 94.37,
+      "median": 1.62,
+      "p99": 470.5842800000005
+    },
+    "GrossLandAreaSF": {
+      "valid_pct": 94.37,
+      "median": 70567.0,
+      "p99": 20503779.12000013
+    },
+    "NetFee": {
+      "valid_count": 654717,
+      "min": 0.01,
+      "max": 7820000.0,
+      "mean": 3354.0,
+      "median": 2900.0,
+      "p01": 200.0,
+      "p99": 14010.667999999587
+    }
+  },
+  "zipcode_analysis": {
+    "correlations": {
+      "Zip_HousingUnits": 0.0907,
+      "Zip_Population": 0.047,
+      "Zip_Longitude": -0.0215,
+      "Zip_PopDensity": -0.0193,
+      "Zip_HouseholdsPerZip": -0.0147,
+      "Zip_GrowthRank": 0.0147,
+      "Zip_WorkersOutZip": -0.0139,
+      "Zip_AverageHouseValue": -0.0131,
+      "Zip_SingleDelivery": -0.013,
+      "Zip_PopulationEstimate": -0.0126,
+      "Zip_IncomePerHousehold": -0.0124,
+      "Zip_DeliveryTotal": -0.012,
+      "Zip_NumberOfEmployees": 0.0107,
+      "Zip_LandArea": 0.0075,
+      "Zip_PopCount": -0.0066,
+      "Zip_MedianIncome": 0.0064,
+      "Zip_AverageHouseholdSize": 0.0057,
+      "Zip_NumberOfBusinesses": 0.0057,
+      "Zip_WaterArea": 0.0054,
+      "Zip_MedianAge": 0.0045,
+      "Zip_MultiDelivery": -0.0042,
+      "Zip_AvgHouseValue2": -0.0035,
+      "Zip_Latitude": -0.003,
+      "Zip_MedianAgeFemale": -0.0029,
+      "Zip_MedianHouseValue": -0.0027,
+      "Zip_AvgIncomePerHousehold": -0.0019,
+      "Zip_GrowthIncrease": 0.0017,
+      "Zip_PersonsPerHousehold": -0.0015,
+      "Zip_MedianAgeMale": -0.0008,
+      "Zip_TotalDensity": 0.0008,
+      "Zip_WorkersInZip": -0.0
+    },
+    "coverage": {
+      "Zip_Latitude": 81.79,
+      "Zip_Longitude": 81.79,
+      "Zip_Population": 72.87,
+      "Zip_HousingUnits": 32.59,
+      "Zip_PopulationEstimate": 81.8,
+      "Zip_HouseholdsPerZip": 81.8,
+      "Zip_AverageHouseValue": 81.8,
+      "Zip_IncomePerHousehold": 81.8,
+      "Zip_PersonsPerHousehold": 81.8,
+      "Zip_AverageHouseholdSize": 81.8,
+      "Zip_MedianAge": 81.8,
+      "Zip_MedianAgeMale": 81.8,
+      "Zip_MedianAgeFemale": 81.8,
+      "Zip_DeliveryTotal": 81.8,
+      "Zip_SingleDelivery": 81.8,
+      "Zip_MultiDelivery": 81.8,
+      "Zip_GrowthRank": 81.8,
+      "Zip_GrowthIncrease": 81.8,
+      "Zip_MedianHouseValue": 81.8,
+      "Zip_AvgIncomePerHousehold": 81.8,
+      "Zip_AvgHouseValue2": 81.8,
+      "Zip_MedianIncome": 81.8,
+      "Zip_NumberOfBusinesses": 81.8,
+      "Zip_NumberOfEmployees": 81.8,
+      "Zip_LandArea": 81.8,
+      "Zip_WaterArea": 81.8,
+      "Zip_TotalDensity": 81.8,
+      "Zip_PopDensity": 81.8,
+      "Zip_PopCount": 81.8,
+      "Zip_WorkersInZip": 81.8,
+      "Zip_WorkersOutZip": 81.8
+    },
+    "selected_top_features": [
+      "Zip_Population",
+      "Zip_Longitude",
+      "Zip_PopDensity",
+      "Zip_HouseholdsPerZip",
+      "Zip_GrowthRank",
+      "Zip_WorkersOutZip",
+      "Zip_AverageHouseValue",
+      "Zip_SingleDelivery",
+      "Zip_PopulationEstimate",
+      "Zip_IncomePerHousehold",
+      "Zip_DeliveryTotal",
+      "Zip_NumberOfEmployees",
+      "Zip_LandArea",
+      "Zip_PopCount",
+      "Zip_MedianIncome"
+    ]
+  },
+  "temporal_distribution": {
+    "year_distribution": {
+      "1940": 1,
+      "1955": 1,
+      "1984": 1,
+      "1986": 2,
+      "1993": 1,
+      "1994": 2,
+      "1995": 4,
+      "1996": 4,
+      "1997": 4,
+      "1998": 14,
+      "1999": 136,
+      "2000": 727,
+      "2001": 6467,
+      "2002": 13772,
+      "2003": 17121,
+      "2004": 20059,
+      "2005": 20179,
+      "2006": 22020,
+      "2007": 25216,
+      "2008": 24157,
+      "2009": 27321,
+      "2010": 31091,
+      "2011": 33713,
+      "2012": 37870,
+      "2013": 37792,
+      "2014": 36119,
+      "2015": 42299,
+      "2016": 39045,
+      "2017": 26333,
+      "2018": 25586,
+      "2019": 28855,
+      "2020": 30228,
+      "2021": 33730,
+      "2022": 29572,
+      "2023": 26441,
+      "2024": 29368,
+      "2025": 31415,
+      "2026": 4151,
+      "2027": 1,
+      "2028": 1,
+      "2048": 1
+    },
+    "total_2018_plus": 239349,
+    "closed_2018_plus": 226493
+  },
+  "join_fields": {
+    "jobid_unique": 700200,
+    "jobid_duplicates": 1229,
+    "office_id_unique": 114,
+    "property_id_unique": 512428
+  },
+  "column_profiles": {
+    "JobId": {
+      "null_count": 0,
+      "null_pct": 0.0,
+      "unique": 700200,
+      "dtype": "numeric",
+      "min": 5.0,
+      "max": 1033568.0,
+      "mean": 503379.75,
+      "median": 464908.5,
+      "std": 319833.74
+    },
+    "JobName": {
+      "null_count": 17140,
+      "null_pct": 2.45,
+      "unique": 525323,
+      "dtype": "categorical",
+      "top_values": {
+        "Industrial Building": 3301,
+        "Office Building": 2998,
+        "Land": 2338,
+        "Industrial": 2129,
+        "Vacant Land": 1825
+      }
+    },
+    "JobType": {
+      "null_count": 0,
+      "null_pct": 0.0,
+      "unique": 2,
+      "dtype": "categorical",
+      "top_values": {
+        "Standalone": 513076,
+        "SubJob": 187744
+      }
+    },
+    "JobStatus": {
+      "null_count": 0,
+      "null_pct": 0.0,
+      "unique": 2,
+      "dtype": "categorical",
+      "top_values": {
+        "Closed": 687795,
+        "Open": 13025
+      }
+    },
+    "StartDate": {
+      "null_count": 0,
+      "null_pct": 0.0,
+      "unique": 8389,
+      "dtype": "categorical",
+      "top_values": {
+        "2012-01-03": 1415,
+        "2004-04-16": 1118,
+        "2024-09-23": 640,
+        "2004-07-21": 624,
+        "2007-06-12": 614
+      }
+    },
+    "EndDate": {
+      "null_count": 114110,
+      "null_pct": 16.28,
+      "unique": 8812,
+      "dtype": "categorical",
+      "top_values": {
+        "2015-06-01": 709,
+        "2015-08-28": 620,
+        "2015-07-10": 520,
+        "2016-10-31": 516,
+        "2016-06-03": 503
+      }
+    },
+    "DueDate": {
+      "null_count": 99287,
+      "null_pct": 14.17,
+      "unique": 9236,
+      "dtype": "categorical",
+      "top_values": {
+        "2012-03-15": 1247,
+        "2015-12-31": 850,
+        "2025-12-31": 645,
+        "2004-10-06": 562,
+        "2026-02-27": 537
+      }
+    },
+    "NetFee": {
+      "null_count": 13882,
+      "null_pct": 1.98,
+      "unique": 6337,
+      "dtype": "numeric",
+      "min": -28340.0,
+      "max": 7820000.0,
+      "mean": 3196.85,
+      "median": 2800.0,
+      "std": 11260.25
+    },
+    "JobPurpose": {
+      "null_count": 0,
+      "null_pct": 0.0,
+      "unique": 9,
+      "dtype": "categorical",
+      "top_values": {
+        "Valuation": 617328,
+        "Litigation": 28544,
+        "Consulting": 27328,
+        "Other": 23137,
+        "Evaluation": 1903
+      }
+    },
+    "Deliverable": {
+      "null_count": 105808,
+      "null_pct": 15.1,
+      "unique": 34,
+      "dtype": "categorical",
+      "top_values": {
+        "Market Value": 519686,
+        "Review (External)": 17619,
+        "Other": 11959,
+        "Market Study": 10871,
+        "Market Rent": 7687
+      }
+    },
+    "AppraisalFileType": {
+      "null_count": 108,
+      "null_pct": 0.02,
+      "unique": 30,
+      "dtype": "categorical",
+      "top_values": {
+        "Standard": 374345,
+        "Comprehensive": 114973,
+        "Other": 42228,
+        "Part Taken - State Rule": 41133,
+        "Form - SFR": 27337
+      }
+    },
+    "BusinessSegment": {
+      "null_count": 8,
+      "null_pct": 0.0,
+      "unique": 11,
+      "dtype": "categorical",
+      "top_values": {
+        "Financing": 468648,
+        "Financial Reporting": 66161,
+        "Eminent Domain": 56267,
+        "Value Dispute": 28539,
+        "Consulting": 27318
+      }
+    },
+    "BusinessSegmentDetail": {
+      "null_count": 8,
+      "null_pct": 0.0,
+      "unique": 73,
+      "dtype": "categorical",
+      "top_values": {
+        "Bank": 246157,
+        "Other": 209387,
+        "Right of Way - General": 45158,
+        "Mortgage Company": 28012,
+        "Corporate reporting": 26345
+      }
+    },
+    "PortfolioMultiProperty": {
+      "null_count": 0,
+      "null_pct": 0.0,
+      "unique": 2,
+      "dtype": "categorical",
+      "top_values": {
+        "No": 673870,
+        "Yes-Sub": 26950
+      }
+    },
+    "PotentialLitigation": {
+      "null_count": 0,
+      "null_pct": 0.0,
+      "unique": 2,
+      "dtype": "categorical",
+      "top_values": {
+        "No Dispute Likely": 669243,
+        "Dispute/Testimony Anticipated": 31577
+      }
+    },
+    "Year": {
+      "null_count": 0,
+      "null_pct": 0.0,
+      "unique": 41,
+      "dtype": "numeric",
+      "min": 1940.0,
+      "max": 2048.0,
+      "mean": 2014.32,
+      "median": 2014.0,
+      "std": 6.52
+    },
+    "WeekNumber": {
+      "null_count": 0,
+      "null_pct": 0.0,
+      "unique": 31,
+      "dtype": "numeric",
+      "min": 1.0,
+      "max": 31.0,
+      "mean": 15.47,
+      "median": 15.0,
+      "std": 8.75
+    },
+    "DayOfWeek": {
+      "null_count": 0,
+      "null_pct": 0.0,
+      "unique": 4,
+      "dtype": "numeric",
+      "min": 1.0,
+      "max": 4.0,
+      "mean": 2.47,
+      "median": 2.0,
+      "std": 1.11
+    },
+    "YearWeek": {
+      "null_count": 0,
+      "null_pct": 0.0,
+      "unique": 1452,
+      "dtype": "categorical",
+      "top_values": {
+        "2012-W1 ": 1800,
+        "2004-W16": 1491,
+        "2016-W34": 1229,
+        "2015-W15": 1214,
+        "2011-W44": 1154
+      }
+    },
+    "YearMonth": {
+      "null_count": 0,
+      "null_pct": 0.0,
+      "unique": 356,
+      "dtype": "categorical",
+      "top_values": {
+        "2016-M8 ": 4516,
+        "2012-M1 ": 4129,
+        "2015-M5 ": 4098,
+        "2015-M4 ": 4043,
+        "2015-M6 ": 3875
+      }
+    },
+    "YearQuarter": {
+      "null_count": 0,
+      "null_pct": 0.0,
+      "unique": 133,
+      "dtype": "categorical",
+      "top_values": {
+        "2015-Q2": 12016,
+        "2016-Q3": 11205,
+        "2012-Q1": 10469,
+        "2015-Q3": 10367,
+        "2015-Q1": 10242
+      }
+    },
+    "WeekOfYear": {
+      "null_count": 0,
+      "null_pct": 0.0,
+      "unique": 54,
+      "dtype": "numeric",
+      "min": 1.0,
+      "max": 54.0,
+      "mean": 26.4,
+      "median": 26.0,
+      "std": 14.85
+    },
+    "MonthNumber": {
+      "null_count": 0,
+      "null_pct": 0.0,
+      "unique": 12,
+      "dtype": "numeric",
+      "min": 1.0,
+      "max": 12.0,
+      "mean": 6.39,
+      "median": 6.0,
+      "std": 3.41
+    },
+    "YearMonthNum": {
+      "null_count": 0,
+      "null_pct": 0.0,
+      "unique": 356,
+      "dtype": "categorical",
+      "top_values": {
+        "2016-8": 4516,
+        "2012-1": 4129,
+        "2015-5": 4098,
+        "2015-4": 4043,
+        "2015-6": 3875
+      }
+    },
+    "YearWeekNum": {
+      "null_count": 0,
+      "null_pct": 0.0,
+      "unique": 1452,
+      "dtype": "categorical",
+      "top_values": {
+        "2012-1": 1800,
+        "2004-16": 1491,
+        "2016-34": 1229,
+        "2015-15": 1214,
+        "2011-44": 1154
+      }
+    },
+    "YearWeekConcat": {
+      "null_count": 0,
+      "null_pct": 0.0,
+      "unique": 1452,
+      "dtype": "numeric",
+      "min": 194009.0,
+      "max": 204824.0,
+      "mean": 201457.94,
+      "median": 201447.0,
+      "std": 651.66
+    },
+    "WeekNum2": {
+      "null_count": 0,
+      "null_pct": 0.0,
+      "unique": 54,
+      "dtype": "numeric",
+      "min": 1.0,
+      "max": 54.0,
+      "mean": 26.4,
+      "median": 26.0,
+      "std": 14.85
+    },
+    "MonthNum2": {
+      "null_count": 0,
+      "null_pct": 0.0,
+      "unique": 12,
+      "dtype": "numeric",
+      "min": 1.0,
+      "max": 12.0,
+      "mean": 6.39,
+      "median": 6.0,
+      "std": 3.41
+    },
+    "JobDistanceMiles": {
+      "null_count": 0,
+      "null_pct": 0.0,
+      "unique": 9,
+      "dtype": "categorical",
+      "top_values": {
+        "10-29 Miles": 175090,
+        "Less than 10 Miles": 149088,
+        "Not Applicable": 133944,
+        "30-59 Miles": 74746,
+        "60-89 Miles": 41602
+      }
+    },
+    "OfficeJobTerritory": {
+      "null_count": 50459,
+      "null_pct": 7.2,
+      "unique": 5,
+      "dtype": "categorical",
+      "top_values": {
+        "Primary": 501831,
+        "Secondary": 101834,
+        "Open Territory": 39343,
+        "Primary ": 7086,
+        "Secondary ": 267
+      }
+    },
+    "JobLength_Days": {
+      "null_count": 114091,
+      "null_pct": 16.28,
+      "unique": 2284,
+      "dtype": "numeric",
+      "min": -361558.0,
+      "max": 1095794.0,
+      "mean": 68.66,
+      "median": 32.0,
+      "std": 2667.92
+    },
+    "PropertyID": {
+      "null_count": 2544,
+      "null_pct": 0.36,
+      "unique": 512428,
+      "dtype": "numeric",
+      "min": 1.0,
+      "max": 2294447.0,
+      "mean": 944391.83,
+      "median": 770032.5,
+      "std": 686529.98
+    },
+    "PropertyType": {
+      "null_count": 2544,
+      "null_pct": 0.36,
+      "unique": 12,
+      "dtype": "categorical",
+      "top_values": {
+        "Land": 155522,
+        "Retail": 137977,
+        "Multifamily": 93422,
+        "Office": 91731,
+        "Industrial": 82825
+      }
+    },
+    "SubType": {
+      "null_count": 100233,
+      "null_pct": 14.3,
+      "unique": 70,
+      "dtype": "categorical",
+      "top_values": {
+        "Single User": 77978,
+        "Conventional": 55794,
+        "Warehouse": 51218,
+        "Specialty": 47581,
+        "General Purpose": 40212
+      }
+    },
+    "SpecificUse": {
+      "null_count": 348775,
+      "null_pct": 49.77,
+      "unique": 202,
+      "dtype": "categorical",
+      "top_values": {
+        "Garden/Low Rise": 30582,
+        "Other": 28191,
+        "Single Family Development Land": 19781,
+        "General Warehouse": 17037,
+        "Low Rise": 16533
+      }
+    },
+    "GrossLandAreaAcres": {
+      "null_count": 39457,
+      "null_pct": 5.63,
+      "unique": 76176,
+      "dtype": "numeric",
+      "min": -1.0,
+      "max": 9999999.0,
+      "mean": 297.53,
+      "median": 1.62,
+      "std": 32453.47
+    },
+    "GrossLandAreaSF": {
+      "null_count": 39459,
+      "null_pct": 5.63,
+      "unique": 130618,
+      "dtype": "numeric",
+      "min": -43560.0,
+      "max": 435599956440.0,
+      "mean": 12960529.48,
+      "median": 70567.0,
+      "std": 1413675287.43
+    },
+    "Shape": {
+      "null_count": 340689,
+      "null_pct": 48.61,
+      "unique": 7,
+      "dtype": "categorical",
+      "top_values": {
+        "Irregular": 205708,
+        "Rectangular": 142889,
+        "Square": 4800,
+        "Very Irregular": 3693,
+        "Other": 1673
+      }
+    },
+    "Topography": {
+      "null_count": 345887,
+      "null_pct": 49.35,
+      "unique": 7,
+      "dtype": "categorical",
+      "top_values": {
+        "Level": 297966,
+        "Gently Sloping": 38460,
+        "Rolling": 10744,
+        "Hilly": 2591,
+        "Other": 2023
+      }
+    },
+    "BuildingClass": {
+      "null_count": 466296,
+      "null_pct": 66.54,
+      "unique": 5,
+      "dtype": "categorical",
+      "top_values": {
+        "B": 97616,
+        "C": 84392,
+        "A": 39858,
+        "A-": 9644,
+        "Historic": 3014
+      }
+    },
+    "YearBuilt": {
+      "null_count": 343196,
+      "null_pct": 48.97,
+      "unique": 283,
+      "dtype": "numeric",
+      "min": 1600.0,
+      "max": 2092.0,
+      "mean": 1979.62,
+      "median": 1986.0,
+      "std": 31.95
+    },
+    "PropertyCondition": {
+      "null_count": 401641,
+      "null_pct": 57.31,
+      "unique": 6,
+      "dtype": "categorical",
+      "top_values": {
+        "Average": 170078,
+        "Good": 84265,
+        "New": 15255,
+        "Excellent": 14669,
+        "Fair": 12130
+      }
+    },
+    "CityMunicipality": {
+      "null_count": 7405,
+      "null_pct": 1.06,
+      "unique": 19379,
+      "dtype": "categorical",
+      "top_values": {
+        "Chicago": 34873,
+        "Charlotte": 10294,
+        "Houston": 9917,
+        "Residential": 9012,
+        "Indianapolis": 6849
+      }
+    },
+    "StateName": {
+      "null_count": 2587,
+      "null_pct": 0.37,
+      "unique": 82,
+      "dtype": "categorical",
+      "top_values": {
+        "Texas": 83072,
+        "Illinois": 68700,
+        "Florida": 60375,
+        "California": 56499,
+        "North Carolina": 46159
+      }
+    },
+    "Market": {
+      "null_count": 299767,
+      "null_pct": 42.77,
+      "unique": 65,
+      "dtype": "categorical",
+      "top_values": {
+        "Chicago, IL": 32582,
+        "Dallas-Fort Worth, TX": 25581,
+        "Detroit, MI": 20851,
+        "Charlotte, NC": 19273,
+        "NNJ/New York City": 15986
+      }
+    },
+    "Submarket": {
+      "null_count": 299767,
+      "null_pct": 42.77,
+      "unique": 1513,
+      "dtype": "categorical",
+      "top_values": {
+        "Southwest": 6508,
+        "FortWorth": 4330,
+        "Northwest": 3893,
+        "South": 3777,
+        "Dallas": 3547
+      }
+    },
+    "CountyID": {
+      "null_count": 50729,
+      "null_pct": 7.24,
+      "unique": 3041,
+      "dtype": "categorical",
+      "top_values": {
+        "0500000US17031": 35587,
+        "0500000US18097": 15342,
+        "0500000US48201": 13206,
+        "0500000US37119": 12516,
+        "0500000US48439": 10748
+      }
+    },
+    "MarketOrientation": {
+      "null_count": 83329,
+      "null_pct": 11.89,
+      "unique": 13,
+      "dtype": "categorical",
+      "top_values": {
+        "Suburban": 401177,
+        "Urban": 108150,
+        "Rural": 46302,
+        "Small Town - Non Metro": 27091,
+        "CBD": 15049
+      }
+    },
+    "PhotosCount": {
+      "null_count": 227859,
+      "null_pct": 32.51,
+      "unique": 292,
+      "dtype": "numeric",
+      "min": 1.0,
+      "max": 1014.0,
+      "mean": 14.16,
+      "median": 6.0,
+      "std": 22.59
+    },
+    "SaleCount": {
+      "null_count": 417817,
+      "null_pct": 59.62,
+      "unique": 14,
+      "dtype": "categorical",
+      "top_values": {
+        "1.0": 129630,
+        "0.0": 114172,
+        "2.0": 29313,
+        "3.0": 7311,
+        "4.0": 1886
+      }
+    },
+    "IECount": {
+      "null_count": 417817,
+      "null_pct": 59.62,
+      "unique": 48,
+      "dtype": "categorical",
+      "top_values": {
+        "0.0": 184627,
+        "3.0": 24941,
+        "1.0": 21731,
+        "2.0": 15769,
+        "4.0": 13850
+      }
+    },
+    "LeaseCount": {
+      "null_count": 417817,
+      "null_pct": 59.62,
+      "unique": 193,
+      "dtype": "categorical",
+      "top_values": {
+        "0.0": 149677,
+        "1.0": 55778,
+        "2.0": 21324,
+        "3.0": 10877,
+        "4.0": 7559
+      }
+    },
+    "RentSurveyCount": {
+      "null_count": 417817,
+      "null_pct": 59.62,
+      "unique": 36,
+      "dtype": "categorical",
+      "top_values": {
+        "0.0": 251190,
+        "1.0": 13732,
+        "2.0": 6007,
+        "3.0": 3618,
+        "4.0": 2250
+      }
+    },
+    "IRRRegion": {
+      "null_count": 2594,
+      "null_pct": 0.37,
+      "unique": 11,
+      "dtype": "categorical",
+      "top_values": {
+        "South": 272205,
+        "Central": 207776,
+        "West": 121309,
+        "East": 91450,
+        "Caribbean ": 5324
+      }
+    },
+    "RooftopLatitude": {
+      "null_count": 3113,
+      "null_pct": 0.44,
+      "unique": 438963,
+      "dtype": "numeric",
+      "min": -86.975301,
+      "max": 89.5432,
+      "mean": 36.96,
+      "median": 38.54,
+      "std": 5.55
+    },
+    "RooftopLongitude": {
+      "null_count": 3113,
+      "null_pct": 0.44,
+      "unique": 440960,
+      "dtype": "numeric",
+      "min": -170.240036,
+      "max": 150.916992,
+      "mean": -90.33,
+      "median": -86.25,
+      "std": 14.68
+    },
+    "GrossBuildingSF": {
+      "null_count": 224467,
+      "null_pct": 32.03,
+      "unique": 98945,
+      "dtype": "numeric",
+      "min": -48615.0,
+      "max": 174482162.0,
+      "mean": 65343.47,
+      "median": 14556.0,
+      "std": 350654.34
+    },
+    "GLARentableSF": {
+      "null_count": 180669,
+      "null_pct": 25.78,
+      "unique": 98682,
+      "dtype": "numeric",
+      "min": -48615.0,
+      "max": 844400000.0,
+      "mean": 68403.1,
+      "median": 11594.0,
+      "std": 2287396.51
+    },
+    "OfficeID": {
+      "null_count": 0,
+      "null_pct": 0.0,
+      "unique": 114,
+      "dtype": "numeric",
+      "min": 1.0,
+      "max": 194.0,
+      "mean": 50.82,
+      "median": 41.0,
+      "std": 38.66
+    },
+    "OfficeCode": {
+      "null_count": 0,
+      "null_pct": 0.0,
+      "unique": 114,
+      "dtype": "categorical",
+      "top_values": {
+        "194 - Chicago": 58260,
+        "105 - CHARLOTTE, NC": 34032,
+        "142 - DETROIT, MI": 29751,
+        "118 - INDIANAPOLIS, IN": 28664,
+        "155 - HOUSTON, TX": 26744
+      }
+    },
+    "CompanyLocation": {
+      "null_count": 0,
+      "null_pct": 0.0,
+      "unique": 105,
+      "dtype": "categorical",
+      "top_values": {
+        "Chicago": 58260,
+        "CHARLOTTE, NC": 34032,
+        "DETROIT, MI": 29751,
+        "INDIANAPOLIS, IN": 28664,
+        "HOUSTON, TX": 27516
+      }
+    },
+    "Office_Region": {
+      "null_count": 871,
+      "null_pct": 0.12,
+      "unique": 6,
+      "dtype": "categorical",
+      "top_values": {
+        "Central": 202588,
+        "Southeast": 164319,
+        "Southwest": 146741,
+        "Northeast": 99479,
+        "West": 81506
+      }
+    },
+    "ClientCompanyID": {
+      "null_count": 97786,
+      "null_pct": 13.95,
+      "unique": 42921,
+      "dtype": "numeric",
+      "min": 1241.0,
+      "max": 454612.0,
+      "mean": 226694.85,
+      "median": 206640.0,
+      "std": 80951.36
+    },
+    "CompanyName": {
+      "null_count": 100143,
+      "null_pct": 14.29,
+      "unique": 40352,
+      "dtype": "categorical",
+      "top_values": {
+        "Wells Fargo Bank, N.A.": 13929,
+        "Bank of America, N.A.": 11300,
+        "PNC Bank": 9044,
+        "JPMorgan Chase Bank, N.A.": 7820,
+        "Fifth Third Bank, National Association": 7653
+      }
+    },
+    "ClientContactID": {
+      "null_count": 1836,
+      "null_pct": 0.26,
+      "unique": 101177,
+      "dtype": "numeric",
+      "min": 1.0,
+      "max": 454613.0,
+      "mean": 223014.58,
+      "median": 222206.0,
+      "std": 119820.01
+    },
+    "ContactType": {
+      "null_count": 138445,
+      "null_pct": 19.75,
+      "unique": 28,
+      "dtype": "categorical",
+      "top_values": {
+        "No Type Specified": 99552,
+        "Executive": 77169,
+        "Administrative": 64497,
+        "Management": 54167,
+        "Appraiser ": 53443
+      }
+    },
+    "CompanyType": {
+      "null_count": 99344,
+      "null_pct": 14.18,
+      "unique": 38,
+      "dtype": "categorical",
+      "top_values": {
+        "Banks / Credit Institutions": 289521,
+        "Professional Service (PS)": 45989,
+        "Missing": 40360,
+        "No Type Specified": 34692,
+        "Financial Services Firm": 25072
+      }
+    },
+    "ZipCode": {
+      "null_count": 93659,
+      "null_pct": 13.36,
+      "unique": 20220,
+      "dtype": "numeric",
+      "min": 606.0,
+      "max": 99929.0,
+      "mean": 54148.86,
+      "median": 48322.0,
+      "std": 24621.33
+    },
+    "Zip_Latitude": {
+      "null_count": 93668,
+      "null_pct": 13.37,
+      "unique": 19759,
+      "dtype": "numeric",
+      "min": 17.7229995727539,
+      "max": 68.2577056884766,
+      "mean": 36.9,
+      "median": 37.73,
+      "std": 5.13
+    },
+    "Zip_Longitude": {
+      "null_count": 93668,
+      "null_pct": 13.37,
+      "unique": 19771,
+      "dtype": "numeric",
+      "min": -174.209732055664,
+      "max": -64.7829513549805,
+      "mean": -91.64,
+      "median": -87.6,
+      "std": 13.68
+    },
+    "Zip_StateAbbr": {
+      "null_count": 93659,
+      "null_pct": 13.36,
+      "unique": 55,
+      "dtype": "categorical",
+      "top_values": {
+        "TX": 74062,
+        "IL": 61498,
+        "FL": 57580,
+        "CA": 50974,
+        "NC": 45398
+      }
+    },
+    "Zip_StateName": {
+      "null_count": 93666,
+      "null_pct": 13.37,
+      "unique": 53,
+      "dtype": "categorical",
+      "top_values": {
+        "Texas": 74062,
+        "Illinois": 61498,
+        "Florida": 57580,
+        "California": 50974,
+        "North Carolina": 45398
+      }
+    },
+    "Zip_DecommissionedFlag": {
+      "null_count": 93659,
+      "null_pct": 13.36,
+      "unique": 6,
+      "dtype": "categorical",
+      "top_values": {
+        "P": 564162,
+        "B": 23609,
+        "N": 11437,
+        "Z": 7805,
+        "C": 141
+      }
+    },
+    "Zip_CityName": {
+      "null_count": 93659,
+      "null_pct": 13.36,
+      "unique": 9841,
+      "dtype": "categorical",
+      "top_values": {
+        "CHICAGO": 31256,
+        "CHARLOTTE": 10377,
+        "HOUSTON": 9057,
+        "CINCINNATI": 6785,
+        "INDIANAPOLIS": 6768
+      }
+    },
+    "Zip_CountyName": {
+      "null_count": 93666,
+      "null_pct": 13.37,
+      "unique": 1760,
+      "dtype": "categorical",
+      "top_values": {
+        "COOK": 43705,
+        "MECKLENBURG": 12533,
+        "HARRIS": 12372,
+        "TARRANT": 10115,
+        "HAMILTON": 9450
+      }
+    },
+    "Zip_CountyFIPS": {
+      "null_count": 93666,
+      "null_pct": 13.37,
+      "unique": 1760,
+      "dtype": "categorical",
+      "top_values": {
+        "Cook": 43705,
+        "Mecklenburg": 12533,
+        "Harris": 12372,
+        "Tarrant": 10115,
+        "Hamilton": 9450
+      }
+    },
+    "Zip_Congressional": {
+      "null_count": 93666,
+      "null_pct": 13.37,
+      "unique": 320,
+      "dtype": "numeric",
+      "min": 1.0,
+      "max": 840.0,
+      "mean": 97.02,
+      "median": 73.0,
+      "std": 102.65
+    },
+    "Zip_MSA": {
+      "null_count": 558968,
+      "null_pct": 79.76,
+      "unique": 1,
+      "dtype": "categorical",
+      "top_values": {
+        "Y": 141852
+      }
+    },
+    "Zip_CBSA": {
+      "null_count": 93666,
+      "null_pct": 13.37,
+      "unique": 53,
+      "dtype": "numeric",
+      "min": 1.0,
+      "max": 78.0,
+      "mean": 28.43,
+      "median": 27.0,
+      "std": 15.69
+    },
+    "Zip_CBSA2": {
+      "null_count": 93666,
+      "null_pct": 13.37,
+      "unique": 53,
+      "dtype": "numeric",
+      "min": 1.0,
+      "max": 78.0,
+      "mean": 28.43,
+      "median": 27.0,
+      "std": 15.69
+    },
+    "Zip_Congressional2": {
+      "null_count": 93706,
+      "null_pct": 13.37,
+      "unique": 319,
+      "dtype": "numeric",
+      "min": 1.0,
+      "max": 840.0,
+      "mean": 97.8,
+      "median": 73.0,
+      "std": 104.53
+    },
+    "Zip_Congressional3": {
+      "null_count": 93659,
+      "null_pct": 13.36,
+      "unique": 8,
+      "dtype": "numeric",
+      "min": 0.0,
+      "max": 10.0,
+      "mean": 5.84,
+      "median": 6.0,
+      "std": 1.0
+    },
+    "Zip_MultiCounty": {
+      "null_count": 93659,
+      "null_pct": 13.36,
+      "unique": 2,
+      "dtype": "categorical",
+      "top_values": {
+        "Y": 598243,
+        "N": 8918
+      }
+    },
+    "Zip_FIPS": {
+      "null_count": 93659,
+      "null_pct": 13.36,
+      "unique": 13937,
+      "dtype": "categorical",
+      "top_values": {
+        "W12401": 31256,
+        "Y14993": 10357,
+        "W24130": 9009,
+        "X20549": 6785,
+        "X12558": 6768
+      }
+    },
+    "Zip_CityType": {
+      "null_count": 93659,
+      "null_pct": 13.36,
+      "unique": 9841,
+      "dtype": "categorical",
+      "top_values": {
+        "Chicago": 31256,
+        "Charlotte": 10377,
+        "Houston": 9057,
+        "Cincinnati": 6785,
+        "Indianapolis": 6768
+      }
+    },
+    "Zip_CityAliasAbbr": {
+      "null_count": 93659,
+      "null_pct": 13.36,
+      "unique": 4,
+      "dtype": "categorical",
+      "top_values": {
+        "P": 571306,
+        "B": 23980,
+        "N": 11648,
+        "C": 227
+      }
+    },
+    "Zip_PreferredFlag": {
+      "null_count": 93659,
+      "null_pct": 13.36,
+      "unique": 2,
+      "dtype": "categorical",
+      "top_values": {
+        "Y": 528257,
+        "N": 78904
+      }
+    },
+    "Zip_DecommFlag2": {
+      "null_count": 93659,
+      "null_pct": 13.36,
+      "unique": 2,
+      "dtype": "categorical",
+      "top_values": {
+        "D": 574967,
+        "C": 32194
+      }
+    },
+    "Zip_CBSAName": {
+      "null_count": 93668,
+      "null_pct": 13.37,
+      "unique": 450,
+      "dtype": "categorical",
+      "top_values": {
+        "Chicago-Naperville-Evanston, IL": 51909,
+        "Charlotte-Concord-Gastonia, NC-SC": 22292,
+        "Houston-The Woodlands-Sugar Land, TX": 18709,
+        "Dallas-Plano-Irving, TX": 16706,
+        "Warren-Troy-Farmington Hills, MI": 14454
+      }
+    },
+    "Zip_CBSAType": {
+      "null_count": 94117,
+      "null_pct": 13.43,
+      "unique": 2,
+      "dtype": "categorical",
+      "top_values": {
+        "Metro": 554056,
+        "Micro": 52647
+      }
+    },
+    "Zip_Population": {
+      "null_count": 161642,
+      "null_pct": 23.06,
+      "unique": 275,
+      "dtype": "numeric",
+      "min": 40.0,
+      "max": 9360.0,
+      "mean": 4092.2,
+      "median": 3480.0,
+      "std": 2486.95
+    },
+    "Zip_HousingUnits": {
+      "null_count": 456393,
+      "null_pct": 65.12,
+      "unique": 70,
+      "dtype": "categorical",
+      "top_values": {
+        "1600.0": 57490,
+        "2160.0": 21419,
+        "1920.0": 16775,
+        "3360.0": 16150,
+        "2800.0": 12380
+      }
+    },
+    "Zip_CSAName": {
+      "null_count": 186474,
+      "null_pct": 26.61,
+      "unique": 183,
+      "dtype": "categorical",
+      "top_values": {
+        "Chicago-Naperville, IL-IN-WI": 59257,
+        "Dallas-Fort Worth, TX-OK": 31165,
+        "Detroit-Warren-Ann Arbor, MI": 24357,
+        "Charlotte-Concord, NC-SC": 24186,
+        "Houston-Pasadena, TX": 19184
+      }
+    },
+    "Zip_CSACode": {
+      "null_count": 513228,
+      "null_pct": 73.23,
+      "unique": 37,
+      "dtype": "categorical",
+      "top_values": {
+        "Chicago-Naperville-Schaumburg, IL": 51909,
+        "Dallas-Plano-Irving, TX": 16706,
+        "Warren-Troy-Farmington Hills, MI": 14454,
+        "Fort Worth-Arlington-Grapevine, TX": 12402,
+        "Tampa, FL": 8954
+      }
+    },
+    "Zip_CBSACode2": {
+      "null_count": 109947,
+      "null_pct": 15.69,
+      "unique": 913,
+      "dtype": "numeric",
+      "min": 10100.0,
+      "max": 49820.0,
+      "mean": 28213.88,
+      "median": 26900.0,
+      "std": 10923.0
+    },
+    "Zip_Combined_Code": {
+      "null_count": 513228,
+      "null_pct": 73.23,
+      "unique": 37,
+      "dtype": "categorical",
+      "top_values": {
+        "16984.0": 51909,
+        "19124.0": 16706,
+        "47664.0": 14454,
+        "23104.0": 12402,
+        "45294.0": 8954
+      }
+    },
+    "Zip_CensusTract": {
+      "null_count": 700820,
+      "null_pct": 100.0,
+      "unique": 0,
+      "dtype": "categorical",
+      "top_values": {}
+    },
+    "Zip_MSAName": {
+      "null_count": 109947,
+      "null_pct": 15.69,
+      "unique": 913,
+      "dtype": "categorical",
+      "top_values": {
+        "Chicago-Naperville-Elgin IL-IN": 58569,
+        "Dallas-Fort Worth-Arlington TX": 29108,
+        "Detroit-Warren-Dearborn MI": 21742,
+        "Charlotte-Concord-Gastonia NC-SC": 21696,
+        "Houston-Pasadena-The Woodlands TX": 18834
+      }
+    },
+    "Zip_CMSAName": {
+      "null_count": 161642,
+      "null_pct": 23.06,
+      "unique": 275,
+      "dtype": "categorical",
+      "top_values": {
+        "Chicago-Gary-Kenosha IL-IN-WI CMSA": 58914,
+        "Dallas-Fort Worth TX CMSA": 29155,
+        "Detroit-Ann Arbor-Flint MI CMSA": 24357,
+        "Charlotte-Gastonia-Rock Hill NC-SC MSA": 19621,
+        "Houston-Galveston-Brazoria TX CMSA": 18662
+      }
+    },
+    "Zip_PMSAName": {
+      "null_count": 456393,
+      "null_pct": 65.12,
+      "unique": 70,
+      "dtype": "categorical",
+      "top_values": {
+        "Chicago IL PMSA": 57490,
+        "Detroit MI PMSA": 21419,
+        "Dallas TX PMSA": 16775,
+        "Houston TX PMSA": 16150,
+        "Fort Worth-Arlington TX PMSA": 12380
+      }
+    },
+    "Zip_CensusRegion": {
+      "null_count": 93720,
+      "null_pct": 13.37,
+      "unique": 4,
+      "dtype": "categorical",
+      "top_values": {
+        "South": 279782,
+        "Midwest": 176991,
+        "West": 113930,
+        "Northeast": 36397
+      }
+    },
+    "Zip_CensusDivision": {
+      "null_count": 93720,
+      "null_pct": 13.37,
+      "unique": 9,
+      "dtype": "categorical",
+      "top_values": {
+        "South Atlantic": 159876,
+        "East North Central": 151120,
+        "West South Central": 86972,
+        "Pacific": 67920,
+        "Mountain": 46010
+      }
+    },
+    "Zip_CensusDivisionCode": {
+      "null_count": 93660,
+      "null_pct": 13.36,
+      "unique": 1202,
+      "dtype": "categorical",
+      "top_values": {
+        "704/980": 15963,
+        "513": 10568,
+        "239": 7674,
+        "817/682": 7365,
+        "773/872": 7115
+      }
+    },
+    "Zip_CountyFIPS2": {
+      "null_count": 93706,
+      "null_pct": 13.37,
+      "unique": 2940,
+      "dtype": "categorical",
+      "top_values": {
+        "0500000US17031": 43700,
+        "0500000US37119": 12486,
+        "0500000US48201": 12361,
+        "0500000US48439": 10115,
+        "0500000US06073": 9400
+      }
+    },
+    "Zip_PopulationEstimate": {
+      "null_count": 93659,
+      "null_pct": 13.36,
+      "unique": 13757,
+      "dtype": "numeric",
+      "min": 0.0,
+      "max": 135256.0,
+      "mean": 32499.91,
+      "median": 30187.0,
+      "std": 19647.24
+    },
+    "Zip_HouseholdsPerZip": {
+      "null_count": 93659,
+      "null_pct": 13.36,
+      "unique": 10237,
+      "dtype": "numeric",
+      "min": 0.0,
+      "max": 44650.0,
+      "mean": 12784.63,
+      "median": 12009.0,
+      "std": 7464.45
+    },
+    "Zip_AverageHouseValue": {
+      "null_count": 93659,
+      "null_pct": 13.36,
+      "unique": 12218,
+      "dtype": "numeric",
+      "min": 0.0,
+      "max": 113195.0,
+      "mean": 18515.79,
+      "median": 16816.0,
+      "std": 12185.07
+    },
+    "Zip_IncomePerHousehold": {
+      "null_count": 93659,
+      "null_pct": 13.36,
+      "unique": 5325,
+      "dtype": "numeric",
+      "min": 0.0,
+      "max": 82687.0,
+      "mean": 4950.95,
+      "median": 2258.0,
+      "std": 7459.4
+    },
+    "Zip_PersonsPerHousehold": {
+      "null_count": 93659,
+      "null_pct": 13.36,
+      "unique": 6201,
+      "dtype": "numeric",
+      "min": 0.0,
+      "max": 91942.0,
+      "mean": 6606.15,
+      "median": 2950.0,
+      "std": 10028.35
+    },
+    "Zip_AverageHouseholdSize": {
+      "null_count": 93659,
+      "null_pct": 13.36,
+      "unique": 3554,
+      "dtype": "numeric",
+      "min": 0.0,
+      "max": 69267.0,
+      "mean": 2235.04,
+      "median": 896.0,
+      "std": 3847.0
+    },
+    "Zip_MedianAge": {
+      "null_count": 93659,
+      "null_pct": 13.36,
+      "unique": 571,
+      "dtype": "numeric",
+      "min": 0.0,
+      "max": 8684.0,
+      "mean": 59.76,
+      "median": 15.0,
+      "std": 198.24
+    },
+    "Zip_MedianAgeMale": {
+      "null_count": 93659,
+      "null_pct": 13.36,
+      "unique": 1392,
+      "dtype": "numeric",
+      "min": 0.0,
+      "max": 15451.0,
+      "mean": 285.41,
+      "median": 136.0,
+      "std": 496.9
+    },
+    "Zip_MedianAgeFemale": {
+      "null_count": 93659,
+      "null_pct": 13.36,
+      "unique": 4246,
+      "dtype": "numeric",
+      "min": 0.0,
+      "max": 65261.0,
+      "mean": 2931.18,
+      "median": 1144.0,
+      "std": 5025.87
+    },
+    "Zip_DeliveryTotal": {
+      "null_count": 93659,
+      "null_pct": 13.36,
+      "unique": 11164,
+      "dtype": "numeric",
+      "min": 0.0,
+      "max": 67766.0,
+      "mean": 15890.07,
+      "median": 14727.0,
+      "std": 9603.68
+    },
+    "Zip_SingleDelivery": {
+      "null_count": 93659,
+      "null_pct": 13.36,
+      "unique": 11225,
+      "dtype": "numeric",
+      "min": 0.0,
+      "max": 67490.0,
+      "mean": 16609.84,
+      "median": 15515.0,
+      "std": 10082.07
+    },
+    "Zip_MultiDelivery": {
+      "null_count": 93659,
+      "null_pct": 13.36,
+      "unique": 382,
+      "dtype": "numeric",
+      "min": 0.0,
+      "max": 53.0,
+      "mean": 2.45,
+      "median": 2.47,
+      "std": 0.54
+    },
+    "Zip_GrowthRank": {
+      "null_count": 93659,
+      "null_pct": 13.36,
+      "unique": 5315,
+      "dtype": "numeric",
+      "min": 0.0,
+      "max": 2000000.0,
+      "mean": 301372.18,
+      "median": 244200.0,
+      "std": 227179.9
+    },
+    "Zip_GrowthIncrease": {
+      "null_count": 93659,
+      "null_pct": 13.36,
+      "unique": 14923,
+      "dtype": "numeric",
+      "min": 0.0,
+      "max": 250000.0,
+      "mean": 73717.03,
+      "median": 68854.0,
+      "std": 30625.33
+    },
+    "Zip_MedianHouseValue": {
+      "null_count": 93659,
+      "null_pct": 13.36,
+      "unique": 533,
+      "dtype": "numeric",
+      "min": 0.0,
+      "max": 87.4000015258789,
+      "mean": 38.32,
+      "median": 38.0,
+      "std": 7.45
+    },
+    "Zip_AvgIncomePerHousehold": {
+      "null_count": 93659,
+      "null_pct": 13.36,
+      "unique": 537,
+      "dtype": "numeric",
+      "min": 0.0,
+      "max": 82.0999984741211,
+      "mean": 37.3,
+      "median": 36.9,
+      "std": 7.22
+    },
+    "Zip_AvgHouseValue2": {
+      "null_count": 93659,
+      "null_pct": 13.36,
+      "unique": 531,
+      "dtype": "numeric",
+      "min": 0.0,
+      "max": 87.6999969482422,
+      "mean": 39.3,
+      "median": 39.1,
+      "std": 7.78
+    },
+    "Zip_MedianIncome": {
+      "null_count": 93659,
+      "null_pct": 13.36,
+      "unique": 3672,
+      "dtype": "numeric",
+      "min": -230.0,
+      "max": 12678.0,
+      "mean": 835.37,
+      "median": 608.0,
+      "std": 1185.43
+    },
+    "Zip_NumberOfBusinesses": {
+      "null_count": 93659,
+      "null_pct": 13.36,
+      "unique": 2000,
+      "dtype": "numeric",
+      "min": 0.0,
+      "max": 6626.0,
+      "mean": 948.0,
+      "median": 833.0,
+      "std": 671.05
+    },
+    "Zip_NumberOfEmployees": {
+      "null_count": 93659,
+      "null_pct": 13.36,
+      "unique": 9195,
+      "dtype": "numeric",
+      "min": 0.0,
+      "max": 179047.0,
+      "mean": 16182.65,
+      "median": 12051.0,
+      "std": 15895.83
+    },
+    "Zip_BusinessFirst8": {
+      "null_count": 93659,
+      "null_pct": 13.36,
+      "unique": 15987,
+      "dtype": "numeric",
+      "min": 0.0,
+      "max": 10193791.0,
+      "mean": 278458.01,
+      "median": 138818.0,
+      "std": 522745.38
+    },
+    "Zip_BusinessSecond8": {
+      "null_count": 93659,
+      "null_pct": 13.36,
+      "unique": 18479,
+      "dtype": "numeric",
+      "min": 0.0,
+      "max": 30263660.0,
+      "mean": 1129174.67,
+      "median": 604414.0,
+      "std": 1913874.43
+    },
+    "Zip_CompanyEmployees1k": {
+      "null_count": 93659,
+      "null_pct": 13.36,
+      "unique": 96,
+      "dtype": "numeric",
+      "min": 0.0,
+      "max": 100.0,
+      "mean": 6.35,
+      "median": 0.0,
+      "std": 19.34
+    },
+    "Zip_CompanyEmployees1kPct": {
+      "null_count": 93659,
+      "null_pct": 13.36,
+      "unique": 96,
+      "dtype": "numeric",
+      "min": 0.0,
+      "max": 1229226.0,
+      "mean": 77485.28,
+      "median": 0.0,
+      "std": 246168.41
+    },
+    "Zip_CompanyEmployeesAll": {
+      "null_count": 93659,
+      "null_pct": 13.36,
+      "unique": 96,
+      "dtype": "numeric",
+      "min": 0.0,
+      "max": 1267775.0,
+      "mean": 79916.51,
+      "median": 0.0,
+      "std": 253869.1
+    },
+    "Zip_CompanyEmployeesAllPct": {
+      "null_count": 93659,
+      "null_pct": 13.36,
+      "unique": 95,
+      "dtype": "numeric",
+      "min": 0.0,
+      "max": 38858.0,
+      "mean": 2431.23,
+      "median": 0.0,
+      "std": 7768.93
+    },
+    "Zip_WorkersInZip": {
+      "null_count": 93659,
+      "null_pct": 13.36,
+      "unique": 33,
+      "dtype": "numeric",
+      "min": 0.0,
+      "max": 10.3000001907349,
+      "mean": 0.36,
+      "median": 0.0,
+      "std": 1.02
+    },
+    "Zip_WorkersOutZip": {
+      "null_count": 93659,
+      "null_pct": 13.36,
+      "unique": 836,
+      "dtype": "numeric",
+      "min": 0.0,
+      "max": 18897108.0,
+      "mean": 2954882.64,
+      "median": 1836911.0,
+      "std": 3149788.16
+    },
+    "Zip_WhiteCollar": {
+      "null_count": 93659,
+      "null_pct": 13.36,
+      "unique": 38,
+      "dtype": "numeric",
+      "min": 0.0,
+      "max": 11576251.0,
+      "mean": 1279398.86,
+      "median": 0.0,
+      "std": 2457281.83
+    },
+    "Zip_BlueCollar": {
+      "null_count": 99580,
+      "null_pct": 14.21,
+      "unique": 615,
+      "dtype": "numeric",
+      "min": 0.0,
+      "max": 98.0,
+      "mean": 9.69,
+      "median": 7.0,
+      "std": 10.52
+    },
+    "Zip_DeliveryResidential": {
+      "null_count": 93659,
+      "null_pct": 13.36,
+      "unique": 10439,
+      "dtype": "numeric",
+      "min": 0.0,
+      "max": 49087.0,
+      "mean": 13912.63,
+      "median": 13189.0,
+      "std": 8031.56
+    },
+    "Zip_DeliveryBusiness": {
+      "null_count": 93659,
+      "null_pct": 13.36,
+      "unique": 2135,
+      "dtype": "numeric",
+      "min": 0.0,
+      "max": 6399.0,
+      "mean": 1015.8,
+      "median": 896.0,
+      "std": 705.76
+    },
+    "Zip_DeliveryOther": {
+      "null_count": 93659,
+      "null_pct": 13.36,
+      "unique": 11577,
+      "dtype": "numeric",
+      "min": 0.0,
+      "max": 71971.0,
+      "mean": 16204.14,
+      "median": 15540.0,
+      "std": 8919.14
+    },
+    "Zip_DeliveryAll": {
+      "null_count": 93659,
+      "null_pct": 13.36,
+      "unique": 13629,
+      "dtype": "numeric",
+      "min": 0.0,
+      "max": 158060.0,
+      "mean": 34549.35,
+      "median": 32344.0,
+      "std": 20960.33
+    },
+    "Zip_LandArea": {
+      "null_count": 93659,
+      "null_pct": 13.36,
+      "unique": 16994,
+      "dtype": "numeric",
+      "min": 0.0,
+      "max": 11431.6708984375,
+      "mean": 48.72,
+      "median": 15.39,
+      "std": 112.66
+    },
+    "Zip_WaterArea": {
+      "null_count": 93659,
+      "null_pct": 13.36,
+      "unique": 4705,
+      "dtype": "numeric",
+      "min": 0.0,
+      "max": 693.757019042969,
+      "mean": 1.53,
+      "median": 0.22,
+      "std": 7.18
+    },
+    "Zip_TotalDensity": {
+      "null_count": 93659,
+      "null_pct": 13.36,
+      "unique": 1307,
+      "dtype": "numeric",
+      "min": 0.0,
+      "max": 12807.0,
+      "mean": 157.55,
+      "median": 0.0,
+      "std": 269.06
+    },
+    "Zip_PopDensity": {
+      "null_count": 93659,
+      "null_pct": 13.36,
+      "unique": 8698,
+      "dtype": "numeric",
+      "min": 0.0,
+      "max": 31736.0,
+      "mean": 7497.22,
+      "median": 7025.0,
+      "std": 4874.89
+    },
+    "Zip_PopCount": {
+      "null_count": 93659,
+      "null_pct": 13.36,
+      "unique": 4299,
+      "dtype": "numeric",
+      "min": 0.0,
+      "max": 44304.0,
+      "mean": 3744.07,
+      "median": 2032.0,
+      "std": 5209.88
+    }
+  }
+}
