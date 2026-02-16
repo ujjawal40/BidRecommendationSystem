@@ -440,7 +440,7 @@ class EnhancedBidPredictor:
         segment_avg: float,
         num_points: int = 20,
     ) -> Dict[str, Any]:
-        """Generate P(Win) and EV across a range of fee levels."""
+        """Generate P(Win) across a range of fee levels."""
         fee_low = max(500, recommended_fee * 0.40)
         fee_high = recommended_fee * 2.0
 
@@ -449,9 +449,6 @@ class EnhancedBidPredictor:
         fee_points = np.sort(np.unique(np.append(fee_points, recommended_fee)))
 
         curve_points = []
-        best_ev = -1
-        best_ev_point = None
-
         for fee in fee_points:
             features_copy = features.copy()
             features_copy["BidFee"] = float(fee)
@@ -459,25 +456,14 @@ class EnhancedBidPredictor:
             wp_result = self._predict_win_probability(
                 features_copy, float(fee), segment_avg
             )
-            prob = wp_result["probability"]
-            ev = prob * fee
 
-            point = {
+            curve_points.append({
                 "fee": round(float(fee), 0),
-                "win_probability": round(prob * 100, 1),
-                "expected_value": round(ev, 0),
-            }
-            curve_points.append(point)
-
-            if ev > best_ev:
-                best_ev = ev
-                best_ev_point = point
+                "win_probability": round(wp_result["probability"] * 100, 1),
+            })
 
         return {
             "curve_points": curve_points,
-            "ev_optimal_fee": best_ev_point["fee"],
-            "ev_optimal_win_prob": best_ev_point["win_probability"],
-            "ev_optimal_ev": best_ev_point["expected_value"],
             "recommended_fee": round(recommended_fee, 0),
         }
 
