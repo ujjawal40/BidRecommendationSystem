@@ -2,6 +2,11 @@ import React from 'react';
 import './BidForm.css';
 
 function BidForm({ formData, options, onChange, onSubmit, onReset, loading }) {
+  // Get subtypes filtered by selected property type
+  const subtypesForPropertyType = formData.property_type
+    ? (options.subtypes_by_property_type || {})[formData.property_type] || []
+    : options.sub_property_types || [];
+
   return (
     <form className="bid-form" onSubmit={onSubmit}>
       <div className="form-grid">
@@ -35,6 +40,25 @@ function BidForm({ formData, options, onChange, onSubmit, onReset, loading }) {
             <option value="">Select type...</option>
             {options.property_types.map(type => (
               <option key={type} value={type}>{type}</option>
+            ))}
+          </select>
+        </div>
+
+        {/* Sub-Property Type (cascading from Property Type) */}
+        <div className="form-group">
+          <label htmlFor="sub_property_type">
+            Sub-Property Type
+            <span className="field-hint">Filtered by property type</span>
+          </label>
+          <select
+            id="sub_property_type"
+            name="sub_property_type"
+            value={formData.sub_property_type}
+            onChange={onChange}
+          >
+            <option value="">Any / Unknown</option>
+            {subtypesForPropertyType.map(st => (
+              <option key={st} value={st}>{st}</option>
             ))}
           </select>
         </div>
@@ -74,35 +98,41 @@ function BidForm({ formData, options, onChange, onSubmit, onReset, loading }) {
           />
         </div>
 
-        {/* Distance */}
+        {/* Office Region */}
         <div className="form-group">
-          <label htmlFor="distance_km">
-            Distance (km)
-            <span className="field-hint">Distance to property</span>
+          <label htmlFor="office_region">
+            Office Region
+            <span className="field-hint">Originating office region</span>
+          </label>
+          <select
+            id="office_region"
+            name="office_region"
+            value={formData.office_region}
+            onChange={onChange}
+          >
+            <option value="">Any / Unknown</option>
+            {(options.office_regions || []).map(region => (
+              <option key={region} value={region}>{region}</option>
+            ))}
+          </select>
+        </div>
+
+        {/* Delivery Days */}
+        <div className="form-group">
+          <label htmlFor="delivery_days">
+            Delivery Days
+            <span className="field-hint">Expected job duration</span>
           </label>
           <input
             type="number"
-            id="distance_km"
-            name="distance_km"
-            value={formData.distance_km}
+            id="delivery_days"
+            name="delivery_days"
+            value={formData.delivery_days}
             onChange={onChange}
-            min="0"
-            step="0.1"
+            min="1"
+            max="365"
+            placeholder="Optional"
           />
-        </div>
-
-        {/* On Due Date */}
-        <div className="form-group">
-          <label htmlFor="on_due_date">Delivery</label>
-          <select
-            id="on_due_date"
-            name="on_due_date"
-            value={formData.on_due_date}
-            onChange={onChange}
-          >
-            <option value={0}>Before due date</option>
-            <option value={1}>On due date</option>
-          </select>
         </div>
       </div>
 
