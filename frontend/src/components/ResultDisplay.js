@@ -1,4 +1,5 @@
 import React from 'react';
+import FeeSensitivityCharts from './FeeSensitivityCharts';
 import './ResultDisplay.css';
 
 function ResultDisplay({ prediction, formData }) {
@@ -12,6 +13,7 @@ function ResultDisplay({ prediction, formData }) {
     factors,
     win_probability,
     expected_value,
+    fee_curve,
   } = prediction;
 
   // Calculate how prediction compares to benchmarks
@@ -151,6 +153,11 @@ function ResultDisplay({ prediction, formData }) {
         <h4>Recommendation</h4>
         <p>{recommendation}</p>
       </div>
+
+      {/* Fee Sensitivity Charts */}
+      {fee_curve && (
+        <FeeSensitivityCharts curveData={fee_curve} />
+      )}
 
       {/* Factors Breakdown */}
       <div className="card result-factors">
