@@ -328,6 +328,13 @@ class EnhancedBidPredictor:
         # Expected value
         expected_value = win_prob_result["probability"] * prediction
 
+        # Fee sensitivity curve
+        curve_data = self.get_fee_sensitivity_curve(
+            features=features,
+            recommended_fee=prediction,
+            segment_avg=segment_avg,
+        )
+
         # Blended benchmark
         blended = (
             0.4 * features["segment_avg_fee"]
@@ -366,6 +373,7 @@ class EnhancedBidPredictor:
                 "office_region_effect": round(features["office_region_avg_fee"], 2),
                 "delivery_days": delivery_days,
             },
+            "fee_curve": curve_data,
             "metadata": {
                 "model_version": "2.0",
                 "prediction_date": datetime.now().isoformat(),
@@ -423,6 +431,54 @@ class EnhancedBidPredictor:
             "probability_pct": round(probability * 100, 1),
             "confidence": "low",
             "model_used": "Heuristic fallback (no v2 classification model)",
+        }
+
+    def get_fee_sensitivity_curve(
+        self,
+        features: Dict[str, float],
+        recommended_fee: float,
+        segment_avg: float,
+        num_points: int = 20,
+    ) -> Dict[str, Any]:
+        """Generate P(Win) and EV across a range of fee levels."""
+        fee_low = max(500, recommended_fee * 0.40)
+        fee_high = recommended_fee * 2.0
+
+        fee_points = np.geomspace(fee_low, fee_high, num=num_points)
+        # Ensure recommended fee is always a data point
+        fee_points = np.sort(np.unique(np.append(fee_points, recommended_fee)))
+
+        curve_points = []
+        best_ev = -1
+        best_ev_point = None
+
+        for fee in fee_points:
+            features_copy = features.copy()
+            features_copy["BidFee"] = float(fee)
+
+            wp_result = self._predict_win_probability(
+                features_copy, float(fee), segment_avg
+            )
+            prob = wp_result["probability"]
+            ev = prob * fee
+
+            point = {
+                "fee": round(float(fee), 0),
+                "win_probability": round(prob * 100, 1),
+                "expected_value": round(ev, 0),
+            }
+            curve_points.append(point)
+
+            if ev > best_ev:
+                best_ev = ev
+                best_ev_point = point
+
+        return {
+            "curve_points": curve_points,
+            "ev_optimal_fee": best_ev_point["fee"],
+            "ev_optimal_win_prob": best_ev_point["win_probability"],
+            "ev_optimal_ev": best_ev_point["expected_value"],
+            "recommended_fee": round(recommended_fee, 0),
         }
 
     def get_dropdown_options(self) -> Dict[str, List]:
