@@ -1,0 +1,91 @@
+{
+  "bidfee": {
+    "overfitting_ratio": {
+      "v1": 1.6,
+      "v2": 2.09
+    },
+    "num_features": {
+      "v1": 68,
+      "v2": 60
+    }
+  },
+  "winprob": {
+    "auc_roc": {
+      "v1": 0.8696,
+      "v2": 0.9475,
+      "change_pct": 9.0
+    },
+    "accuracy": {
+      "v1": 0.7902,
+      "v2": 0.8671,
+      "change_pct": 9.7
+    },
+    "precision": {
+      "v1": 0.8154,
+      "v2": 0.8893,
+      "change_pct": 9.1
+    },
+    "recall": {
+      "v1": 0.698,
+      "v2": 0.861,
+      "change_pct": 23.4
+    },
+    "f1": {
+      "v1": 0.7521,
+      "v2": 0.8749,
+      "change_pct": 16.3
+    },
+    "brier_score": {
+      "v1": 0.1403,
+      "v2": 0.0929
+    },
+    "num_features": {
+      "v1": 72,
+      "v2": 44
+    }
+  },
+  "sample_predictions": [
+    {
+      "inputs": {
+        "business_segment": "Financing",
+        "property_type": "Multifamily",
+        "property_state": "Illinois",
+        "target_time": 30,
+        "sub_property_type": "Conventional",
+        "office_region": "Great Lakes"
+      },
+      "fee": 2993.68,
+      "win_prob": 61.4,
+      "ev": 1839.32,
+      "confidence": "high"
+    },
+    {
+      "inputs": {
+        "business_segment": "Litigation",
+        "property_type": "Industrial",
+        "property_state": "California",
+        "target_time": 45,
+        "sub_property_type": "Distribution/Logistics",
+        "office_region": "Pacific"
+      },
+      "fee": 2701.79,
+      "win_prob": 95.0,
+      "ev": 2566.7,
+      "confidence": "low"
+    },
+    {
+      "inputs": {
+        "business_segment": "Tax",
+        "property_type": "Office",
+        "property_state": "New York",
+        "target_time": 21,
+        "sub_property_type": "CBD",
+        "office_region": "Northeast"
+      },
+      "fee": 2913.28,
+      "win_prob": 95.0,
+      "ev": 2767.61,
+      "confidence": "low"
+    }
+  ]
+}
