@@ -2,12 +2,10 @@
 
 **Global Stat Solutions** | AI-Powered Bid Fee Prediction Platform
 
-A dual-model machine learning system for commercial real estate appraisal pricing:
-- **Bid Fee Prediction**: LightGBM regressor with 68 engineered features
-- **Win Probability**: Binary classifier (AUC: 0.96) for bid success estimation
-- **Expected Value Optimization**: EV = P(Win) × BidFee for revenue-maximizing decisions
+A machine learning system that predicts optimal bid fees for commercial real estate appraisal services, helping appraisers make data-driven pricing decisions.
 
 ---
+
 
 ## System Architecture
 
@@ -24,13 +22,13 @@ A dual-model machine learning system for commercial real estate appraisal pricin
 │  │  - Results   │    │  /api/options    │    │  │ (Bid Fee Model)    │    │ │
 │  │  - Charts    │◀───│  /api/health     │◀───│  │ - 500 trees        │    │ │
 │  │              │    │                  │    │  │ - 68 features      │    │ │
-│  └──────────────┘    └──────────────────┘    │  │ - MAE: $108        │    │ │
+│  └──────────────┘    └──────────────────┘    │  │ - RMSE: $328       │    │ │
 │        │                     │               │  └────────────────────┘    │ │
 │        │                     │               │                            │ │
 │        ▼                     ▼               │  ┌────────────────────┐    │ │
 │   ┌─────────┐         ┌─────────────┐        │  │ Win Probability    │    │ │
-│   │ Vercel  │         │   Render    │        │  │ Classifier         │    │ │
-│   │ (Host)  │         │   (Host)    │        │  │ - AUC: 0.96        │    │ │
+│   │ Vercel  │         │   Render    │        │  │ (Experimental)     │    │ │
+│   │ (Host)  │         │   (Host)    │        │  └────────────────────┘    │ │
 │   └─────────┘         └─────────────┘        └────────────────────────────┘ │
 │                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
@@ -38,10 +36,9 @@ A dual-model machine learning system for commercial real estate appraisal pricin
 
 ## Features
 
-- **Bid Fee Prediction**: ML-powered predictions based on 68 engineered features
-- **Win Probability**: Calibrated probability estimates (AUC: 0.96) for bid success
-- **Expected Value**: EV = P(Win) × BidFee for revenue optimization
-- **Confidence Intervals**: Empirical quantile bands (80% coverage) with heteroscedastic estimation
+- **Bid Fee Prediction**: ML-powered predictions based on 68 features
+- **Confidence Intervals**: Empirical quantile bands (80% coverage)
+- **Win Probability**: Experimental competitive positioning indicator
 - **Market Benchmarks**: Compare against segment and state averages
 - **Real-time API**: RESTful endpoints for integration
 
@@ -72,13 +69,11 @@ BidRecommendationSystem/
 ├── outputs/
 │   ├── models/                  # Trained models
 │   │   ├── lightgbm_bidfee_model.txt
-│   │   ├── lightgbm_win_probability.txt
-│   │   └── lightgbm_win_probability_metadata.json
-│   ├── reports/                 # Precomputed statistics
-│   │   ├── empirical_bands.json
-│   │   ├── feature_defaults.json
-│   │   └── rolling_stats.json
-│   └── figures/                 # Training visualizations
+│   │   └── lightgbm_win_probability.txt
+│   └── reports/                 # Precomputed statistics
+│       ├── empirical_bands.json
+│       ├── feature_defaults.json
+│       └── rolling_stats.json
 │
 ├── scripts/                     # Training & analysis scripts
 │
@@ -165,10 +160,7 @@ Content-Type: application/json
   "prediction": {
     "predicted_fee": 3127.98,
     "confidence_interval": {"low": 3056.05, "high": 3188.72},
-    "segment_benchmark": 3215.48,
-    "win_probability": 0.72,
-    "expected_value": 2252.15,
-    "recommendation": "Predicted fee is within ±10% of segment average. Good competitive position."
+    "segment_benchmark": 3215.48
   }
 }
 ```
@@ -183,31 +175,18 @@ Content-Type: application/json
 2. Set root directory: `frontend`
 3. Add environment variable:
    ```
-   REACT_APP_API_URL=https://bid-recommendation-api.onrender.com/api
+   REACT_APP_API_URL=https://your-api.onrender.com
    ```
 
 ### Backend → Render
 
 1. Connect repo to Render
 2. Uses `render.yaml` config automatically
-3. Build Command: `pip install -r requirements-api.txt`
-4. Start Command: `gunicorn api.app:app --bind 0.0.0.0:$PORT --timeout 120`
-5. Live at: `https://bid-recommendation-api.onrender.com`
-
----
-
-## Data & Training
-
-- **Training Data**: 2023+ bids only (recent market conditions)
-- **Split Strategy**: Time-based 60/20/20 (train/validation/test)
-- **Total Samples**: ~52,000 bid records
-- **Feature Engineering**: 68+ features including rolling averages, client history, market benchmarks
+3. Deploys at `https://bid-recommendation-api.onrender.com`
 
 ---
 
 ## Model Performance
-
-### Bid Fee Prediction (Phase 1A)
 
 | Metric | Value |
 |--------|-------|
@@ -216,32 +195,14 @@ Content-Type: application/json
 | Features | 68 |
 | Test RMSE | $328.75 |
 | Test MAE | $215.42 |
-| Overfitting Ratio | 1.99x |
 
-### Win Probability (Phase 1B)
+### Top Features
 
-| Metric | Value |
-|--------|-------|
-| Algorithm | LightGBM Classifier |
-| Test AUC-ROC | 0.962 |
-| Test Accuracy | 89.2% |
-| Brier Score | 0.078 |
-
-### Top Features (Bid Fee Model)
-
-1. `segment_avg_fee` (63%) - Average fee for business segment
-2. `state_avg_fee` (10%) - State-level market pricing
-3. `propertytype_avg_fee` (5%) - Property type benchmarks
-4. `TargetTime` (4%) - Delivery timeline
-5. `rolling_avg_fee_segment` (3%) - Recent segment trends
-
-### Top Features (Win Probability)
-
-1. `JobCount` (47%) - Office workload capacity
-2. `market_competitiveness` (11%) - Market competition level
-3. `TargetTime_Original` (4%) - Delivery requirements
-4. `PropertyState_frequency` (3%) - State market activity
-5. `RooftopLongitude` (3%) - Geographic positioning
+1. `segment_avg_fee` (63%)
+2. `state_avg_fee` (10%)
+3. `propertytype_avg_fee` (5%)
+4. `TargetTime` (4%)
+5. `rolling_avg_fee_segment` (3%)
 
 ---
 
@@ -249,21 +210,10 @@ Content-Type: application/json
 
 | Layer | Technology |
 |-------|------------|
-| Frontend | React 18, Axios |
-| Backend | Flask, Gunicorn, Python 3.11 |
-| ML | LightGBM 4.6, scikit-learn, pandas |
-| Deployment | Vercel (frontend), Render (API) |
-| CI/CD | GitHub Actions |
-
----
-
-## Anti-Overfitting Measures
-
-- **L1/L2 Regularization**: reg_alpha=2.0, reg_lambda=2.0
-- **Tree Constraints**: max_depth=8, num_leaves=18, min_child_samples=30
-- **Sampling**: feature_fraction=0.8, bagging_fraction=0.8
-- **Early Stopping**: 50 rounds patience on validation set
-- **Recent Data Only**: Training on 2023+ data for better generalization
+| Frontend | React 18 |
+| Backend | Flask, Python 3.11 |
+| ML | LightGBM, scikit-learn |
+| Deployment | Vercel, Render |
 
 ---
 
@@ -273,4 +223,4 @@ Proprietary - Global Stat Solutions
 
 ---
 
-**Global Stat Solutions** | Bid Recommendation System v2.0
+**Global Stat Solutions** | Bid Recommendation System v1.0
