@@ -11,6 +11,7 @@ function ResultDisplay({ prediction, formData }) {
     recommendation,
     factors,
     win_probability,
+    expected_value,
   } = prediction;
 
   // Calculate how prediction compares to benchmarks
@@ -99,6 +100,21 @@ function ResultDisplay({ prediction, formData }) {
         </div>
       </div>
 
+      {/* Expected Value */}
+      {expected_value && (
+        <div className="card result-ev">
+          <h4>Expected Value</h4>
+          <div className="ev-display">
+            <span className="ev-amount">
+              ${Math.round(expected_value).toLocaleString()}
+            </span>
+            <span className="ev-formula">
+              EV = {Math.round(winProbability)}% win prob x ${predicted_fee.toLocaleString('en-US', { maximumFractionDigits: 0 })} fee
+            </span>
+          </div>
+        </div>
+      )}
+
       {/* Benchmarks Comparison */}
       <div className="card result-benchmarks">
         <h4>Market Comparison</h4>
@@ -149,13 +165,19 @@ function ResultDisplay({ prediction, formData }) {
             <span className="factor-value">${factors.state_effect?.toLocaleString() || '-'}</span>
           </div>
           <div className="factor-item">
-            <span className="factor-label">Office Effect</span>
-            <span className="factor-value">${factors.office_effect?.toLocaleString() || '-'}</span>
+            <span className="factor-label">SubType Effect</span>
+            <span className="factor-value">${factors.subtype_effect?.toLocaleString() || factors.office_effect?.toLocaleString() || '-'}</span>
           </div>
           <div className="factor-item">
-            <span className="factor-label">Time Factor</span>
-            <span className="factor-value">{factors.time_factor} days</span>
+            <span className="factor-label">Office Region</span>
+            <span className="factor-value">${factors.office_region_effect?.toLocaleString() || factors.time_factor || '-'}</span>
           </div>
+          {factors.delivery_days && (
+            <div className="factor-item">
+              <span className="factor-label">Delivery Days</span>
+              <span className="factor-value">{factors.delivery_days} days</span>
+            </div>
+          )}
         </div>
       </div>
     </div>
