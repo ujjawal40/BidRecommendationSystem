@@ -364,6 +364,23 @@ class EnhancedBidPredictor:
             rec = (f"Fee aligns with market context. "
                    f"Win probability is {win_pct}% (EV: ${expected_value:,.0f}). Good competitive position.")
 
+        # Sample-size warnings for rare combos
+        warnings = []
+        if seg_count < 100:
+            warnings.append(
+                f"Low data: only {seg_count} training samples for {business_segment} segment. "
+                f"Prediction may be less reliable."
+            )
+        if state_count < 100:
+            warnings.append(
+                f"Low data: only {state_count} training samples for {property_state}. "
+                f"Prediction may be less reliable."
+            )
+        if seg_count < 100 and state_count < 100:
+            warnings.append(
+                "Consider using segment benchmark as a safer reference point."
+            )
+
         return {
             "predicted_fee": round(prediction, 2),
             "confidence_interval": {"low": round(low, 2), "high": round(high, 2)},
@@ -375,6 +392,7 @@ class EnhancedBidPredictor:
                 self.stats["state_avg_fee"].get(property_state, segment_avg), 2
             ),
             "recommendation": rec,
+            "warnings": warnings,
             "factors": {
                 "segment_effect": round(features["segment_avg_fee"], 2),
                 "state_effect": round(features["state_avg_fee"], 2),
