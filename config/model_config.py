@@ -33,6 +33,7 @@ PROCESSED_DATA = DATA_DIR / "processed" / "BidData_processed.csv"
 # See: outputs/reports/recent_data_experiment_results.json
 DATA_START_DATE = "2023-01-01"  # Filter training data to 2023+ only
 USE_RECENT_DATA_ONLY = True     # Set to False to use all historical data
+MIN_TRAINING_FEE = 100          # Exclude anomaly fees (pro-bono, internal) below this threshold
 
 # JobData features to EXCLUDE (they degrade performance - see jobdata_enrichment_final_results.txt)
 JOBDATA_FEATURES_TO_EXCLUDE = [
