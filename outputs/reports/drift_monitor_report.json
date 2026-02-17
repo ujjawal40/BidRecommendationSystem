@@ -1,0 +1,10 @@
+{
+  "run_date": "2026-02-17T17:05:31.551871",
+  "alerts": [],
+  "alert_count": 0,
+  "thresholds": {
+    "mape_alert": 20.0,
+    "auc_alert": 0.85,
+    "ks_drift": 0.1
+  }
+}
