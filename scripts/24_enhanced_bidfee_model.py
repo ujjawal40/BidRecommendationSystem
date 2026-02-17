@@ -61,8 +61,8 @@ V2_CONFIG = {
         "max_depth": 6,           # Shallower for less overfitting
         "min_child_samples": 50,  # Larger min samples
         "min_child_weight": 10,
-        "reg_alpha": 5.0,         # Stronger L1
-        "reg_lambda": 5.0,        # Stronger L2
+        "reg_alpha": 20.0,        # Strong L1 (reduced overfit 1.91x → 1.48x)
+        "reg_lambda": 20.0,       # Strong L2
         "random_state": 42,
         "n_jobs": -1,
         "verbose": -1,
