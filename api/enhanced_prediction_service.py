@@ -31,6 +31,7 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent))
 
 import json
+import pickle
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
@@ -50,6 +51,7 @@ class EnhancedBidPredictor:
         self.model_features = None
         self.win_prob_model = None
         self.win_prob_features = None
+        self.win_prob_calibrator = None
         self.stats = {}
         self.feature_defaults = {}
         self.band_calculator = EmpiricalBandCalculator()
@@ -82,6 +84,13 @@ class EnhancedBidPredictor:
                     meta = json.load(f)
                 auc = meta["metrics"]["test"]["auc_roc"]
                 print(f"[EnhancedPredictor] Win prob v2 loaded: AUC={auc:.4f}")
+
+            # Load calibrator (isotonic regression)
+            calibrator_path = MODELS_DIR / "win_probability_v2_calibrator.pkl"
+            if calibrator_path.exists():
+                with open(calibrator_path, "rb") as f:
+                    self.win_prob_calibrator = pickle.load(f)
+                print("[EnhancedPredictor] Win prob calibrator loaded")
         else:
             print("[EnhancedPredictor] Win prob v2 not found, using fallback")
 
@@ -401,7 +410,14 @@ class EnhancedBidPredictor:
                 feature_vector.append(0)
 
         X = np.array([feature_vector])
-        probability = float(self.win_prob_model.predict(X)[0])
+        raw_probability = float(self.win_prob_model.predict(X)[0])
+
+        # Apply isotonic calibration if available
+        if self.win_prob_calibrator is not None:
+            probability = float(self.win_prob_calibrator.predict([raw_probability])[0])
+        else:
+            probability = raw_probability
+
         probability = max(PREDICTION_CONFIG["win_prob_min"],
                          min(PREDICTION_CONFIG["win_prob_max"], probability))
 
