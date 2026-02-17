@@ -19,6 +19,7 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent))
 
 import json
+import pickle
 import warnings
 
 import lightgbm as lgb
@@ -178,8 +179,18 @@ def backtest_win_probability():
     X_test = test[features].values
     y_actual = test["Won"].values.astype(int)
 
-    # Predict
-    y_prob = model.predict(X_test)
+    # Predict (raw + calibrated)
+    y_prob_raw = model.predict(X_test)
+
+    calibrator_path = MODELS_DIR / "win_probability_v2_calibrator.pkl"
+    if calibrator_path.exists():
+        with open(calibrator_path, "rb") as f:
+            calibrator = pickle.load(f)
+        y_prob = calibrator.predict(y_prob_raw)
+        print(f"  Using isotonic calibration")
+    else:
+        y_prob = y_prob_raw
+
     y_prob = np.clip(y_prob, 0.05, 0.95)
     y_pred = (y_prob >= 0.5).astype(int)
 
