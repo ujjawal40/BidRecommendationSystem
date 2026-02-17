@@ -152,7 +152,10 @@
     "true_positives": 15463
   },
   "calibration": {
-    "brier_score": 0.0929435552320501
+    "brier_score_raw": 0.0929435552320501,
+    "brier_score_calibrated": 0.09268677299562736,
+    "method": "isotonic_regression",
+    "calibrator_file": "win_probability_v2_calibrator.pkl"
   },
-  "training_date": "2026-02-15 12:20:27"
+  "training_date": "2026-02-17 16:58:28"
 }
