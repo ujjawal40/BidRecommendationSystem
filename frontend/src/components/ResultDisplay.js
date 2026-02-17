@@ -14,6 +14,7 @@ function ResultDisplay({ prediction, formData }) {
     win_probability,
     expected_value,
     fee_curve,
+    warnings,
   } = prediction;
 
   // Calculate how prediction compares to benchmarks
@@ -63,6 +64,15 @@ function ResultDisplay({ prediction, formData }) {
           </div>
         </div>
       </div>
+
+      {/* Low Data Warnings */}
+      {warnings && warnings.length > 0 && (
+        <div className="card result-warnings">
+          {warnings.map((w, i) => (
+            <p key={i} className="warning-text">{w}</p>
+          ))}
+        </div>
+      )}
 
       {/* Win Probability Card */}
       <div className="card result-winprob">

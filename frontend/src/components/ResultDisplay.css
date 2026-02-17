@@ -280,3 +280,15 @@
   font-weight: var(--font-weight-medium);
   color: var(--color-text-primary);
 }
+
+/* Warnings */
+.result-warnings {
+  background: #fffbeb;
+  border-left: 4px solid #f59e0b;
+}
+
+.warning-text {
+  color: #92400e;
+  font-size: var(--font-size-sm);
+  margin: 4px 0;
+}
