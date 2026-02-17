@@ -1,0 +1,59 @@
+{
+  "bid_fee_backtest": {
+    "n_test": 43002,
+    "rmse": 419.5934545517295,
+    "mae": 103.01321130131086,
+    "median_ae": 25.0,
+    "mape": 4.310886625703002,
+    "median_ape": 1.0113208377150924,
+    "within_10pct": 91.70271150179062,
+    "within_20pct": 96.52341751546439,
+    "within_30pct": 97.76289474908144
+  },
+  "win_probability_backtest": {
+    "n_test": 33275,
+    "accuracy": 0.867137490608565,
+    "precision": 0.8893426122965434,
+    "recall": 0.8609688195991091,
+    "f1": 0.8749257362718194,
+    "auc_roc": 0.9423649736382297,
+    "brier_score": 0.0937975388388395,
+    "calibration_bins": [
+      {
+        "bin": "0-20%",
+        "count": 9654,
+        "actual_win_pct": 6.3,
+        "predicted_avg": 8.5,
+        "gap": -2.2
+      },
+      {
+        "bin": "20-40%",
+        "count": 4921,
+        "actual_win_pct": 27.5,
+        "predicted_avg": 29.0,
+        "gap": -1.4
+      },
+      {
+        "bin": "40-60%",
+        "count": 2415,
+        "actual_win_pct": 43.6,
+        "predicted_avg": 49.4,
+        "gap": -5.8
+      },
+      {
+        "bin": "60-80%",
+        "count": 1629,
+        "actual_win_pct": 58.5,
+        "predicted_avg": 69.8,
+        "gap": -11.3
+      },
+      {
+        "bin": "80-100%",
+        "count": 14656,
+        "actual_win_pct": 95.4,
+        "predicted_avg": 94.3,
+        "gap": 1.2
+      }
+    ]
+  }
+}
