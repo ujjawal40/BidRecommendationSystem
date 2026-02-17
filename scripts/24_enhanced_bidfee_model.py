@@ -39,6 +39,7 @@ from config.model_config import (
     FIGURES_DIR,
     MODELS_DIR,
     REPORTS_DIR,
+    MIN_TRAINING_FEE,
 )
 
 warnings.filterwarnings("ignore")
@@ -125,6 +126,14 @@ class EnhancedBidFeePredictor:
         # Filter to start date
         start = pd.Timestamp(DATA_START_DATE)
         df = df[df[DATE_COLUMN] >= start].copy()
+
+        # Remove anomaly fees (pro-bono, internal work)
+        before_fee_filter = len(df)
+        df = df[df[TARGET_COLUMN] >= MIN_TRAINING_FEE].copy()
+        removed = before_fee_filter - len(df)
+        if removed > 0:
+            print(f"  Removed {removed:,} rows with {TARGET_COLUMN} < ${MIN_TRAINING_FEE}")
+
         df = df.sort_values(DATE_COLUMN).reset_index(drop=True)
 
         print(f"  Rows: {len(df):,}")
