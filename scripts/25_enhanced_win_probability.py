@@ -27,7 +27,10 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import pickle
+
 from sklearn.calibration import calibration_curve
+from sklearn.isotonic import IsotonicRegression
 from sklearn.metrics import (
     accuracy_score,
     brier_score_loss,
@@ -291,6 +294,50 @@ def main():
     print(f"    FN={fn:,}  TN={tn:,}")
 
     # ========================================================================
+    # CALIBRATION (Isotonic Regression)
+    # ========================================================================
+    print("\n" + "=" * 80)
+    print("CALIBRATING PROBABILITIES (Isotonic Regression)")
+    print("=" * 80)
+
+    # Fit isotonic regression on validation set
+    y_valid_proba = model.predict(X_valid, num_iteration=model.best_iteration)
+    calibrator = IsotonicRegression(y_min=0.05, y_max=0.95, out_of_bounds="clip")
+    calibrator.fit(y_valid_proba, y_valid)
+
+    # Compare uncalibrated vs calibrated on test set
+    y_test_raw = model.predict(X_test, num_iteration=model.best_iteration)
+    y_test_calibrated = calibrator.predict(y_test_raw)
+
+    brier_raw = brier_score_loss(y_test, y_test_raw)
+    brier_cal = brier_score_loss(y_test, y_test_calibrated)
+
+    print(f"  Brier score (raw):        {brier_raw:.4f}")
+    print(f"  Brier score (calibrated): {brier_cal:.4f}")
+    print(f"  Improvement:              {(brier_raw - brier_cal) / brier_raw * 100:.1f}%")
+
+    # Calibration bins comparison
+    print(f"\n  Calibration comparison (test set):")
+    print(f"    {'Bin':<12} {'Count':>6} {'Actual':>8} {'Raw':>8} {'Calibr.':>8} {'Raw Gap':>8} {'Cal Gap':>8}")
+    print("    " + "-" * 60)
+    for lo, hi, label in [(0, 0.2, "0-20%"), (0.2, 0.4, "20-40%"), (0.4, 0.6, "40-60%"),
+                           (0.6, 0.8, "60-80%"), (0.8, 1.0, "80-100%")]:
+        mask = (y_test_raw >= lo) & (y_test_raw < hi)
+        if mask.sum() == 0:
+            continue
+        actual = y_test[mask].mean() * 100
+        raw_avg = y_test_raw[mask].mean() * 100
+        cal_avg = y_test_calibrated[mask].mean() * 100
+        print(f"    {label:<12} {mask.sum():>6,} {actual:>7.1f}% {raw_avg:>7.1f}% {cal_avg:>7.1f}% "
+              f"{actual - raw_avg:>+7.1f}% {actual - cal_avg:>+7.1f}%")
+
+    # Save calibrator
+    calibrator_path = MODELS_DIR / "win_probability_v2_calibrator.pkl"
+    with open(calibrator_path, "wb") as f:
+        pickle.dump(calibrator, f)
+    print(f"\n  Calibrator saved: {calibrator_path}")
+
+    # ========================================================================
     # FEATURE IMPORTANCE
     # ========================================================================
     print("\n" + "=" * 80)
@@ -386,7 +433,12 @@ def main():
             "false_negatives": int(fn),
             "true_positives": int(tp),
         },
-        "calibration": {"brier_score": float(brier)},
+        "calibration": {
+            "brier_score_raw": float(brier_raw),
+            "brier_score_calibrated": float(brier_cal),
+            "method": "isotonic_regression",
+            "calibrator_file": "win_probability_v2_calibrator.pkl",
+        },
         "training_date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
     }
 
