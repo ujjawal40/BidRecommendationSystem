@@ -299,6 +299,15 @@ class EnhancedBidPredictor:
         segment_floor = 0.3 * segment_avg
         prediction = max(prediction, PREDICTION_CONFIG["min_fee"], segment_floor)
 
+        # Blend with segment average for rare combos
+        seg_count = self.stats.get("segment_count", {}).get(business_segment, 0)
+        state_count = self.stats.get("state_count", {}).get(property_state, 0)
+        min_samples = min(seg_count, state_count)
+        if min_samples < 100 and segment_avg > 0:
+            # Gradually increase blending: fewer samples = more reliance on segment avg
+            blend_weight = max(0.2, min_samples / 100)  # model weight: 0.2 to 1.0
+            prediction = blend_weight * prediction + (1 - blend_weight) * segment_avg
+
         # Confidence interval
         low, high, band_meta = self.band_calculator.get_confidence_interval(
             predicted_fee=prediction,
@@ -307,9 +316,7 @@ class EnhancedBidPredictor:
             confidence_level=0.80,
         )
 
-        # Confidence level
-        seg_count = self.stats.get("segment_count", {}).get(business_segment, 0)
-        state_count = self.stats.get("state_count", {}).get(property_state, 0)
+        # Confidence level (seg_count, state_count computed above for blending)
         cfg = PREDICTION_CONFIG
         if seg_count > cfg["confidence_segment_high"] and state_count > cfg["confidence_state_high"]:
             data_conf = "high"
