@@ -360,16 +360,33 @@ class EnhancedBidPredictor:
 
         diff_pct = ((prediction - blended) / blended) * 100
         win_pct = win_prob_result["probability_pct"]
-        if diff_pct > 15:
-            rec = (f"Predicted fee is {diff_pct:.1f}% above market context. "
-                   f"Win probability is {win_pct}% at this price (EV: ${expected_value:,.0f}).")
-        elif diff_pct < -15:
-            rec = (f"Predicted fee is {abs(diff_pct):.1f}% below market context. "
-                   f"Win probability is {win_pct}% (EV: ${expected_value:,.0f}). "
-                   f"Consider if deal conditions justify this positioning.")
-        else:
-            rec = (f"Fee aligns with market context. "
-                   f"Win probability is {win_pct}% (EV: ${expected_value:,.0f}). Good competitive position.")
+        win_prob = win_prob_result["probability"]
+
+        # EV-optimal fee from curve data
+        ev_optimal_fee = None
+        ev_optimal_diff_pct = 0
+        if curve_data and curve_data.get("curve_points"):
+            best_ev_point = max(
+                curve_data["curve_points"],
+                key=lambda p: (p["win_probability"] / 100) * p["fee"],
+            )
+            ev_optimal_fee = best_ev_point["fee"]
+            ev_optimal_diff_pct = ((ev_optimal_fee - prediction) / prediction) * 100
+
+        rec = self._build_recommendation(
+            diff_pct=diff_pct,
+            win_pct=win_pct,
+            win_prob=win_prob,
+            expected_value=expected_value,
+            prediction=prediction,
+            blended=blended,
+            confidence=confidence,
+            ev_optimal_fee=ev_optimal_fee,
+            ev_optimal_diff_pct=ev_optimal_diff_pct,
+            segment=business_segment,
+            seg_count=seg_count,
+            state_count=state_count,
+        )
 
         # Sample-size warnings for rare combos
         warnings = []
@@ -507,6 +524,139 @@ class EnhancedBidPredictor:
             "curve_points": curve_points,
             "recommended_fee": round(recommended_fee, 0),
         }
+
+    def _build_recommendation(
+        self,
+        diff_pct: float,
+        win_pct: float,
+        win_prob: float,
+        expected_value: float,
+        prediction: float,
+        blended: float,
+        confidence: str,
+        ev_optimal_fee: float,
+        ev_optimal_diff_pct: float,
+        segment: str,
+        seg_count: int,
+        state_count: int,
+    ) -> Dict[str, str]:
+        """Build a structured recommendation based on multiple signals."""
+        # Fee positioning (5 tiers)
+        if diff_pct < -20:
+            fee_pos = "aggressive"
+        elif diff_pct < -5:
+            fee_pos = "competitive"
+        elif diff_pct <= 10:
+            fee_pos = "aligned"
+        elif diff_pct <= 25:
+            fee_pos = "premium"
+        else:
+            fee_pos = "stretch"
+
+        # Win probability tier
+        if win_pct >= 70:
+            win_tier = "strong"
+        elif win_pct >= 40:
+            win_tier = "moderate"
+        else:
+            win_tier = "low"
+
+        # Build headline
+        headlines = {
+            ("aggressive", "strong"): "Underpriced — room to increase",
+            ("aggressive", "moderate"): "Below market with moderate odds",
+            ("aggressive", "low"): "Low fee but still competitive",
+            ("competitive", "strong"): "Strong competitive position",
+            ("competitive", "moderate"): "Competitive pricing, fair odds",
+            ("competitive", "low"): "Competitive fee, tough market",
+            ("aligned", "strong"): "Well-positioned to win",
+            ("aligned", "moderate"): "Market-rate pricing",
+            ("aligned", "low"): "Fair price, contested segment",
+            ("premium", "strong"): "Premium fee with strong odds",
+            ("premium", "moderate"): "Above market — weigh the tradeoff",
+            ("premium", "low"): "Premium pricing risk",
+            ("stretch", "strong"): "High fee but favorable conditions",
+            ("stretch", "moderate"): "Stretch pricing — proceed carefully",
+            ("stretch", "low"): "Significant pricing risk",
+        }
+        headline = headlines.get((fee_pos, win_tier), "Market-rate pricing")
+
+        # Build detail text
+        fee_str = f"${prediction:,.0f}"
+        blended_str = f"${blended:,.0f}"
+        abs_diff = abs(diff_pct)
+
+        if diff_pct < -5:
+            position_text = f"At {fee_str}, your bid is {abs_diff:.0f}% below the market benchmark ({blended_str})."
+        elif diff_pct > 10:
+            position_text = f"At {fee_str}, your bid is {abs_diff:.0f}% above the market benchmark ({blended_str})."
+        else:
+            position_text = f"At {fee_str}, your bid aligns with the market benchmark ({blended_str})."
+
+        detail = (
+            f"{position_text} "
+            f"Win probability is {win_pct}% with an expected value of ${expected_value:,.0f}."
+        )
+
+        # Build strategy tip
+        strategy_tip = None
+        if fee_pos == "aggressive" and win_tier == "strong":
+            strategy_tip = (
+                f"You'd likely win at a higher fee. "
+                f"Consider increasing toward {blended_str} to capture more revenue."
+            )
+        elif fee_pos == "aggressive" and win_tier in ("moderate", "low"):
+            strategy_tip = (
+                "Fee is already below market. If win odds are still modest, "
+                "the segment may be highly competitive — focus on non-price differentiators."
+            )
+        elif fee_pos in ("premium", "stretch") and win_tier == "low":
+            strategy_tip = (
+                f"Reducing fee toward {blended_str} could significantly improve win probability. "
+                f"Check the sensitivity chart for the optimal tradeoff."
+            )
+        elif fee_pos in ("premium", "stretch") and win_tier == "moderate":
+            strategy_tip = (
+                "Fee is above market but odds are reasonable. "
+                "Consider whether the higher revenue per win justifies the lower win rate."
+            )
+        elif fee_pos == "aligned" and win_tier == "low":
+            strategy_tip = (
+                f"This {segment} segment is highly contested. "
+                "A modest fee reduction may improve odds without sacrificing much revenue."
+            )
+
+        # EV-optimal insight
+        if ev_optimal_fee is not None and abs(ev_optimal_diff_pct) > 10:
+            ev_direction = "higher" if ev_optimal_diff_pct > 0 else "lower"
+            strategy_tip = (
+                (strategy_tip + " " if strategy_tip else "")
+                + f"The EV-optimal fee is ${ev_optimal_fee:,.0f} ({ev_direction} than recommended), "
+                f"which may yield better risk-adjusted returns."
+            )
+
+        # Low confidence hedging
+        if confidence == "low":
+            headline = "Limited data — " + headline.lower()
+            detail = "Note: prediction is based on limited training data. " + detail
+
+        # Signal for frontend color coding
+        if win_tier == "strong" and fee_pos in ("competitive", "aligned", "aggressive"):
+            signal = "positive"
+        elif win_tier == "low" and fee_pos in ("premium", "stretch"):
+            signal = "caution"
+        else:
+            signal = "neutral"
+
+        rec = {
+            "headline": headline,
+            "detail": detail,
+            "signal": signal,
+        }
+        if strategy_tip:
+            rec["strategy_tip"] = strategy_tip
+
+        return rec
 
     def get_dropdown_options(self) -> Dict[str, List]:
         """Return options for UI dropdowns including new v2 fields."""
