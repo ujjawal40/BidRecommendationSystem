@@ -14,7 +14,7 @@ function Header() {
         </div>
 
         <nav className="header-nav">
-          <span className="version-badge">v1.0</span>
+          <span className="version-badge">v2.0</span>
         </nav>
       </div>
     </header>
