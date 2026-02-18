@@ -24,7 +24,13 @@ function ResultDisplay({ prediction, formData }) {
   // Use win probability from ML model (or fallback if not available)
   const winProbability = win_probability?.probability_pct || calculateFallbackWinProb(predicted_fee, segment_benchmark);
   const winProbConfidence = win_probability?.confidence || 'low';
-  const modelUsed = win_probability?.model_used || 'Fallback Heuristic';
+
+  // Win probability color tier
+  const winTierClass = winProbability >= 70 ? 'winprob-high' : winProbability >= 40 ? 'winprob-moderate' : 'winprob-low-tier';
+  const winStrokeColor = winProbability >= 70 ? '#10b981' : winProbability >= 40 ? '#f59e0b' : '#ef4444';
+
+  // Structured vs legacy recommendation
+  const isStructured = recommendation && typeof recommendation === 'object' && recommendation.headline;
 
   return (
     <div className="result-display">
@@ -91,20 +97,22 @@ function ResultDisplay({ prediction, formData }) {
                   a 15.9155 15.9155 0 0 1 0 31.831
                   a 15.9155 15.9155 0 0 1 0 -31.831"
                 fill="none"
-                stroke="#e0e0e0"
+                stroke="#e5e7eb"
                 strokeWidth="3"
               />
               <path
+                className="winprob-progress"
                 d="M18 2.0845
                   a 15.9155 15.9155 0 0 1 0 31.831
                   a 15.9155 15.9155 0 0 1 0 -31.831"
                 fill="none"
-                stroke="#38a169"
+                stroke={winStrokeColor}
                 strokeWidth="3"
                 strokeDasharray={`${winProbability}, 100`}
+                strokeLinecap="round"
               />
             </svg>
-            <span className="winprob-value">{Math.round(winProbability)}%</span>
+            <span className={`winprob-value ${winTierClass}`}>{Math.round(winProbability)}%</span>
           </div>
           <p className="winprob-note">
             Probability of winning this bid at the recommended fee
@@ -159,10 +167,20 @@ function ResultDisplay({ prediction, formData }) {
       </div>
 
       {/* Recommendation */}
-      <div className="card result-recommendation">
-        <h4>Recommendation</h4>
-        <p>{recommendation}</p>
-      </div>
+      {isStructured ? (
+        <div className={`card result-recommendation signal-${recommendation.signal || 'neutral'}`}>
+          <h4 className="rec-headline">{recommendation.headline}</h4>
+          <p className="rec-detail">{recommendation.detail}</p>
+          {recommendation.strategy_tip && (
+            <p className="rec-strategy">{recommendation.strategy_tip}</p>
+          )}
+        </div>
+      ) : (
+        <div className="card result-recommendation signal-neutral">
+          <h4>Recommendation</h4>
+          <p className="legacy-rec">{typeof recommendation === 'string' ? recommendation : ''}</p>
+        </div>
+      )}
 
       {/* Fee Sensitivity Charts */}
       {fee_curve && (

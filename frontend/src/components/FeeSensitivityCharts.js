@@ -54,7 +54,7 @@ function FeeSensitivityCharts({ curveData }) {
             <Line
               type="monotone"
               dataKey="win_probability"
-              stroke="#38a169"
+              stroke="#10b981"
               strokeWidth={2}
               dot={{ r: 3 }}
               activeDot={{ r: 6 }}
