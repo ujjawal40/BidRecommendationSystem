@@ -4,18 +4,14 @@ import './Header.css';
 function Header() {
   return (
     <header className="header">
-      <div className="header-content">
-        <div className="logo-section">
-          <img src="/logo.svg" alt="Global Stat Solutions" className="logo" />
-          <div className="brand-text">
-            <h1>Bid Recommendation System</h1>
-            <p className="tagline">Intelligent Pricing for Commercial Real Estate Appraisals</p>
-          </div>
+      <div className="header-inner">
+        <div className="header-brand">
+          <div className="brand-dot" />
+          <span className="brand-name">Global Stat Solutions</span>
+          <span className="brand-sep">·</span>
+          <span className="brand-product">Bid Intelligence</span>
         </div>
-
-        <nav className="header-nav">
-          <span className="version-badge">v2.0</span>
-        </nav>
+        <span className="header-badge">v2.0</span>
       </div>
     </header>
   );
