@@ -3,22 +3,23 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background: var(--bg);
 }
 
 .main-content {
   flex: 1;
-  max-width: 1400px;
+  max-width: 1320px;
   margin: 0 auto;
-  padding: var(--spacing-xl) var(--spacing-lg);
+  padding: var(--s-xl) var(--s-lg);
   width: 100%;
 }
 
-/* Content Grid */
+/* Two-column grid: form left, results right */
 .content-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--spacing-xl);
-  margin-bottom: var(--spacing-xl);
+  grid-template-columns: 380px 1fr;
+  gap: var(--s-xl);
+  align-items: start;
 }
 
 @media (max-width: 1024px) {
@@ -27,81 +28,70 @@
   }
 }
 
-/* Form Section */
+/* Sticky form panel */
 .form-section .card {
   position: sticky;
-  top: var(--spacing-lg);
+  top: 72px;
 }
 
 .form-section h2 {
-  font-size: var(--font-size-2xl);
-  margin-bottom: var(--spacing-xs);
+  font-size: var(--font-xl);
+  font-weight: 700;
+  margin-bottom: var(--s-xs);
 }
 
 .form-section .subtitle {
-  color: var(--color-text-muted);
-  font-size: var(--font-size-sm);
-  margin-bottom: var(--spacing-lg);
+  color: var(--text-muted);
+  font-size: var(--font-sm);
+  margin-bottom: var(--s-lg);
 }
 
-/* Results Section */
+/* Results panel */
 .results-section {
   min-height: 400px;
 }
 
-/* Placeholder Card */
+/* Placeholder state */
 .placeholder-card {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  min-height: 400px;
-  background-color: var(--color-bg-secondary);
-  border: 2px dashed var(--color-border);
+  min-height: 420px;
+  background: var(--bg-card);
+  border: 1.5px dashed var(--border);
+  box-shadow: none;
 }
 
 .placeholder-icon {
-  color: var(--color-text-light);
-  margin-bottom: var(--spacing-md);
+  color: var(--text-light);
+  margin-bottom: var(--s-md);
+  opacity: 0.5;
 }
 
 .placeholder-card h3 {
-  color: var(--color-text-secondary);
-  margin-bottom: var(--spacing-sm);
+  color: var(--text-secondary);
+  font-size: var(--font-lg);
+  margin-bottom: var(--s-xs);
 }
 
 .placeholder-card p {
-  color: var(--color-text-muted);
-  max-width: 300px;
+  color: var(--text-muted);
+  font-size: var(--font-sm);
+  max-width: 260px;
 }
 
-/* Benchmarks Section */
-.benchmarks-section {
-  margin-top: var(--spacing-xl);
-}
-
-.benchmarks-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--spacing-xl);
-}
-
-@media (max-width: 768px) {
-  .benchmarks-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* Error Message */
+/* Error */
 .error-message {
-  background-color: #fef2f2;
-  border: 1px solid #fecaca;
-  color: var(--color-error);
-  padding: var(--spacing-md);
-  border-radius: var(--radius-md);
-  margin-top: var(--spacing-md);
-  font-size: var(--font-size-sm);
+  background: var(--danger-bg);
+  border: 1px solid rgba(244, 63, 94, 0.2);
+  color: #fca5a5;
+  padding: var(--s-md);
+  border-radius: var(--r-md);
+  margin-top: var(--s-md);
+  font-size: var(--font-sm);
+  font-weight: 500;
 }
 
 /* Loading */
@@ -110,47 +100,32 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 400px;
-  color: var(--color-text-muted);
+  min-height: 60vh;
+  color: var(--text-muted);
+  gap: var(--s-md);
 }
 
 .loading-spinner {
-  width: 40px;
-  height: 40px;
-  border: 3px solid var(--color-border);
-  border-top-color: var(--color-accent);
+  width: 36px;
+  height: 36px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
   border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin-bottom: var(--spacing-md);
+  animation: spin 0.9s linear infinite;
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
+@keyframes spin { to { transform: rotate(360deg); } }
 
 /* Footer */
 .footer {
-  background-color: var(--color-bg-secondary);
-  border-top: 1px solid var(--color-border);
-  padding: var(--spacing-lg);
+  border-top: 1px solid var(--border-light);
+  padding: var(--s-lg);
   text-align: center;
+  background: var(--bg-card);
 }
 
 .footer p {
-  font-size: var(--font-size-sm);
-  color: var(--color-text-muted);
-  margin-bottom: var(--spacing-xs);
-}
-
-.footer .disclaimer {
-  font-size: var(--font-size-xs);
-}
-
-.experimental-badge {
-  background-color: var(--color-warning);
-  color: white;
-  padding: 2px 6px;
-  border-radius: var(--radius-sm);
-  font-weight: var(--font-weight-medium);
-  font-size: var(--font-size-xs);
+  font-size: var(--font-xs);
+  color: var(--text-muted);
+  margin: 0;
 }
