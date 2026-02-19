@@ -1,238 +1,277 @@
-import React from 'react';
-import FeeSensitivityCharts from './FeeSensitivityCharts';
+import { useState } from 'react';
 import './ResultDisplay.css';
+
+// ── Helpers ─────────────────────────────────────────────────────────────────
+
+function fmt(n) {
+  return Math.round(n).toLocaleString('en-US');
+}
+
+function interpolateWinProb(fee, curvePoints) {
+  if (!curvePoints || curvePoints.length === 0) return null;
+  const pts = [...curvePoints].sort((a, b) => a.fee - b.fee);
+  if (fee <= pts[0].fee) return pts[0].win_probability;
+  if (fee >= pts[pts.length - 1].fee) return pts[pts.length - 1].win_probability;
+  for (let i = 0; i < pts.length - 1; i++) {
+    if (fee >= pts[i].fee && fee <= pts[i + 1].fee) {
+      const t = (fee - pts[i].fee) / (pts[i + 1].fee - pts[i].fee);
+      return pts[i].win_probability + t * (pts[i + 1].win_probability - pts[i].win_probability);
+    }
+  }
+  return pts[pts.length - 1].win_probability;
+}
+
+function winLabel(pct) {
+  if (pct >= 65) return 'Strong chance of winning';
+  if (pct >= 45) return 'Solid chance of winning';
+  if (pct >= 30) return 'Moderate chance of winning';
+  return 'Low chance of winning';
+}
+
+function winColor(pct) {
+  if (pct >= 55) return '#10b981';
+  if (pct >= 35) return '#f59e0b';
+  return '#f43f5e';
+}
+
+// ── Main Component ────────────────────────────────────────────────────────────
 
 function ResultDisplay({ prediction, formData }) {
   const {
     predicted_fee,
+    ev_optimal_fee,
+    solid_win_ceiling,
+    ev_capped_at_ceiling,
     confidence_interval,
     confidence_level,
     segment_benchmark,
     state_benchmark,
-    recommendation,
-    factors,
     win_probability,
-    expected_value,
     fee_curve,
     warnings,
+    factors,
+    recommendation,
   } = prediction;
 
-  // Calculate how prediction compares to benchmarks
-  const vsSegment = ((predicted_fee - segment_benchmark) / segment_benchmark * 100).toFixed(1);
-  const vsState = ((predicted_fee - state_benchmark) / state_benchmark * 100).toFixed(1);
+  const [showDetails, setShowDetails] = useState(false);
 
-  // Use win probability from ML model (or fallback if not available)
-  const winProbability = win_probability?.probability_pct || calculateFallbackWinProb(predicted_fee, segment_benchmark);
-  const winProbConfidence = win_probability?.confidence || 'low';
+  const curvePoints = fee_curve?.curve_points || [];
 
-  // Win probability color tier
-  const winTierClass = winProbability >= 70 ? 'winprob-high' : winProbability >= 40 ? 'winprob-moderate' : 'winprob-low-tier';
-  const winStrokeColor = winProbability >= 70 ? '#10b981' : winProbability >= 40 ? '#f59e0b' : '#ef4444';
+  // Three anchor values
+  const floorFee = confidence_interval.low;
+  const recFee   = ev_optimal_fee    || predicted_fee;
+  const maxFee   = solid_win_ceiling || confidence_interval.high;
+  const evCapped = ev_capped_at_ceiling || false;
 
-  // Structured vs legacy recommendation
-  const isStructured = recommendation && typeof recommendation === 'object' && recommendation.headline;
+  // Win prob at recommended fee
+  const rawWinProb = interpolateWinProb(recFee, curvePoints);
+  const winProbPct = Math.round(rawWinProb ?? win_probability?.probability_pct ?? 50);
+  const evAtRec    = Math.round((winProbPct / 100) * recFee);
+
+  // Track position (2-98%)
+  const recTrackPct = maxFee > floorFee
+    ? Math.max(2, Math.min(98, ((recFee - floorFee) / (maxFee - floorFee)) * 100))
+    : 50;
+
+  const recEqualsMax = Math.abs(recFee - maxFee) < 50;
+
+  // Flat curve detection
+  const probValues  = curvePoints.map(p => p.win_probability);
+  const probRange   = probValues.length > 1 ? Math.max(...probValues) - Math.min(...probValues) : 0;
+  const isFlatCurve = probRange < 8;
+
+  // Market context
+  const vsMarket    = ((predicted_fee - segment_benchmark) / segment_benchmark * 100);
+  const vsMarketStr = (vsMarket >= 0 ? '+' : '') + vsMarket.toFixed(0) + '%';
+
+  const turnaroundDays = formData.turnaround_days || 30;
+  const isRush         = turnaroundDays <= 21;
+  const wpColor        = winColor(winProbPct);
 
   return (
     <div className="result-display">
-      {/* Main Prediction Card */}
-      <div className="card result-main">
-        <div className="result-header">
-          <span className="result-label">Recommended Bid Fee</span>
-          <span className={`confidence-badge confidence-${confidence_level}`}>
+
+      {/* ── Warnings ── */}
+      {warnings?.length > 0 && (
+        <div className="result-warning">
+          <span className="warning-icon">⚠</span>
+          <span>{warnings[0]}</span>
+        </div>
+      )}
+
+      {/* ── Bid Range Panel ── */}
+      <div className="card result-hero">
+
+        <div className="bid-range-header">
+          <span className="bid-range-label">Bid Range</span>
+          <span className={`confidence-pill confidence-${confidence_level}`}>
             {confidence_level} confidence
           </span>
         </div>
 
-        <div className="predicted-fee">
-          <span className="currency">$</span>
-          <span className="amount">{predicted_fee.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>
+        {/* Three anchors */}
+        <div className="bid-anchors">
+
+          <div className="anchor">
+            <span className="anchor-tag">Floor</span>
+            <span className="anchor-fee">${fmt(floorFee)}</span>
+            <p className="anchor-legend">
+              The lower boundary of what similar assignments in this market typically charge.
+              Bidding below this is unusual and may signal underpricing.
+            </p>
+          </div>
+
+          <div className="anchor anchor-center">
+            <span className="anchor-tag anchor-tag-rec">Optimal Bid</span>
+            <div className="anchor-rec-fee">
+              <span className="anchor-rec-currency">$</span>
+              <span className="anchor-rec-amount">{fmt(recFee)}</span>
+            </div>
+            <p className="anchor-legend">
+              {evCapped
+                ? <>The unconstrained optimal fee exceeds the Bid Ceiling. <strong>Capped here</strong> to keep win odds above 30%.</>
+                : <>The fee most likely to maximize your earnings — it weighs both your chance of winning <em>and</em> the revenue when you do.</>
+              }
+            </p>
+          </div>
+
+          <div className="anchor anchor-right">
+            <span className="anchor-tag">Bid Ceiling</span>
+            <span className="anchor-fee">${fmt(maxFee)}</span>
+            <p className="anchor-legend">
+              The highest fee where you still have a reasonable shot at winning.
+              Above this, your odds drop below our 30% business threshold — a long shot.
+            </p>
+          </div>
         </div>
 
-        {/* Confidence Interval */}
-        <div className="confidence-interval">
-          <div className="interval-bar">
-            <div
-              className="interval-range"
-              style={{
-                left: `${Math.max(0, (confidence_interval.low / confidence_interval.high) * 40)}%`,
-                right: '10%',
-              }}
-            />
-            <div
-              className="interval-marker"
-              style={{ left: `${((predicted_fee - confidence_interval.low) / (confidence_interval.high - confidence_interval.low)) * 80 + 10}%` }}
-            />
+        {/* Static scale */}
+        <div className="range-scale-wrap">
+          <div className="range-scale">
+            <div className="range-scale-fill" style={{ width: `${recTrackPct}%` }} />
+            <div className="scale-tick tick-floor" />
+            <div className="scale-tick tick-rec" style={{ left: `${recTrackPct}%` }} />
+            {!recEqualsMax && <div className="scale-tick tick-max" />}
+            {recEqualsMax  && <div className="scale-tick tick-rec-max" />}
           </div>
-          <div className="interval-labels">
-            <span>${confidence_interval.low.toLocaleString()}</span>
-            <span className="interval-label-center">80% Confidence Band</span>
-            <span>${confidence_interval.high.toLocaleString()}</span>
+          <div className="range-scale-labels">
+            <span className="scale-label-left">Floor</span>
+            <span className="scale-label-right">Ceiling</span>
           </div>
         </div>
+
+        {/* Win probability */}
+        <div className="win-section">
+          <div className="win-row">
+            <span className="win-pct" style={{ color: wpColor }}>
+              {winProbPct}<span className="win-pct-sym">%</span>
+            </span>
+            <div className="win-meta">
+              <span className="win-label" style={{ color: wpColor }}>{winLabel(winProbPct)}</span>
+              <span className="win-ev">EV · ${fmt(evAtRec)} at optimal bid</span>
+            </div>
+          </div>
+          <div className="win-bar-track">
+            <div className="win-bar-fill" style={{ width: `${winProbPct}%`, background: wpColor }} />
+          </div>
+        </div>
+
       </div>
 
-      {/* Low Data Warnings */}
-      {warnings && warnings.length > 0 && (
-        <div className="card result-warnings">
-          {warnings.map((w, i) => (
-            <p key={i} className="warning-text">{w}</p>
-          ))}
-        </div>
-      )}
-
-      {/* Win Probability Card */}
-      <div className="card result-winprob">
-        <div className="winprob-header">
-          <h4>Win Probability</h4>
-          <span className={`confidence-tag confidence-${winProbConfidence}`}>
-            {winProbConfidence} confidence
+      {/* ── Flat curve note ── */}
+      {isFlatCurve && !evCapped && (
+        <div className="flat-curve-note">
+          <span className="flat-curve-icon">ℹ</span>
+          <span>
+            For this type of work, your win odds stay roughly the same no matter where you price
+            within the range — meaning charging more doesn't hurt your chances. Bidding near the
+            Ceiling earns you more per job won without sacrificing much.
           </span>
         </div>
-
-        <div className="winprob-display">
-          <div className="winprob-circle">
-            <svg viewBox="0 0 36 36" className="winprob-chart">
-              <path
-                d="M18 2.0845
-                  a 15.9155 15.9155 0 0 1 0 31.831
-                  a 15.9155 15.9155 0 0 1 0 -31.831"
-                fill="none"
-                stroke="#e5e7eb"
-                strokeWidth="3"
-              />
-              <path
-                className="winprob-progress"
-                d="M18 2.0845
-                  a 15.9155 15.9155 0 0 1 0 31.831
-                  a 15.9155 15.9155 0 0 1 0 -31.831"
-                fill="none"
-                stroke={winStrokeColor}
-                strokeWidth="3"
-                strokeDasharray={`${winProbability}, 100`}
-                strokeLinecap="round"
-              />
-            </svg>
-            <span className={`winprob-value ${winTierClass}`}>{Math.round(winProbability)}%</span>
-          </div>
-          <p className="winprob-note">
-            Probability of winning this bid at the recommended fee
-          </p>
-        </div>
-      </div>
-
-      {/* Expected Value */}
-      {expected_value && (
-        <div className="card result-ev">
-          <h4>Expected Value</h4>
-          <div className="ev-display">
-            <span className="ev-amount">
-              ${Math.round(expected_value).toLocaleString()}
-            </span>
-            <span className="ev-formula">
-              EV = {Math.round(winProbability)}% win prob x ${predicted_fee.toLocaleString('en-US', { maximumFractionDigits: 0 })} fee
-            </span>
-          </div>
-        </div>
       )}
 
-      {/* Benchmarks Comparison */}
-      <div className="card result-benchmarks">
-        <h4>Market Comparison</h4>
-
-        <div className="benchmark-item">
-          <div className="benchmark-info">
-            <span className="benchmark-label">vs. Segment Average</span>
-            <span className="benchmark-name">{formData.business_segment}</span>
-          </div>
-          <div className="benchmark-values">
-            <span className="benchmark-base">${segment_benchmark.toLocaleString()}</span>
-            <span className={`benchmark-diff ${parseFloat(vsSegment) >= 0 ? 'positive' : 'negative'}`}>
-              {vsSegment > 0 ? '+' : ''}{vsSegment}%
-            </span>
-          </div>
-        </div>
-
-        <div className="benchmark-item">
-          <div className="benchmark-info">
-            <span className="benchmark-label">vs. State Average</span>
-            <span className="benchmark-name">{formData.property_state}</span>
-          </div>
-          <div className="benchmark-values">
-            <span className="benchmark-base">${state_benchmark.toLocaleString()}</span>
-            <span className={`benchmark-diff ${parseFloat(vsState) >= 0 ? 'positive' : 'negative'}`}>
-              {vsState > 0 ? '+' : ''}{vsState}%
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* Recommendation */}
-      {isStructured ? (
-        <div className={`card result-recommendation signal-${recommendation.signal || 'neutral'}`}>
-          <h4 className="rec-headline">{recommendation.headline}</h4>
+      {/* ── API recommendation card (from backend) ── */}
+      {recommendation && (
+        <div className={`card result-recommendation signal-${recommendation.signal}`}>
+          <p className="rec-headline">{recommendation.headline}</p>
           <p className="rec-detail">{recommendation.detail}</p>
           {recommendation.strategy_tip && (
-            <p className="rec-strategy">{recommendation.strategy_tip}</p>
+            <p className="rec-tip">{recommendation.strategy_tip}</p>
           )}
-        </div>
-      ) : (
-        <div className="card result-recommendation signal-neutral">
-          <h4>Recommendation</h4>
-          <p className="legacy-rec">{typeof recommendation === 'string' ? recommendation : ''}</p>
         </div>
       )}
 
-      {/* Fee Sensitivity Charts */}
-      {fee_curve && (
-        <FeeSensitivityCharts curveData={fee_curve} />
-      )}
-
-      {/* Factors Breakdown */}
-      <div className="card result-factors">
-        <h4>Key Factors</h4>
-        <div className="factors-grid">
-          <div className="factor-item">
-            <span className="factor-label">Segment Effect</span>
-            <span className="factor-value">${factors.segment_effect?.toLocaleString() || '-'}</span>
+      {/* ── Market context ── */}
+      <div className="card result-context">
+        <div className="context-row">
+          <span className="context-segment">
+            {formData.business_segment} · {formData.property_state}
+          </span>
+          <div className="context-right">
+            <span className="context-bench">
+              {formData.business_segment} avg ${fmt(segment_benchmark)}
+            </span>
+            <span className={`context-diff ${vsMarket >= 0 ? 'above' : 'below'}`}>
+              {vsMarketStr} vs segment
+            </span>
           </div>
-          <div className="factor-item">
-            <span className="factor-label">State Effect</span>
-            <span className="factor-value">${factors.state_effect?.toLocaleString() || '-'}</span>
-          </div>
-          <div className="factor-item">
-            <span className="factor-label">SubType Effect</span>
-            <span className="factor-value">${factors.subtype_effect?.toLocaleString() || factors.office_effect?.toLocaleString() || '-'}</span>
-          </div>
-          <div className="factor-item">
-            <span className="factor-label">Office Region</span>
-            <span className="factor-value">${factors.office_region_effect?.toLocaleString() || factors.time_factor || '-'}</span>
-          </div>
-          {factors.delivery_days && (
-            <div className="factor-item">
-              <span className="factor-label">Delivery Days</span>
-              <span className="factor-value">{factors.delivery_days} days</span>
-            </div>
-          )}
         </div>
       </div>
+
+      {/* ── Rush callout ── */}
+      {isRush && (
+        <div className="card result-rush">
+          <span className="rush-icon">⚡</span>
+          <div>
+            <p className="rush-title">Short turnaround premium included</p>
+            <p className="rush-body">
+              Your {turnaroundDays}-day timeline earns a fee premium over standard assignments.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* ── Details toggle ── */}
+      <button className="details-toggle" onClick={() => setShowDetails(v => !v)}>
+        {showDetails ? '▲ Hide details' : '▾ Benchmarks & model factors'}
+      </button>
+
+      {showDetails && (
+        <div className="result-details">
+          <div className="card detail-card">
+            <h5>Market Benchmarks</h5>
+            <div className="detail-row">
+              <span>Segment ({formData.business_segment})</span>
+              <span>${fmt(segment_benchmark)}</span>
+            </div>
+            {state_benchmark && (
+              <div className="detail-row">
+                <span>State ({formData.property_state})</span>
+                <span>${fmt(state_benchmark)}</span>
+              </div>
+            )}
+            {factors?.subtype_effect > 0 && (
+              <div className="detail-row">
+                <span>Sub-type effect</span>
+                <span>${fmt(factors.subtype_effect)}</span>
+              </div>
+            )}
+            {factors?.office_region_effect > 0 && (
+              <div className="detail-row">
+                <span>Office region effect</span>
+                <span>${fmt(factors.office_region_effect)}</span>
+              </div>
+            )}
+            <div className="detail-row">
+              <span>Market-typical fee (model)</span>
+              <span>${fmt(predicted_fee)}</span>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
-}
-
-/**
- * Fallback win probability calculation when API doesn't return model prediction.
- * Uses smooth sigmoid curve instead of hard buckets.
- */
-function calculateFallbackWinProb(predicted, benchmark) {
-  const ratio = predicted / benchmark;
-
-  // Smooth sigmoid-like function
-  // Lower ratio (more competitive) = higher win probability
-  const k = 5; // Steepness
-  const probability = 1 / (1 + Math.exp(k * (ratio - 1)));
-
-  // Scale to realistic range (20% - 75%)
-  return 20 + (probability * 55);
 }
 
 export default ResultDisplay;
