@@ -130,6 +130,120 @@ function buildContextMessage({ recFee, maxFee, winProbPct, confidence, segment, 
   };
 }
 
+// ── SVG Fee Chart ─────────────────────────────────────────────────────────────
+
+function FeeChart({ curvePoints, recFee, maxFee, floorFee }) {
+  const pts = [...curvePoints].sort((a, b) => a.fee - b.fee);
+  if (pts.length < 2) return null;
+
+  const [chartFee, setChartFee] = useState(recFee);
+
+  const minFee     = pts[0].fee;
+  const maxCurFee  = pts[pts.length - 1].fee;
+  const chartWinProb = Math.round(interpolateWinProb(chartFee, pts) ?? 50);
+  const chartEV      = Math.round((chartWinProb / 100) * chartFee);
+  const chartColor   = winColor(chartWinProb);
+
+  // SVG dimensions
+  const W = 560, H = 170;
+  const PAD = { top: 14, right: 16, bottom: 28, left: 36 };
+  const cW = W - PAD.left - PAD.right;
+  const cH = H - PAD.top  - PAD.bottom;
+
+  const xS = fee  => PAD.left + ((fee  - minFee) / (maxCurFee - minFee)) * cW;
+  const yS = prob => PAD.top  + cH - (prob / 100) * cH;
+
+  const pathD = pts.map((p, i) =>
+    `${i === 0 ? 'M' : 'L'}${xS(p.fee).toFixed(1)},${yS(p.win_probability).toFixed(1)}`
+  ).join(' ');
+
+  const selX = xS(chartFee);
+  const selY = yS(chartWinProb);
+  const threshY = yS(30);
+
+  // Clamp marker positions to visible range
+  const recX   = Math.min(Math.max(xS(recFee),  PAD.left), PAD.left + cW);
+  const maxX   = Math.min(Math.max(xS(maxFee),  PAD.left), PAD.left + cW);
+  const floorX = Math.min(Math.max(xS(floorFee), PAD.left), PAD.left + cW);
+
+  return (
+    <div className="fee-chart">
+      <div className="fee-chart-title">Fee vs. Win Probability</div>
+      <svg viewBox={`0 0 ${W} ${H}`} width="100%" className="fee-chart-svg">
+        {/* 30% threshold band */}
+        <rect x={PAD.left} y={threshY} width={cW} height={cH + PAD.top - threshY + PAD.top}
+          fill="rgba(244, 63, 94, 0.04)" />
+        <line x1={PAD.left} y1={threshY} x2={PAD.left + cW} y2={threshY}
+          stroke="rgba(244, 63, 94, 0.35)" strokeWidth="1" strokeDasharray="4,3" />
+        <text x={PAD.left + 4} y={threshY - 4}
+          fill="rgba(244, 63, 94, 0.5)" fontSize="9" fontFamily="Inter, sans-serif">30% min threshold</text>
+
+        {/* Y-axis gridlines + labels */}
+        {[0, 25, 50, 75, 100].map(v => (
+          <g key={v}>
+            <line x1={PAD.left} y1={yS(v)} x2={PAD.left + cW} y2={yS(v)}
+              stroke="rgba(148,163,184,0.06)" strokeWidth="1" />
+            <text x={PAD.left - 4} y={yS(v) + 3.5} fill="#475569" fontSize="9"
+              textAnchor="end" fontFamily="Inter, sans-serif">{v}%</text>
+          </g>
+        ))}
+
+        {/* Floor, Ceiling vertical markers */}
+        <line x1={floorX} y1={PAD.top} x2={floorX} y2={PAD.top + cH}
+          stroke="rgba(148,163,184,0.2)" strokeWidth="1" strokeDasharray="3,3" />
+        <line x1={maxX} y1={PAD.top} x2={maxX} y2={PAD.top + cH}
+          stroke="rgba(59,130,246,0.25)" strokeWidth="1" strokeDasharray="3,3" />
+
+        {/* Curve */}
+        <path d={pathD} fill="none" stroke="#3b82f6" strokeWidth="1.5" strokeLinejoin="round" />
+
+        {/* Selected fee vertical */}
+        <line x1={selX} y1={PAD.top} x2={selX} y2={PAD.top + cH}
+          stroke="rgba(255,255,255,0.15)" strokeWidth="1" />
+
+        {/* Selected point */}
+        <circle cx={selX} cy={selY} r="5" fill={chartColor} stroke="#0c111d" strokeWidth="2" />
+
+        {/* X-axis labels */}
+        <text x={floorX} y={H - 6} fill="#475569" fontSize="9" textAnchor="middle"
+          fontFamily="Inter, sans-serif">Floor</text>
+        <text x={recX} y={H - 6} fill="#60a5fa" fontSize="9" textAnchor="middle"
+          fontFamily="Inter, sans-serif">Optimal</text>
+        {Math.abs(recX - maxX) > 30 && (
+          <text x={maxX} y={H - 6} fill="#475569" fontSize="9" textAnchor="middle"
+            fontFamily="Inter, sans-serif">Ceiling</text>
+        )}
+      </svg>
+
+      {/* Slider */}
+      <div className="chart-slider-wrap">
+        <input
+          type="range"
+          className="chart-slider"
+          min={minFee}
+          max={maxCurFee}
+          step={50}
+          value={chartFee}
+          onChange={e => setChartFee(Number(e.target.value))}
+        />
+      </div>
+
+      {/* Live stats */}
+      <div className="chart-stats">
+        <span className="chart-fee">${fmt(chartFee)}</span>
+        <span className="chart-arrow">→</span>
+        <span className="chart-prob" style={{ color: chartColor }}>
+          {chartWinProb}% chance of winning
+        </span>
+        <span className="chart-ev">· EV ${fmt(chartEV)}</span>
+        {chartWinProb < 30 && (
+          <span className="chart-below-threshold">below viable threshold</span>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ── Main Component ────────────────────────────────────────────────────────────
 
 function ResultDisplay({ prediction, formData }) {
@@ -306,6 +420,25 @@ function ResultDisplay({ prediction, formData }) {
           <p className="insight-tip">{ctxMsg.tip}</p>
         )}
       </div>
+
+      {/* ── Fee analysis chart (expandable) ── */}
+      {curvePoints.length > 1 && (
+        <div className="chart-section">
+          <button className="chart-toggle" onClick={() => setShowChart(v => !v)}>
+            {showChart ? '▲ Hide fee analysis' : '▾ Show fee vs. win probability chart'}
+          </button>
+          {showChart && (
+            <div className="card chart-card">
+              <FeeChart
+                curvePoints={curvePoints}
+                recFee={recFee}
+                maxFee={maxFee}
+                floorFee={floorFee}
+              />
+            </div>
+          )}
+        </div>
+      )}
 
       {/* ── Market context ── */}
       <div className="card result-context">
