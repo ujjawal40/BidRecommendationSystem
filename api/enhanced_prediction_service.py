@@ -563,8 +563,11 @@ class EnhancedBidPredictor:
         seg_count: int,
         state_count: int,
     ) -> Dict[str, str]:
-        """Build a structured recommendation based on multiple signals."""
-        # Fee positioning (5 tiers)
+        """Build a plain-language recommendation based on fee position and win odds."""
+        blended_str = f"${blended:,.0f}"
+        abs_diff = abs(diff_pct)
+
+        # Fee positioning tier
         if diff_pct < -20:
             fee_pos = "aggressive"
         elif diff_pct < -5:
@@ -584,84 +587,108 @@ class EnhancedBidPredictor:
         else:
             win_tier = "low"
 
-        # Build headline
+        # Plain-English headlines — no jargon, no formula references
         headlines = {
-            ("aggressive", "strong"): "Underpriced — room to increase",
-            ("aggressive", "moderate"): "Below market with moderate odds",
-            ("aggressive", "low"): "Low fee but still competitive",
-            ("competitive", "strong"): "Strong competitive position",
-            ("competitive", "moderate"): "Competitive pricing, fair odds",
-            ("competitive", "low"): "Competitive fee, tough market",
-            ("aligned", "strong"): "Well-positioned to win",
-            ("aligned", "moderate"): "Market-rate pricing",
-            ("aligned", "low"): "Fair price, contested segment",
-            ("premium", "strong"): "Premium fee with strong odds",
-            ("premium", "moderate"): "Above market — weigh the tradeoff",
-            ("premium", "low"): "Premium pricing risk",
-            ("stretch", "strong"): "High fee but favorable conditions",
-            ("stretch", "moderate"): "Stretch pricing — proceed carefully",
-            ("stretch", "low"): "Significant pricing risk",
+            ("aggressive", "strong"):   "You're priced below market — there's room to charge more",
+            ("aggressive", "moderate"): "Below-market bid with decent chances",
+            ("aggressive", "low"):      "Low fee, but this market is hard to break into",
+            ("competitive", "strong"):  "Strong position — well-priced and likely to win",
+            ("competitive", "moderate"): "Solid bid in a competitive market",
+            ("competitive", "low"):     "Fair price, but competition is stiff here",
+            ("aligned", "strong"):      "Right at the market rate with strong win odds",
+            ("aligned", "moderate"):    "Market-rate pricing",
+            ("aligned", "low"):         "Market price, but this is a heavily contested segment",
+            ("premium", "strong"):      "Above market and still likely to win",
+            ("premium", "moderate"):    "Higher than average — good odds, but review before submitting",
+            ("premium", "low"):         "Fee is above what the market typically sees here",
+            ("stretch", "strong"):      "Aggressive fee, but conditions are in your favor",
+            ("stretch", "moderate"):    "Fee is on the high end — worth a second look",
+            ("stretch", "low"):         "Fee is too high relative to what this market supports",
         }
         headline = headlines.get((fee_pos, win_tier), "Market-rate pricing")
 
-        # Build detail text
-        fee_str = f"${prediction:,.0f}"
-        blended_str = f"${blended:,.0f}"
-        abs_diff = abs(diff_pct)
-
+        # Build detail — reference market benchmark, no raw model fee or formulas
         if diff_pct < -5:
-            position_text = f"At {fee_str}, your bid is {abs_diff:.0f}% below the market benchmark ({blended_str})."
+            market_context = (
+                f"The average {segment} fee in this area runs around {blended_str}. "
+                f"Your recommended bid comes in {abs_diff:.0f}% below that — "
+                f"you're priced aggressively."
+            )
         elif diff_pct > 10:
-            position_text = f"At {fee_str}, your bid is {abs_diff:.0f}% above the market benchmark ({blended_str})."
+            market_context = (
+                f"The average {segment} fee in this area runs around {blended_str}. "
+                f"Your recommended bid is {abs_diff:.0f}% above that — "
+                f"you're pricing at a premium."
+            )
         else:
-            position_text = f"At {fee_str}, your bid aligns with the market benchmark ({blended_str})."
+            market_context = (
+                f"Your recommended bid is right in line with the average {segment} "
+                f"fee in this area ({blended_str})."
+            )
 
-        detail = (
-            f"{position_text} "
-            f"Win probability is {win_pct}% with an expected value of ${expected_value:,.0f}."
-        )
+        if win_tier == "strong":
+            odds_context = "Your win odds are strong at this price."
+        elif win_tier == "moderate":
+            odds_context = "Your win odds are reasonable, though not guaranteed."
+        else:
+            odds_context = (
+                f"Win odds are modest at {win_pct:.0f}% — this is a competitive assignment."
+            )
 
-        # Build strategy tip
+        detail = f"{market_context} {odds_context}"
+
+        # Strategy tips — plain English, no slider, no EV formula
         strategy_tip = None
         if fee_pos == "aggressive" and win_tier == "strong":
             strategy_tip = (
-                f"You'd likely win at a higher fee. "
-                f"Consider increasing toward {blended_str} to capture more revenue."
+                f"You'd likely win even at a higher fee. "
+                f"Consider bidding closer to the market rate ({blended_str}) "
+                f"to capture more revenue per job."
             )
         elif fee_pos == "aggressive" and win_tier in ("moderate", "low"):
             strategy_tip = (
-                "Fee is already below market. If win odds are still modest, "
-                "the segment may be highly competitive — focus on non-price differentiators."
+                "Even at a below-market price, win odds are modest — "
+                "this segment is likely very competitive. "
+                "Your track record and client relationships may matter more than price here."
             )
         elif fee_pos in ("premium", "stretch") and win_tier == "low":
             strategy_tip = (
-                f"Reducing fee toward {blended_str} could significantly improve win probability. "
-                f"Check the sensitivity chart for the optimal tradeoff."
+                f"Lowering your fee closer to {blended_str} could meaningfully "
+                f"improve your chances. At this price point, winning will be difficult."
             )
         elif fee_pos in ("premium", "stretch") and win_tier == "moderate":
             strategy_tip = (
-                "Fee is above market but odds are reasonable. "
-                "Consider whether the higher revenue per win justifies the lower win rate."
+                "You're pricing above average, which is fine if you have a strong "
+                "relationship with this client or a competitive edge on deliverables."
             )
         elif fee_pos == "aligned" and win_tier == "low":
             strategy_tip = (
-                f"This {segment} segment is highly contested. "
-                "A modest fee reduction may improve odds without sacrificing much revenue."
+                f"The {segment} segment here is highly competitive. "
+                "Non-price factors — your experience, turnaround time, and client "
+                "relationships — will likely matter as much as the fee itself."
             )
 
-        # EV-optimal insight
-        if ev_optimal_fee is not None and abs(ev_optimal_diff_pct) > 10:
-            ev_direction = "higher" if ev_optimal_diff_pct > 0 else "lower"
-            strategy_tip = (
-                (strategy_tip + " " if strategy_tip else "")
-                + f"The EV-optimal fee is ${ev_optimal_fee:,.0f} ({ev_direction} than recommended), "
-                f"which may yield better risk-adjusted returns."
-            )
-
-        # Low confidence hedging
+        # Low confidence context — plain language, no "limited data" alarm
         if confidence == "low":
-            headline = "Limited data — " + headline.lower()
-            detail = "Note: prediction is based on limited training data. " + detail
+            cfg = PREDICTION_CONFIG
+            is_data_limited = not (
+                seg_count > cfg["confidence_segment_medium"]
+                and state_count > cfg["confidence_state_medium"]
+            )
+            if is_data_limited:
+                headline = "Estimate based on limited data — " + headline.lower()
+                detail = (
+                    f"There aren't many historical bids for this exact combination, "
+                    f"so treat this as a directional guide rather than a firm number. "
+                    + detail
+                )
+            else:
+                headline = "Fees vary widely here — " + headline.lower()
+                detail = (
+                    f"Fees for {segment} work in this state vary a lot, "
+                    f"so the range is broader than usual. "
+                    + detail
+                )
 
         # Signal for frontend color coding
         if win_tier == "strong" and fee_pos in ("competitive", "aligned", "aggressive"):
