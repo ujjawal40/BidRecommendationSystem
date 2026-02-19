@@ -373,6 +373,26 @@ class EnhancedBidPredictor:
             ev_optimal_fee = best_ev_point["fee"]
             ev_optimal_diff_pct = ((ev_optimal_fee - prediction) / prediction) * 100
 
+        # Solid-win ceiling: highest fee where P(win) >= 30%
+        P_SOLID = 0.30
+        solid_win_ceiling = None
+        if curve_data and curve_data.get("curve_points"):
+            solid_candidates = [
+                p for p in curve_data["curve_points"]
+                if p["win_probability"] / 100 >= P_SOLID
+            ]
+            if solid_candidates:
+                solid_win_ceiling = max(p["fee"] for p in solid_candidates)
+
+        # Constrain: recommended fee must never exceed the solid-win ceiling.
+        # If the unconstrained EV-optimal fee falls above the 30% win threshold,
+        # cap it at the ceiling — bidding above that is a long shot.
+        ev_capped_at_ceiling = False
+        if ev_optimal_fee and solid_win_ceiling and ev_optimal_fee > solid_win_ceiling:
+            ev_optimal_fee = solid_win_ceiling
+            ev_optimal_diff_pct = ((ev_optimal_fee - prediction) / prediction) * 100
+            ev_capped_at_ceiling = True
+
         rec = self._build_recommendation(
             diff_pct=diff_pct,
             win_pct=win_pct,
@@ -424,6 +444,9 @@ class EnhancedBidPredictor:
                 "office_region_effect": round(features["office_region_avg_fee"], 2),
                 "delivery_days": delivery_days,
             },
+            "ev_optimal_fee": round(ev_optimal_fee, 2) if ev_optimal_fee else round(prediction, 2),
+            "solid_win_ceiling": round(solid_win_ceiling, 2) if solid_win_ceiling else round(high, 2),
+            "ev_capped_at_ceiling": ev_capped_at_ceiling,
             "fee_curve": curve_data,
             "metadata": {
                 "model_version": "2.0",
