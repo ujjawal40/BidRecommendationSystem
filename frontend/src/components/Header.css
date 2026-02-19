@@ -1,80 +1,66 @@
-/* Header Styles */
 .header {
-  background-color: var(--color-bg-card);
-  border-bottom: 1px solid var(--color-border);
-  border-top: 3px solid var(--color-accent);
-  padding: var(--spacing-md) var(--spacing-lg);
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+  padding: 0 var(--s-lg);
+  height: 56px;
+  display: flex;
+  align-items: center;
   position: sticky;
   top: 0;
   z-index: 100;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1px 0 var(--border-light), 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
-.header-content {
-  max-width: 1400px;
+.header-inner {
+  max-width: 1320px;
+  width: 100%;
   margin: 0 auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
-.logo-section {
+.header-brand {
   display: flex;
   align-items: center;
-  gap: var(--spacing-md);
+  gap: 0.6rem;
 }
 
-.logo {
-  height: 48px;
-  width: auto;
+.brand-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex-shrink: 0;
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.6);
 }
 
-.brand-text h1 {
-  font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-bold);
-  color: var(--color-text-primary);
-  margin: 0;
-  line-height: 1.2;
+.brand-name {
+  font-size: var(--font-sm);
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
 }
 
-.brand-text .tagline {
-  font-size: var(--font-size-sm);
-  color: var(--color-text-muted);
-  margin: 0;
+.brand-sep {
+  color: var(--text-light);
+  font-size: var(--font-sm);
+  margin: 0 -0.1rem;
 }
 
-.header-nav {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-md);
+.brand-product {
+  font-size: var(--font-sm);
+  font-weight: 500;
+  color: var(--text-muted);
 }
 
-.version-badge {
-  background-color: var(--color-accent-bg);
-  color: var(--color-accent-dark);
-  padding: var(--spacing-xs) var(--spacing-sm);
-  border-radius: var(--radius-sm);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
-  border: 1px solid rgba(16, 185, 129, 0.2);
-}
-
-@media (max-width: 768px) {
-  .logo-section {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--spacing-xs);
-  }
-
-  .logo {
-    height: 36px;
-  }
-
-  .brand-text h1 {
-    font-size: var(--font-size-lg);
-  }
-
-  .brand-text .tagline {
-    display: none;
-  }
+.header-badge {
+  font-size: var(--font-xs);
+  font-weight: 600;
+  color: var(--accent-dark);
+  background: var(--accent-light);
+  padding: 3px 10px;
+  border-radius: var(--r-pill);
+  letter-spacing: 0.03em;
+  border: 1px solid rgba(59, 130, 246, 0.2);
 }
