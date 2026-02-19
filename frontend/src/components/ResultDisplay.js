@@ -34,6 +34,102 @@ function winColor(pct) {
   return '#f43f5e';
 }
 
+// ── Client-side contextual message ──────────────────────────────────────────
+
+function buildContextMessage({ recFee, maxFee, winProbPct, confidence, segment, evCapped, isFlatCurve, segBenchmark }) {
+  const aboveBench = recFee > segBenchmark;
+  const diffPct    = Math.abs(((recFee - segBenchmark) / segBenchmark) * 100).toFixed(0);
+
+  // Case 1: Recommended was capped at ceiling — the model wanted to go higher
+  if (evCapped) {
+    return {
+      headline: 'Optimal bid capped at the ceiling',
+      body: `The fee that would maximize your total earnings outright would push above the Bid Ceiling — ` +
+            `but at that price, your estimated win odds drop below 30%, which is our minimum threshold ` +
+            `for a bid worth submitting. We've set your recommended bid at $${fmt(recFee)}, ` +
+            `the highest fee where you still have a reasonable shot.`,
+      tip: `Your current win probability is ${winProbPct}%. If you choose to bid higher than $${fmt(maxFee)}, ` +
+           `go in with eyes open — your win odds will fall below 30%. In that case, ` +
+           `your track record, client relationships, and quality of work will need to carry the weight.`,
+      signal: winProbPct >= 40 ? 'neutral' : 'caution',
+    };
+  }
+
+  // Case 2: Flat curve — price barely matters
+  if (isFlatCurve) {
+    return {
+      headline: 'Price has little effect on your win odds here',
+      body: `For ${segment} assignments in this market, win probability stays roughly the same ` +
+            `across the entire fee range — meaning raising your price won't meaningfully hurt your chances.`,
+      tip: `Since the odds don't change much with fee, bidding near the Bid Ceiling ($${fmt(maxFee)}) ` +
+           `gives you the same shot at winning while maximizing what you earn per job. ` +
+           `Other factors — your firm's reputation, speed, and relationships — are what will actually decide this.`,
+      signal: 'neutral',
+    };
+  }
+
+  // Case 3: Low win probability (below 30%)
+  if (winProbPct < 30) {
+    const dataNote = confidence === 'low'
+      ? ' The model also has limited data for this exact combination, so treat this as a rough estimate.'
+      : '';
+    return {
+      headline: 'Tough market — win odds are modest even at the recommended fee',
+      body: `Estimated win probability is ${winProbPct}%, which is below our 30% viability threshold. ` +
+            `This is a highly competitive assignment.` + dataNote,
+      tip: `In segments this competitive, price is rarely the deciding factor. ` +
+           `Your track record for this type of work, your client relationships, and what you offer ` +
+           `beyond the fee itself will likely matter more than where you price.`,
+      signal: 'caution',
+    };
+  }
+
+  // Case 4: Low confidence (wide fee spread or sparse data)
+  if (confidence === 'low') {
+    return {
+      headline: 'Estimate is directional — fees vary widely in this market',
+      body: `${segment} fees in this state have a wide spread, so the confidence interval is broader than usual. ` +
+            `Your recommended bid of $${fmt(recFee)} is ${aboveBench ? `${diffPct}% above` : `${diffPct}% below`} ` +
+            `the segment average ($${fmt(segBenchmark)}).`,
+      tip: `Because fees vary a lot here, check what you've charged for similar jobs before committing to this bid. ` +
+           `The floor and ceiling give you the safe range — anywhere in that band is defensible.`,
+      signal: 'neutral',
+    };
+  }
+
+  // Case 5: Strong odds — well positioned
+  if (winProbPct >= 55) {
+    return {
+      headline: aboveBench
+        ? `Above market with strong odds — good position`
+        : `Well priced with strong odds`,
+      body: `Your recommended bid of $${fmt(recFee)} gives you a ${winProbPct}% estimated chance of winning. ` +
+            (aboveBench
+              ? `Even at ${diffPct}% above the ${segment} average ($${fmt(segBenchmark)}), your odds are strong — the market supports this price.`
+              : `At ${diffPct}% below the ${segment} average ($${fmt(segBenchmark)}), you're priced competitively.`),
+      tip: aboveBench && diffPct > 20
+        ? `You could potentially push toward the Bid Ceiling ($${fmt(maxFee)}) — win odds would still be reasonable and you'd capture more revenue per job.`
+        : null,
+      signal: 'positive',
+    };
+  }
+
+  // Case 6: Default — moderate odds, normal range
+  return {
+    headline: aboveBench
+      ? `Above market with moderate odds`
+      : `Competitive bid with reasonable odds`,
+    body: `Your recommended bid of $${fmt(recFee)} gives you a ${winProbPct}% estimated chance of winning. ` +
+          `The ${segment} market average in this area is around $${fmt(segBenchmark)}, ` +
+          `putting you ${aboveBench ? `${diffPct}% above` : `${diffPct}% below`} that benchmark.`,
+    tip: winProbPct < 40
+      ? `Win odds are modest — if this client is price-sensitive, consider whether sliding closer to the ` +
+        `floor ($${fmt(maxFee > segBenchmark ? segBenchmark : maxFee)}) would meaningfully improve your chances.`
+      : null,
+    signal: 'neutral',
+  };
+}
+
 // ── Main Component ────────────────────────────────────────────────────────────
 
 function ResultDisplay({ prediction, formData }) {
@@ -50,10 +146,10 @@ function ResultDisplay({ prediction, formData }) {
     fee_curve,
     warnings,
     factors,
-    recommendation,
   } = prediction;
 
   const [showDetails, setShowDetails] = useState(false);
+  const [showChart,   setShowChart]   = useState(false);
 
   const curvePoints = fee_curve?.curve_points || [];
 
@@ -87,6 +183,18 @@ function ResultDisplay({ prediction, formData }) {
   const turnaroundDays = formData.turnaround_days || 30;
   const isRush         = turnaroundDays <= 21;
   const wpColor        = winColor(winProbPct);
+
+  // Build contextual message client-side (always fresh, no stale API text)
+  const ctxMsg = buildContextMessage({
+    recFee,
+    maxFee,
+    winProbPct,
+    confidence: confidence_level,
+    segment:    formData.business_segment,
+    evCapped,
+    isFlatCurve,
+    segBenchmark: segment_benchmark,
+  });
 
   return (
     <div className="result-display">
@@ -190,16 +298,14 @@ function ResultDisplay({ prediction, formData }) {
         </div>
       )}
 
-      {/* ── API recommendation card (from backend) ── */}
-      {recommendation && (
-        <div className={`card result-recommendation signal-${recommendation.signal}`}>
-          <p className="rec-headline">{recommendation.headline}</p>
-          <p className="rec-detail">{recommendation.detail}</p>
-          {recommendation.strategy_tip && (
-            <p className="rec-tip">{recommendation.strategy_tip}</p>
-          )}
-        </div>
-      )}
+      {/* ── Contextual insight card (client-side, always fresh) ── */}
+      <div className={`card result-insight signal-${ctxMsg.signal}`}>
+        <p className="insight-headline">{ctxMsg.headline}</p>
+        <p className="insight-body">{ctxMsg.body}</p>
+        {ctxMsg.tip && (
+          <p className="insight-tip">{ctxMsg.tip}</p>
+        )}
+      </div>
 
       {/* ── Market context ── */}
       <div className="card result-context">
