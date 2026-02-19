@@ -1,57 +1,105 @@
-/* Bid Form Styles */
 .bid-form {
-  margin-top: var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-lg);
+  margin-top: var(--s-md);
 }
 
-.form-grid {
+.form-fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-md);
+}
+
+.form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: var(--spacing-md);
-}
-
-@media (max-width: 600px) {
-  .form-grid {
-    grid-template-columns: 1fr;
-  }
+  gap: var(--s-sm);
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
-}
-
-.form-group label {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+  gap: var(--s-xs);
 }
 
 .field-hint {
-  font-size: var(--font-size-xs);
-  color: var(--color-text-light);
-  font-weight: var(--font-weight-normal);
+  display: block;
+  font-size: var(--font-xs);
+  font-weight: 400;
+  color: var(--text-muted);
+  margin-top: 1px;
 }
 
-.form-group input,
-.form-group select {
-  margin-top: var(--spacing-xs);
-}
-
+/* Select arrow */
 .form-group select {
   cursor: pointer;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b6b6b' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%23475569' d='M5 6L0 0h10z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 12px center;
-  padding-right: 36px;
+  padding-right: 32px;
   appearance: none;
 }
 
+/* Number input with unit label */
+.input-with-unit {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-with-unit input {
+  padding-right: 3.5rem;
+}
+
+.input-unit {
+  position: absolute;
+  right: 12px;
+  font-size: var(--font-sm);
+  font-weight: 500;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+/* Quick preset chips */
+.turnaround-presets {
+  display: flex;
+  gap: var(--s-xs);
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+.preset-chip {
+  font-size: var(--font-xs);
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--ease-fast);
+  letter-spacing: 0.02em;
+}
+
+.preset-chip:hover {
+  border-color: var(--accent);
+  color: var(--accent-dark);
+  background: var(--accent-bg);
+}
+
+.preset-chip.active {
+  border-color: var(--accent);
+  background: var(--accent-light);
+  color: var(--accent-dark);
+}
+
+/* Form actions */
 .form-actions {
   display: flex;
-  gap: var(--spacing-md);
-  margin-top: var(--spacing-lg);
-  padding-top: var(--spacing-lg);
-  border-top: 1px solid var(--color-border-light);
+  gap: var(--s-sm);
+  border-top: 1px solid var(--border-light);
+  padding-top: var(--s-lg);
 }
 
 .btn-predict {
@@ -59,39 +107,25 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-md) var(--spacing-lg);
-  font-size: var(--font-size-base);
-  font-weight: var(--font-weight-semibold);
-  background: var(--gradient-accent);
-  color: white;
-  border: none;
-  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25);
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  gap: var(--s-sm);
+  padding: 0.8rem var(--s-lg);
+  font-size: var(--font-base);
+  border-radius: var(--r-md);
+  letter-spacing: 0.01em;
 }
 
-.btn-predict:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
-}
-
-.btn-predict:active:not(:disabled) {
-  transform: translateY(0);
+.btn-reset {
+  padding: 0.8rem var(--s-md);
 }
 
 .btn-spinner {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   border: 2px solid rgba(255, 255, 255, 0.3);
-  border-top-color: white;
+  border-top-color: #fff;
   border-radius: 50%;
-  animation: spin 0.8s linear infinite;
+  animation: spin 0.75s linear infinite;
+  display: inline-block;
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-.form-actions .btn-secondary {
-  padding: var(--spacing-md) var(--spacing-lg);
-}
+@keyframes spin { to { transform: rotate(360deg); } }
