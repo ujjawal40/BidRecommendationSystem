@@ -1,9 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Header from './components/Header';
 import BidForm from './components/BidForm';
 import ResultDisplay from './components/ResultDisplay';
-import SegmentStats from './components/SegmentStats';
-import StateBenchmarks from './components/StateBenchmarks';
 import { fetchV2Options, predictV2BidFee } from './services/api';
 import './App.css';
 
@@ -22,21 +20,18 @@ function App() {
   const [prediction, setPrediction] = useState(null);
   const [error, setError] = useState(null);
 
-  // Form state
+  // Single turnaround_days replaces separate target_time + delivery_days
   const [formData, setFormData] = useState({
     business_segment: '',
     property_type: '',
     property_state: '',
-    target_time: 30,
+    turnaround_days: 30,
     sub_property_type: '',
     office_region: '',
-    delivery_days: '',
+    office_location: '',
   });
 
-  // Load options on mount
-  useEffect(() => {
-    loadOptions();
-  }, []);
+  useEffect(() => { loadOptions(); }, []);
 
   const loadOptions = async () => {
     try {
@@ -44,9 +39,9 @@ function App() {
       const data = await fetchV2Options();
       setOptions(data);
 
-      // Set defaults
       if (data.segments.length > 0) {
-        const defaultPropType = data.property_types.includes('Multifamily') ? 'Multifamily' : data.property_types[0];
+        const defaultPropType = data.property_types.includes('Multifamily')
+          ? 'Multifamily' : data.property_types[0];
         const subtypesForProp = (data.subtypes_by_property_type || {})[defaultPropType] || [];
         setFormData(prev => ({
           ...prev,
@@ -67,12 +62,10 @@ function App() {
 
   const handleInputChange = (e) => {
     const { name, value, type } = e.target;
-    const newData = {
-      ...formData,
-      [name]: type === 'number' ? (value === '' ? '' : Number(value)) : value,
-    };
+    const parsed = type === 'number' ? (value === '' ? '' : Number(value)) : value;
+    const newData = { ...formData, [name]: parsed };
 
-    // When property type changes, reset sub_property_type to first available
+    // When property type changes, reset sub_property_type
     if (name === 'property_type') {
       const subtypesForProp = (options.subtypes_by_property_type || {})[value] || [];
       newData.sub_property_type = subtypesForProp[0] || '';
@@ -87,18 +80,19 @@ function App() {
     setPredicting(true);
 
     try {
-      // Build payload — omit empty optional fields
+      // turnaround_days feeds both API parameters — one field, one timeline
+      const days = Number(formData.turnaround_days) || 30;
       const payload = {
         business_segment: formData.business_segment,
         property_type: formData.property_type,
         property_state: formData.property_state,
-        target_time: formData.target_time,
+        target_time: days,
+        delivery_days: days,
       };
+
       if (formData.sub_property_type) payload.sub_property_type = formData.sub_property_type;
-      if (formData.office_region) payload.office_region = formData.office_region;
-      if (formData.delivery_days !== '' && formData.delivery_days != null) {
-        payload.delivery_days = Number(formData.delivery_days);
-      }
+      if (formData.office_region)      payload.office_region = formData.office_region;
+      if (formData.office_location)    payload.office_location = formData.office_location;
 
       const result = await predictV2BidFee(payload);
       setPrediction(result);
@@ -121,8 +115,8 @@ function App() {
         <Header />
         <main className="main-content">
           <div className="loading-container">
-            <div className="loading-spinner"></div>
-            <p>Loading Bid Recommendation System...</p>
+            <div className="loading-spinner" />
+            <p>Loading…</p>
           </div>
         </main>
       </div>
@@ -135,11 +129,11 @@ function App() {
 
       <main className="main-content">
         <div className="content-grid">
-          {/* Left column: Form */}
+          {/* Left: Form */}
           <div className="form-section">
             <div className="card">
-              <h2>New Bid Prediction</h2>
-              <p className="subtitle">Enter bid details to get a recommended fee with confidence intervals</p>
+              <h2>New Bid</h2>
+              <p className="subtitle">Get a recommended fee with win probability</p>
 
               <BidForm
                 formData={formData}
@@ -150,52 +144,31 @@ function App() {
                 loading={predicting}
               />
 
-              {error && (
-                <div className="error-message">
-                  {error}
-                </div>
-              )}
+              {error && <div className="error-message">{error}</div>}
             </div>
           </div>
 
-          {/* Right column: Results */}
+          {/* Right: Results */}
           <div className="results-section">
             {prediction ? (
               <ResultDisplay prediction={prediction} formData={formData} />
             ) : (
               <div className="card placeholder-card">
                 <div className="placeholder-icon">
-                  <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                     <path d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                   </svg>
                 </div>
-                <h3>Ready to Predict</h3>
-                <p>Fill out the form and click "Get Prediction" to see the recommended bid fee with confidence intervals.</p>
+                <h3>Ready to Analyze</h3>
+                <p>Fill out the form and click "Get Recommendation" to see your optimal bid with live win probability.</p>
               </div>
             )}
-          </div>
-        </div>
-
-        {/* Bottom section: Benchmarks */}
-        <div className="benchmarks-section">
-          <div className="benchmarks-grid">
-            <SegmentStats
-              segment={formData.business_segment}
-              segments={options.segments}
-            />
-            <StateBenchmarks
-              state={formData.property_state}
-              states={options.states}
-            />
           </div>
         </div>
       </main>
 
       <footer className="footer">
-        <p>&copy; 2026 Global Stat Solutions. Bid Recommendation System v2.0</p>
-        <p className="disclaimer">
-          Enhanced model — MAPE 7.3%, AUC 0.948
-        </p>
+        <p>&copy; 2026 Global Stat Solutions</p>
       </footer>
     </div>
   );
