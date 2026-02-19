@@ -271,6 +271,170 @@
   transition: width 0.4s ease, background 0.3s ease;
 }
 
+/* ── Contextual insight card ── */
+.result-insight {
+  border-left: 2px solid transparent;
+}
+.result-insight.signal-positive { border-left-color: var(--success);  background: rgba(16, 185, 129, 0.05); }
+.result-insight.signal-neutral  { border-left-color: var(--accent);   background: rgba(59, 130, 246, 0.05); }
+.result-insight.signal-caution  { border-left-color: var(--warning);  background: rgba(245, 158, 11, 0.06); }
+
+.insight-headline {
+  font-size: var(--font-base);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 var(--s-xs);
+  line-height: 1.3;
+}
+.insight-body {
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+  margin: 0 0 var(--s-xs);
+  line-height: 1.65;
+}
+.insight-tip {
+  font-size: var(--font-sm);
+  color: var(--text-muted);
+  margin: 0;
+  padding-top: var(--s-sm);
+  border-top: 1px solid var(--border-light);
+  line-height: 1.6;
+  font-style: italic;
+}
+
+/* ── Chart section ── */
+.chart-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-sm);
+}
+
+.chart-toggle {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: var(--font-sm);
+  font-weight: 500;
+  cursor: pointer;
+  padding: var(--s-xs) 0;
+  text-align: left;
+  transition: color var(--ease-fast);
+  letter-spacing: 0.01em;
+}
+.chart-toggle:hover { color: var(--accent-dark); }
+
+.chart-card { padding: var(--s-lg); }
+
+.fee-chart { display: flex; flex-direction: column; gap: var(--s-sm); }
+
+.fee-chart-title {
+  font-size: var(--font-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+}
+
+.fee-chart-svg { display: block; }
+
+/* Chart slider */
+.chart-slider-wrap {
+  padding: 0 2px;
+  margin-top: var(--s-xs);
+}
+
+.chart-slider {
+  width: 100%;
+  height: 20px;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.chart-slider::-webkit-slider-runnable-track {
+  height: 3px;
+  background: rgba(148, 163, 184, 0.15);
+  border-radius: 2px;
+}
+
+.chart-slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid var(--bg-card);
+  box-shadow: 0 0 0 2px var(--accent);
+  margin-top: -7px;
+  cursor: grab;
+  transition: transform var(--ease-fast);
+}
+
+.chart-slider::-webkit-slider-thumb:active { cursor: grabbing; transform: scale(1.1); }
+.chart-slider::-moz-range-thumb {
+  width: 16px; height: 16px; border-radius: 50%;
+  background: var(--accent); border: 2px solid var(--bg-card);
+  box-shadow: 0 0 0 2px var(--accent); cursor: grab;
+}
+.chart-slider::-moz-range-track {
+  height: 3px; background: rgba(148, 163, 184, 0.15); border-radius: 2px;
+}
+
+/* Live stats row */
+.chart-stats {
+  display: flex;
+  align-items: center;
+  gap: var(--s-sm);
+  flex-wrap: wrap;
+  padding-top: var(--s-xs);
+  border-top: 1px solid var(--border-light);
+  font-variant-numeric: tabular-nums;
+}
+
+.chart-fee {
+  font-size: var(--font-lg);
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+.chart-arrow { color: var(--text-muted); font-size: var(--font-sm); }
+
+.chart-prob {
+  font-size: var(--font-base);
+  font-weight: 700;
+}
+
+.chart-ev {
+  font-size: var(--font-sm);
+  color: var(--text-muted);
+}
+
+.chart-below-threshold {
+  font-size: var(--font-xs);
+  font-weight: 600;
+  color: #f43f5e;
+  background: rgba(244, 63, 94, 0.10);
+  border: 1px solid rgba(244, 63, 94, 0.2);
+  padding: 2px 8px;
+  border-radius: var(--r-pill);
+}
+
+/* ── Flat curve note ── */
+.flat-curve-note {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s-sm);
+  background: rgba(59, 130, 246, 0.06);
+  border: 1px solid rgba(59, 130, 246, 0.18);
+  border-radius: var(--r-lg);
+  padding: var(--s-md);
+  font-size: var(--font-sm);
+  color: #93c5fd;
+  line-height: 1.55;
+}
+.flat-curve-icon { font-size: 0.9rem; line-height: 1.6; flex-shrink: 0; }
+
 /* ── Market context ── */
 .result-context { padding: var(--s-md) var(--s-lg); }
 
