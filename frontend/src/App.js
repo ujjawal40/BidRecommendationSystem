@@ -27,8 +27,8 @@ function App() {
     property_state: '',
     turnaround_days: 30,
     sub_property_type: '',
-    office_region: '',
     office_location: '',
+    open_date: '',
   });
 
   useEffect(() => { loadOptions(); }, []);
@@ -49,7 +49,7 @@ function App() {
           property_type: defaultPropType,
           property_state: data.states.includes('Illinois') ? 'Illinois' : data.states[0],
           sub_property_type: subtypesForProp[0] || '',
-          office_region: (data.office_regions || [])[0] || '',
+          open_date: '',
         }));
       }
     } catch (err) {
@@ -91,8 +91,8 @@ function App() {
       };
 
       if (formData.sub_property_type) payload.sub_property_type = formData.sub_property_type;
-      if (formData.office_region)      payload.office_region = formData.office_region;
       if (formData.office_location)    payload.office_location = formData.office_location;
+      if (formData.open_date)          payload.open_date = formData.open_date;
 
       const result = await predictV2BidFee(payload);
       setPrediction(result);

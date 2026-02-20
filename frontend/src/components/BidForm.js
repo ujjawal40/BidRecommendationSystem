@@ -1,6 +1,8 @@
 import React from 'react';
 import './BidForm.css';
 
+const TODAY = new Date().toISOString().split('T')[0];
+
 function BidForm({ formData, options, onChange, onSubmit, onReset, loading }) {
   const subtypesForPropertyType = formData.property_type
     ? (options.subtypes_by_property_type || {})[formData.property_type] || []
@@ -61,9 +63,9 @@ function BidForm({ formData, options, onChange, onSubmit, onReset, loading }) {
           </div>
         </div>
 
-        {/* State */}
+        {/* Property State */}
         <div className="form-group">
-          <label htmlFor="property_state">State</label>
+          <label htmlFor="property_state">Property State</label>
           <select
             id="property_state"
             name="property_state"
@@ -111,37 +113,36 @@ function BidForm({ formData, options, onChange, onSubmit, onReset, loading }) {
           </div>
         </div>
 
-        {/* Office Region + Office Name */}
-        <div className="form-row">
-          <div className="form-group">
-            <label htmlFor="office_region">Office Region</label>
-            <select
-              id="office_region"
-              name="office_region"
-              value={formData.office_region}
-              onChange={onChange}
-            >
-              <option value="">Any</option>
-              {(options.office_regions || []).map(r => (
-                <option key={r} value={r}>{r}</option>
-              ))}
-            </select>
-          </div>
+        {/* Job Open Date (optional) */}
+        <div className="form-group">
+          <label htmlFor="open_date">
+            Job Open Date
+            <span className="field-hint">When was this job posted? Leave blank to use today.</span>
+          </label>
+          <input
+            type="date"
+            id="open_date"
+            name="open_date"
+            value={formData.open_date || ''}
+            max={TODAY}
+            onChange={onChange}
+          />
+        </div>
 
-          <div className="form-group">
-            <label htmlFor="office_location">Office Name</label>
-            <select
-              id="office_location"
-              name="office_location"
-              value={formData.office_location}
-              onChange={onChange}
-            >
-              <option value="">Any</option>
-              {(options.office_locations || []).map(loc => (
-                <option key={loc} value={loc}>{loc}</option>
-              ))}
-            </select>
-          </div>
+        {/* Office Location */}
+        <div className="form-group">
+          <label htmlFor="office_location">Office Location</label>
+          <select
+            id="office_location"
+            name="office_location"
+            value={formData.office_location}
+            onChange={onChange}
+          >
+            <option value="">Any</option>
+            {(options.office_locations || []).map(loc => (
+              <option key={loc} value={loc}>{loc}</option>
+            ))}
+          </select>
         </div>
 
       </div>
