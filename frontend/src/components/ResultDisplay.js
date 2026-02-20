@@ -327,7 +327,7 @@ function ResultDisplay({ prediction, formData }) {
         <div className="bid-range-header">
           <span className="bid-range-label">Bid Range</span>
           <span className={`confidence-pill confidence-${confidence_level}`}>
-            {confidence_level} confidence
+            {confidence_level} data coverage
           </span>
         </div>
 
@@ -380,6 +380,7 @@ function ResultDisplay({ prediction, formData }) {
             <span className="scale-label-left">Floor</span>
             <span className="scale-label-right">Ceiling</span>
           </div>
+          <p className="band-note">80% fee band — market fees genuinely vary in this segment</p>
         </div>
 
         {/* Win probability */}
