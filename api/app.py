@@ -366,8 +366,8 @@ def predict_v2():
             target_time=int(data['target_time']),
             sub_property_type=data.get('sub_property_type', 'Unknown'),
             office_location=data.get('office_location', 'Unknown'),
-            office_region=data.get('office_region', 'Unknown'),
             delivery_days=data.get('delivery_days'),
+            open_date=data.get('open_date'),
         )
 
         return jsonify({"success": True, "prediction": result})

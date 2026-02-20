@@ -42,6 +42,79 @@ from config.model_config import MODELS_DIR, PREDICTION_CONFIG, REPORTS_DIR
 
 from api.empirical_bands import EmpiricalBandCalculator
 
+# Location → Region mapping derived from training data (BidData_enriched_v2.csv).
+# Keys are lowercase office location names for case-insensitive lookup.
+# Used to auto-derive office_region from office_location at inference time.
+LOCATION_TO_REGION = {
+    'austin': 'Southwest',
+    'birmingham, al': 'Southeast',
+    'boise, id': 'West',
+    'boston, ma': 'Northeast',
+    'caribbean': 'Other',
+    'charleston, sc': 'Southeast',
+    'charlotte, nc': 'Southeast',
+    'chicago': 'Central',
+    'cincinnati, oh': 'Central',
+    'cleveland': 'Central',
+    'coastal new jersey': 'Northeast',
+    'columbia, sc': 'Southeast',
+    'columbus, oh': 'Central',
+    'corporate office': 'Other',
+    'denver, co': 'Southwest',
+    'detroit, mi': 'Central',
+    'dfw': 'Southwest',
+    'florida property advisors': 'Southeast',
+    'fort worth, tx': 'Southwest',
+    'grand rapids, mi': 'Central',
+    'greensboro, nc': 'Southeast',
+    'hartford, ct': 'Northeast',
+    'houston': 'Southwest',
+    'houston annex': 'Southwest',
+    'indianapolis, in': 'Central',
+    'integra aim core': 'Other',
+    'integra aim national accounts': 'Other',
+    'jackson, ms': 'Southeast',
+    'kansas city': 'Central',
+    'knoxville, tn': 'Southeast',
+    'la metro': 'West',
+    'las vegas, nv': 'West',
+    'little rock, ar': 'Southwest',
+    'los angeles, ca': 'West',
+    'louisville, ky': 'Central',
+    'lubbock, tx': 'Southwest',
+    'memphis, tn': 'Southeast',
+    'miami, fl': 'Southeast',
+    'minneapolis, mn': 'Central',
+    'naples, fl': 'Southeast',
+    'nashville, tn': 'Southeast',
+    'new orleans, la': 'Southwest',
+    'northern new jersey': 'Northeast',
+    'oklahoma city, ok': 'Southwest',
+    'orange county, ca': 'West',
+    'orlando, fl': 'Southeast',
+    'philadelphia': 'Northeast',
+    'phoenix, az': 'Southwest',
+    'pittsburgh, pa': 'Northeast',
+    'portland, or': 'West',
+    'providence, ri': 'Northeast',
+    'puerto rico': 'Other',
+    'raleigh, nc': 'Southeast',
+    'richmond, va': 'Northeast',
+    'rio grande valley, tx': 'Southwest',
+    'sacramento': 'West',
+    'salt lake city, ut': 'West',
+    'san antonio, tx': 'Southwest',
+    'san diego, ca': 'West',
+    'san francisco': 'West',
+    'seattle, wa': 'West',
+    'st. louis, mo': 'Central',
+    'syracuse, ny': 'Northeast',
+    'tampa, fl': 'Southeast',
+    'tellatin senior housing': 'Central',
+    'washington baltimore metro': 'Northeast',
+    'washington dc': 'Northeast',
+}
+
 
 class EnhancedBidPredictor:
     """v2 prediction service using JobsData-trained models."""
@@ -130,6 +203,7 @@ class EnhancedBidPredictor:
         delivery_days: Optional[int] = None,
         company_type: str = "Unknown",
         contact_type: str = "Unknown",
+        ref_date: Optional[datetime] = None,
     ) -> Dict[str, float]:
         """Generate feature vector for v2 model from user inputs."""
         features = {}
@@ -193,8 +267,8 @@ class EnhancedBidPredictor:
         # Interaction features
         features["segment_x_state_fee"] = features["segment_avg_fee"] * features["state_avg_fee"]
 
-        # Temporal features
-        now = datetime.now()
+        # Temporal features — use ref_date (job open date) if provided, else today
+        now = ref_date if ref_date else datetime.now()
         features["Year"] = now.year
         features["Month"] = now.month
         features["Quarter"] = (now.month - 1) // 3 + 1
@@ -255,12 +329,23 @@ class EnhancedBidPredictor:
         target_time: int = 30,
         sub_property_type: str = "Unknown",
         office_location: str = "Unknown",
-        office_region: str = "Unknown",
         delivery_days: Optional[int] = None,
         company_type: str = "Unknown",
         contact_type: str = "Unknown",
+        open_date: Optional[str] = None,
     ) -> Dict[str, Any]:
         """Predict bid fee, win probability, and expected value."""
+
+        # Derive office_region from office_location — no longer a user-supplied input
+        office_region = LOCATION_TO_REGION.get(office_location.lower(), "Unknown")
+
+        # Parse open_date for temporal features; fall back to today if absent/invalid
+        ref_date: Optional[datetime] = None
+        if open_date:
+            try:
+                ref_date = datetime.strptime(open_date, "%Y-%m-%d")
+            except ValueError:
+                ref_date = None
 
         features = self._generate_features(
             business_segment=business_segment,
@@ -273,6 +358,7 @@ class EnhancedBidPredictor:
             delivery_days=delivery_days,
             company_type=company_type,
             contact_type=contact_type,
+            ref_date=ref_date,
         )
 
         # Build feature vector in model order
