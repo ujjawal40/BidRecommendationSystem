@@ -88,7 +88,8 @@
   color: var(--text-muted);
   margin-bottom: 2px;
 }
-.anchor-tag-rec { color: var(--accent); }
+.anchor-tag-rec   { color: var(--accent); }
+.anchor-tag-capped { color: var(--warning); }
 
 .anchor-fee {
   font-size: var(--font-xl);
@@ -178,6 +179,12 @@
   background: var(--accent);
   width: 2px;
   box-shadow: 0 0 6px rgba(59, 130, 246, 0.5);
+}
+
+/* Capped tick — amber instead of blue */
+.tick-rec-capped {
+  background: var(--warning);
+  box-shadow: 0 0 6px rgba(245, 158, 11, 0.5);
 }
 
 /* Max tick — short, dim */

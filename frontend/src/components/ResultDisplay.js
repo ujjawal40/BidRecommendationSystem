@@ -344,7 +344,7 @@ function ResultDisplay({ prediction, formData }) {
 
           <div className="anchor anchor-center">
             <span
-              className="anchor-tag anchor-tag-rec"
+              className={`anchor-tag ${evCapped ? 'anchor-tag-capped' : 'anchor-tag-rec'}`}
               title={evCapped ? 'The EV-maximizing fee exceeds the 30% win threshold — capped at the highest fee with a viable shot at winning.' : undefined}
             >
               {evCapped ? 'Max Recommended' : 'Optimal Bid'}
@@ -374,9 +374,9 @@ function ResultDisplay({ prediction, formData }) {
         {/* Static scale */}
         <div className="range-scale-wrap">
           <div className="range-scale">
-            <div className="range-scale-fill" style={{ width: `${recTrackPct}%` }} />
+            <div className="range-scale-fill" style={{ width: `${recTrackPct}%`, opacity: evCapped ? 0.6 : 0.45, background: evCapped ? 'var(--warning)' : 'var(--accent)' }} />
             <div className="scale-tick tick-floor" />
-            <div className="scale-tick tick-rec" style={{ left: `${recTrackPct}%` }} />
+            <div className={`scale-tick tick-rec${evCapped ? ' tick-rec-capped' : ''}`} style={{ left: `${recTrackPct}%` }} />
             {!recEqualsMax && <div className="scale-tick tick-max" />}
             {recEqualsMax  && <div className="scale-tick tick-rec-max" />}
           </div>
