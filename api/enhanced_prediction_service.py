@@ -470,12 +470,15 @@ class EnhancedBidPredictor:
             if solid_candidates:
                 solid_win_ceiling = max(p["fee"] for p in solid_candidates)
 
-        # Constrain: recommended fee must never exceed the solid-win ceiling.
-        # If the unconstrained EV-optimal fee falls above the 30% win threshold,
-        # cap it at the ceiling — bidding above that is a long shot.
+        # Constrain: ev_optimal_fee must never exceed the displayed ceiling.
+        # The displayed ceiling is solid_win_ceiling when P(win)>=30% was found on
+        # the curve, otherwise it falls back to the CI upper bound (high).
+        # Either way, the Optimal Bid shown in the UI cannot sit above what we call
+        # the "Ceiling" — that would be a contradictory display.
+        displayed_ceiling = solid_win_ceiling if solid_win_ceiling is not None else high
         ev_capped_at_ceiling = False
-        if ev_optimal_fee and solid_win_ceiling and ev_optimal_fee > solid_win_ceiling:
-            ev_optimal_fee = solid_win_ceiling
+        if ev_optimal_fee and ev_optimal_fee > displayed_ceiling:
+            ev_optimal_fee = displayed_ceiling
             ev_optimal_diff_pct = ((ev_optimal_fee - prediction) / prediction) * 100
             ev_capped_at_ceiling = True
 
@@ -531,7 +534,7 @@ class EnhancedBidPredictor:
                 "delivery_days": delivery_days,
             },
             "ev_optimal_fee": round(ev_optimal_fee, 2) if ev_optimal_fee else round(prediction, 2),
-            "solid_win_ceiling": round(solid_win_ceiling, 2) if solid_win_ceiling else round(high, 2),
+            "solid_win_ceiling": round(displayed_ceiling, 2),
             "ev_capped_at_ceiling": ev_capped_at_ceiling,
             "fee_curve": curve_data,
             "metadata": {
