@@ -132,7 +132,7 @@ function buildContextMessage({ recFee, maxFee, winProbPct, confidence, segment, 
 
 // ── SVG Fee Chart ─────────────────────────────────────────────────────────────
 
-function FeeChart({ curvePoints, recFee, maxFee, floorFee }) {
+function FeeChart({ curvePoints, recFee, maxFee, floorFee, evCapped }) {
   const pts = [...curvePoints].sort((a, b) => a.fee - b.fee);
   if (pts.length < 2) return null;
 
@@ -208,7 +208,7 @@ function FeeChart({ curvePoints, recFee, maxFee, floorFee }) {
         <text x={floorX} y={H - 6} fill="#475569" fontSize="9" textAnchor="middle"
           fontFamily="Inter, sans-serif">Floor</text>
         <text x={recX} y={H - 6} fill="#60a5fa" fontSize="9" textAnchor="middle"
-          fontFamily="Inter, sans-serif">Optimal</text>
+          fontFamily="Inter, sans-serif">{evCapped ? 'Max Rec.' : 'Optimal'}</text>
         {Math.abs(recX - maxX) > 30 && (
           <text x={maxX} y={H - 6} fill="#475569" fontSize="9" textAnchor="middle"
             fontFamily="Inter, sans-serif">Ceiling</text>
@@ -344,7 +344,12 @@ function ResultDisplay({ prediction, formData }) {
           </div>
 
           <div className="anchor anchor-center">
-            <span className="anchor-tag anchor-tag-rec">Optimal Bid</span>
+            <span
+              className="anchor-tag anchor-tag-rec"
+              title={evCapped ? 'The EV-maximizing fee exceeds the 30% win threshold — capped at the highest fee with a viable shot at winning.' : undefined}
+            >
+              {evCapped ? 'Max Recommended' : 'Optimal Bid'}
+            </span>
             <div className="anchor-rec-fee">
               <span className="anchor-rec-currency">$</span>
               <span className="anchor-rec-amount">{fmt(recFee)}</span>
@@ -391,7 +396,7 @@ function ResultDisplay({ prediction, formData }) {
             </span>
             <div className="win-meta">
               <span className="win-label" style={{ color: wpColor }}>{winLabel(winProbPct)}</span>
-              <span className="win-ev">EV · ${fmt(evAtRec)} at optimal bid</span>
+              <span className="win-ev">EV · ${fmt(evAtRec)} at {evCapped ? 'max recommended' : 'optimal bid'}</span>
             </div>
           </div>
           <div className="win-bar-track">
@@ -435,6 +440,7 @@ function ResultDisplay({ prediction, formData }) {
                 recFee={recFee}
                 maxFee={maxFee}
                 floorFee={floorFee}
+                evCapped={evCapped}
               />
             </div>
           )}
