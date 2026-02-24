@@ -43,14 +43,13 @@ function buildContextMessage({ recFee, maxFee, winProbPct, confidence, segment, 
   // Case 1: Recommended was capped at ceiling — the model wanted to go higher
   if (evCapped) {
     return {
-      headline: 'Optimal bid capped at the ceiling',
-      body: `The fee that would maximize your total earnings outright would push above the Bid Ceiling — ` +
-            `but at that price, your estimated win odds drop below 30%, which is our minimum threshold ` +
-            `for a bid worth submitting. We've set your recommended bid at $${fmt(recFee)}, ` +
-            `the highest fee where you still have a reasonable shot.`,
-      tip: `Your current win probability is ${winProbPct}%. If you choose to bid higher than $${fmt(maxFee)}, ` +
-           `go in with eyes open — your win odds will fall below 30%. In that case, ` +
-           `your track record, client relationships, and quality of work will need to carry the weight.`,
+      headline: 'Max Recommended — the EV-optimal fee exceeds the 30% win threshold',
+      body: `The fee that would mathematically maximize your expected earnings sits above the Bid Ceiling, ` +
+            `where win odds fall below 30% — our minimum threshold for a viable bid. ` +
+            `$${fmt(recFee)} is the highest fee where you still have a reasonable shot at winning.`,
+      tip: `If you choose to bid above $${fmt(maxFee)}, win odds will drop below 30%. ` +
+           `At that point, your track record, client relationships, and quality of work ` +
+           `will matter more than price.`,
       signal: winProbPct >= 40 ? 'neutral' : 'caution',
     };
   }
@@ -356,7 +355,7 @@ function ResultDisplay({ prediction, formData }) {
             </div>
             <p className="anchor-legend">
               {evCapped
-                ? <>The unconstrained optimal fee exceeds the Bid Ceiling. <strong>Capped here</strong> to keep win odds above 30%.</>
+                ? <>The true EV-maximizing fee falls above the Bid Ceiling. This is the <strong>highest fee with a viable shot at winning</strong> (≥ 30% odds).</>
                 : <>The fee most likely to maximize your earnings — it weighs both your chance of winning <em>and</em> the revenue when you do.</>
               }
             </p>
