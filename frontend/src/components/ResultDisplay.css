@@ -123,6 +123,21 @@
   line-height: 1;
 }
 
+/* Capped badge — shown below the fee amount when ev_capped_at_ceiling */
+.capped-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--warning);
+  background: rgba(245, 158, 11, 0.10);
+  border: 1px solid rgba(245, 158, 11, 0.22);
+  padding: 2px 9px;
+  border-radius: var(--r-pill);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
 /* Legend text below each anchor */
 .anchor-legend {
   font-size: var(--font-xs);

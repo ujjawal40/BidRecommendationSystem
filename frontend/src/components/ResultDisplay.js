@@ -353,6 +353,9 @@ function ResultDisplay({ prediction, formData }) {
               <span className="anchor-rec-currency">$</span>
               <span className="anchor-rec-amount">{fmt(recFee)}</span>
             </div>
+            {evCapped && (
+              <span className="capped-badge">⚠ capped at 30% win floor</span>
+            )}
             <p className="anchor-legend">
               {evCapped
                 ? <>The true EV-maximizing fee falls above the Bid Ceiling. This is the <strong>highest fee with a viable shot at winning</strong> (≥ 30% odds).</>
