@@ -238,16 +238,20 @@ class EnhancedBidPredictor:
         features["subtype_frequency"] = s.get("subtype_frequency", {}).get(sub_property_type, 100)
 
         # Office Region features (NEW in v2)
+        # Fall back to segment_avg_fee (not global_avg_fee) when region is unknown.
+        # global_avg_fee is inflated by high-fee segments and causes win prob model
+        # to predict ~98% for any unspecified office location.
+        region_avg_fallback = features["segment_avg_fee"]
         features["office_region_avg_fee"] = s.get("office_region_avg_fee", {}).get(
-            office_region, s["global_avg_fee"]
+            office_region, region_avg_fallback
         )
         features["office_region_frequency"] = s.get("office_region_frequency", {}).get(
-            office_region, 1000
+            office_region, features["segment_frequency"]
         )
 
         # CompanyLocation features (NEW in v2)
         features["company_location_frequency"] = s.get("company_location_frequency", {}).get(
-            office_location, 500
+            office_location, features["segment_frequency"]
         )
 
         # CompanyType/ContactType (Phase 1A)
@@ -318,6 +322,43 @@ class EnhancedBidPredictor:
 
         # Temporal (days since last in segment — use default)
         features["days_since_last_segment"] = 1
+
+        # --- Win probability model feature alignment ---
+        # The v2 win prob model was trained on column names that differ from the bid fee
+        # model's feature names. Without these, 24 of 44 win prob features silently
+        # default to 0 at inference, pushing raw model output to ~0.97 for every input.
+
+        # Raw user inputs available at inference time
+        features["TargetTime"] = target_time
+        features["targettime_log"] = np.log1p(target_time)
+
+        # Distance: no ZIP code at inference — use state-level average or 25-mile fallback
+        dist_miles = s.get("state_distance_miles", {}).get(property_state, 25.0)
+        features["DistanceInMiles"] = dist_miles
+        features["distance_log"] = np.log1p(dist_miles)
+
+        # Demographic name aliases: win prob model was trained with non-prefixed column names
+        # but the bid fee model uses Zip_* names. Alias them so both models get values.
+        features["PopulationEstimate"] = features["Zip_PopulationEstimate"]
+        features["AverageHouseValue"]  = features["Zip_AverageHouseValue"]
+        features["IncomePerHousehold"] = features["Zip_IncomePerHousehold"]
+        features["MedianAge"]          = features["Zip_MedianAge"]
+        features["DeliveryTotal"]      = features["Zip_DeliveryTotal"]
+        features["NumberofBusinesses"] = features["Zip_NumberOfBusinesses"]
+        features["NumberofEmployees"]  = features["Zip_NumberOfEmployees"]
+        features["ZipPopulation"]      = features["Zip_Population"]
+
+        # Office-level average: proxy with region average (no per-office stats at inference)
+        features["office_avg_fee"] = features["office_region_avg_fee"]
+
+        # Client history: no history available at inference — proxy with segment averages.
+        # Assumption: treat every API call as if it's from a client whose historical
+        # behaviour matches the market average for this segment.
+        features["client_avg_fee"]             = features["segment_avg_fee"]
+        features["client_std_fee"]             = features["segment_std_fee"]
+        features["lag1_bidfee_client"]         = features["segment_avg_fee"]
+        features["cumulative_bids_client"]     = 0    # unknown → assume first bid
+        features["days_since_last_bid_client"] = 365  # unknown → assume long gap
 
         return features
 
@@ -554,6 +595,21 @@ class EnhancedBidPredictor:
         if self.win_prob_model is None:
             return self._fallback_win_probability(predicted_fee, segment_benchmark)
 
+        # Compute fee-relative features here — BidFee is known at this point
+        # but was not available when _generate_features() ran.
+        # Defaulting these to 0 tells the model "fee is at zero relative to market"
+        # which pushes win probability to ~98% for every prediction.
+        seg_avg  = features.get("segment_avg_fee", segment_benchmark) or segment_benchmark
+        state_avg = features.get("state_avg_fee", segment_benchmark) or segment_benchmark
+        fee = features.get("BidFee", predicted_fee) or predicted_fee
+        features["fee_vs_segment_ratio"]  = fee / seg_avg if seg_avg > 0 else 1.0
+        features["fee_diff_from_segment"] = fee - seg_avg
+        features["bid_vs_state_ratio"]    = fee / state_avg if state_avg > 0 else 1.0
+        # fee_percentile_segment: approximate as ratio clamped 0-1
+        features["fee_percentile_segment"] = min(1.0, max(0.0, fee / (2 * seg_avg)))
+        # bid_vs_client_ratio: no client history available at inference → use segment ratio
+        features["bid_vs_client_ratio"] = features["fee_vs_segment_ratio"]
+
         feature_vector = []
         for feat_name in self.win_prob_features:
             if feat_name in features:
@@ -566,9 +622,14 @@ class EnhancedBidPredictor:
         X = np.array([feature_vector])
         raw_probability = float(self.win_prob_model.predict(X)[0])
 
-        # Apply isotonic calibration if available
+        # Apply isotonic calibration if available.
+        # Wrapped in try/except: calibrator was saved under sklearn 1.3.0 but may be
+        # running on a newer version, which can cause silent errors on .predict().
         if self.win_prob_calibrator is not None:
-            probability = float(self.win_prob_calibrator.predict([raw_probability])[0])
+            try:
+                probability = float(self.win_prob_calibrator.predict([raw_probability])[0])
+            except Exception:
+                probability = raw_probability
         else:
             probability = raw_probability
 
