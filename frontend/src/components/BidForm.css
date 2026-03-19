@@ -94,6 +94,43 @@
   color: var(--accent-dark);
 }
 
+/* Zip code input */
+.zip-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--s-xs);
+}
+
+.zip-input-wrap input {
+  flex: 1;
+  min-width: 0;
+}
+
+.zip-badge {
+  font-size: var(--font-xs);
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: var(--r-pill);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.zip-found {
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+}
+
+.zip-not-found {
+  background: rgba(244, 63, 94, 0.10);
+  color: #e11d48;
+}
+
+.zip-loading {
+  background: rgba(148, 163, 184, 0.10);
+  color: var(--text-muted);
+}
+
 /* Form actions */
 .form-actions {
   display: flex;

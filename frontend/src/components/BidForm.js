@@ -3,7 +3,7 @@ import './BidForm.css';
 
 const TODAY = new Date().toISOString().split('T')[0];
 
-function BidForm({ formData, options, onChange, onSubmit, onReset, loading }) {
+function BidForm({ formData, options, onChange, onSubmit, onReset, loading, zipStatus }) {
   const subtypesForPropertyType = formData.property_type
     ? (options.subtypes_by_property_type || {})[formData.property_type] || []
     : options.sub_property_types || [];
@@ -63,21 +63,53 @@ function BidForm({ formData, options, onChange, onSubmit, onReset, loading }) {
           </div>
         </div>
 
-        {/* Property State */}
-        <div className="form-group">
-          <label htmlFor="property_state">Property State</label>
-          <select
-            id="property_state"
-            name="property_state"
-            value={formData.property_state}
-            onChange={onChange}
-            required
-          >
-            <option value="">Select state…</option>
-            {options.states.map(st => (
-              <option key={st} value={st}>{st}</option>
-            ))}
-          </select>
+        {/* Zip Code + Property State */}
+        <div className="form-row">
+          <div className="form-group">
+            <label htmlFor="zip_code">
+              Zip Code
+              <span className="field-hint">Auto-fills state</span>
+            </label>
+            <div className="zip-input-wrap">
+              <input
+                type="text"
+                id="zip_code"
+                name="zip_code"
+                value={formData.zip_code}
+                onChange={onChange}
+                placeholder="e.g. 60601"
+                maxLength="5"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                autoComplete="postal-code"
+              />
+              {zipStatus && !zipStatus.loading && zipStatus.found && (
+                <span className="zip-badge zip-found">{zipStatus.state}</span>
+              )}
+              {zipStatus && !zipStatus.loading && !zipStatus.found && formData.zip_code.length === 5 && (
+                <span className="zip-badge zip-not-found">Not in dataset</span>
+              )}
+              {zipStatus && zipStatus.loading && (
+                <span className="zip-badge zip-loading">…</span>
+              )}
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="property_state">Property State</label>
+            <select
+              id="property_state"
+              name="property_state"
+              value={formData.property_state}
+              onChange={onChange}
+              required
+            >
+              <option value="">Select state…</option>
+              {options.states.map(st => (
+                <option key={st} value={st}>{st}</option>
+              ))}
+            </select>
+          </div>
         </div>
 
         {/* Days to Complete */}
