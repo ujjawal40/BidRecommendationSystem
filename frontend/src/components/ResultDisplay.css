@@ -58,6 +58,18 @@
 .confidence-medium { background: rgba(245, 158, 11, 0.10); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.25); }
 .confidence-low    { background: rgba(244, 63, 94, 0.10);  color: #fca5a5; border: 1px solid rgba(244, 63, 94, 0.25); }
 
+.coverage-count {
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: normal;
+  opacity: 0.8;
+}
+
+.context-zip {
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
 /* ── Three anchors grid ── */
 .bid-anchors {
   display: grid;

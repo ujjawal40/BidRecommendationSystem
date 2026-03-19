@@ -259,6 +259,7 @@ function ResultDisplay({ prediction, formData }) {
     fee_curve,
     warnings,
     factors,
+    metadata,
   } = prediction;
 
   const [showDetails, setShowDetails] = useState(false);
@@ -325,8 +326,15 @@ function ResultDisplay({ prediction, formData }) {
 
         <div className="bid-range-header">
           <span className="bid-range-label">Bid Range</span>
-          <span className={`confidence-pill confidence-${confidence_level}`}>
-            {confidence_level} data coverage
+          <span className={`confidence-pill confidence-${confidence_level}`} title={
+            metadata?.data_coverage
+              ? `${fmt(metadata.data_coverage.segment_samples)} segment + ${fmt(metadata.data_coverage.state_samples)} state samples`
+              : undefined
+          }>
+            {confidence_level} confidence
+            {metadata?.data_coverage?.segment_samples && (
+              <span className="coverage-count"> · {fmt(metadata.data_coverage.segment_samples)} similar bids</span>
+            )}
           </span>
         </div>
 
@@ -387,7 +395,7 @@ function ResultDisplay({ prediction, formData }) {
             <span className="scale-label-left">Floor</span>
             <span className="scale-label-right">Ceiling</span>
           </div>
-          <p className="band-note">80% fee band — market fees genuinely vary in this segment</p>
+          <p className="band-note">80% of similar bids in this segment fall within this range (Floor to Ceiling)</p>
         </div>
 
         {/* Win probability */}
@@ -454,6 +462,9 @@ function ResultDisplay({ prediction, formData }) {
         <div className="context-row">
           <span className="context-segment">
             {formData.business_segment} · {formData.property_state}
+            {formData.zip_code && formData.zip_code.length === 5 && (
+              <span className="context-zip"> · ZIP {formData.zip_code}</span>
+            )}
           </span>
           <div className="context-right">
             <span className="context-bench">
