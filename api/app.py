@@ -368,12 +368,47 @@ def predict_v2():
             office_location=data.get('office_location', 'Unknown'),
             delivery_days=data.get('delivery_days'),
             open_date=data.get('open_date'),
+            zip_code=data.get('zip_code'),
         )
 
         return jsonify({"success": True, "prediction": result})
 
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route('/api/v2/zip/<zip_code>', methods=['GET'])
+def lookup_zip(zip_code: str):
+    """Validate a zip code and return its associated state."""
+    if enhanced_predictor is None:
+        return jsonify({
+            "success": False,
+            "error": f"v2 predictor not available: {enhanced_init_error}",
+        }), 503
+
+    zip_code = str(zip_code).strip()
+    if not zip_code.isdigit() or len(zip_code) != 5:
+        return jsonify({
+            "success": True,
+            "data": {"zip_code": zip_code, "found": False, "reason": "Invalid format"},
+        })
+
+    zip_data = enhanced_predictor.zip_lookup.get(zip_code, {})
+    if zip_data:
+        return jsonify({
+            "success": True,
+            "data": {
+                "zip_code": zip_code,
+                "found": True,
+                "state": zip_data.get("state"),
+                "sample_count": zip_data.get("sample_count", 0),
+            },
+        })
+    else:
+        return jsonify({
+            "success": True,
+            "data": {"zip_code": zip_code, "found": False},
+        })
 
 
 @app.route('/api/v2/segment/<segment_name>', methods=['GET'])
@@ -444,6 +479,7 @@ if __name__ == '__main__':
     print("Endpoints (v2 — Enhanced):")
     print("  GET  /api/v2/options      - v2 dropdown options")
     print("  POST /api/v2/predict      - v2 prediction")
+    print("  GET  /api/v2/zip/<code>   - Zip code lookup")
     print("  GET  /api/v2/segment/<n>  - v2 segment stats")
     print()
 
