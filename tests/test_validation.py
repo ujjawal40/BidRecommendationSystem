@@ -325,5 +325,111 @@ class TestPredictionConfig:
         assert PREDICTION_CONFIG['band_ratio_high'] < PREDICTION_CONFIG['band_ratio_medium']
 
 
+class TestZipLookup:
+    """Tests for zip code demographics lookup."""
+
+    def test_zip_lookup_exists(self):
+        """Verify zip_demographics_lookup.json exists."""
+        from config.model_config import REPORTS_DIR
+        path = REPORTS_DIR / "zip_demographics_lookup.json"
+        assert path.exists(), f"Zip lookup not found: {path}"
+
+    def test_zip_lookup_structure(self):
+        """Verify zip lookup JSON has expected structure."""
+        import json
+        from config.model_config import REPORTS_DIR
+        with open(REPORTS_DIR / "zip_demographics_lookup.json") as f:
+            lookup = json.load(f)
+
+        assert len(lookup) > 1000, f"Expected > 1000 zips, got {len(lookup)}"
+
+        # All keys should be 5-digit strings
+        for zip_code in list(lookup.keys())[:100]:
+            assert len(zip_code) == 5, f"Zip should be 5 digits: {zip_code}"
+            assert zip_code.isdigit(), f"Zip should be numeric: {zip_code}"
+
+    def test_zip_entry_has_demographics(self):
+        """Verify each zip entry has expected demographic fields."""
+        import json
+        from config.model_config import REPORTS_DIR
+        with open(REPORTS_DIR / "zip_demographics_lookup.json") as f:
+            lookup = json.load(f)
+
+        required_fields = [
+            "Zip_Population", "Zip_PopDensity", "Zip_AverageHouseValue",
+            "Zip_MedianIncome", "Zip_NumberOfBusinesses",
+        ]
+        # Check first 50 entries
+        for zip_code in list(lookup.keys())[:50]:
+            entry = lookup[zip_code]
+            for field in required_fields:
+                assert field in entry, f"Zip {zip_code} missing {field}"
+                assert isinstance(entry[field], (int, float)), f"Zip {zip_code}.{field} should be numeric"
+
+    def test_zip_entry_has_state(self):
+        """Most zip entries should include a state."""
+        import json
+        from config.model_config import REPORTS_DIR
+        with open(REPORTS_DIR / "zip_demographics_lookup.json") as f:
+            lookup = json.load(f)
+
+        with_state = sum(1 for e in lookup.values() if e.get("state"))
+        pct = with_state / len(lookup)
+        assert pct > 0.9, f"Expected > 90% of zips with state, got {pct:.1%}"
+
+    def test_known_zip_returns_correct_state(self):
+        """Test that well-known zips map to correct states."""
+        import json
+        from config.model_config import REPORTS_DIR
+        with open(REPORTS_DIR / "zip_demographics_lookup.json") as f:
+            lookup = json.load(f)
+
+        known_zips = {
+            "10001": "New York",
+            "60601": "Illinois",
+            "90210": "California",
+        }
+        for zip_code, expected_state in known_zips.items():
+            if zip_code in lookup:
+                assert lookup[zip_code].get("state") == expected_state, \
+                    f"Zip {zip_code} should be {expected_state}, got {lookup[zip_code].get('state')}"
+
+
+class TestStateDistanceMiles:
+    """Tests for state_distance_miles in v2 stats."""
+
+    def test_state_distance_exists_in_v2_stats(self):
+        """Verify state_distance_miles key exists in v2 stats."""
+        import json
+        from config.model_config import REPORTS_DIR
+        with open(REPORTS_DIR / "api_precomputed_stats_v2.json") as f:
+            stats = json.load(f)
+
+        assert "state_distance_miles" in stats, "state_distance_miles missing from v2 stats"
+        assert len(stats["state_distance_miles"]) > 0, "state_distance_miles is empty"
+
+    def test_state_distance_values_reasonable(self):
+        """Verify distance values are reasonable (positive, < 1000 miles)."""
+        import json
+        from config.model_config import REPORTS_DIR
+        with open(REPORTS_DIR / "api_precomputed_stats_v2.json") as f:
+            stats = json.load(f)
+
+        for state, dist in stats["state_distance_miles"].items():
+            assert dist > 0, f"{state} has non-positive distance: {dist}"
+            assert dist < 1000, f"{state} has unreasonable distance: {dist}"
+
+    def test_major_states_have_distance(self):
+        """Major states should have distance data."""
+        import json
+        from config.model_config import REPORTS_DIR
+        with open(REPORTS_DIR / "api_precomputed_stats_v2.json") as f:
+            stats = json.load(f)
+
+        for state in ["Illinois", "California", "Texas", "New York", "Florida"]:
+            assert state in stats["state_distance_miles"], \
+                f"{state} missing from state_distance_miles"
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
