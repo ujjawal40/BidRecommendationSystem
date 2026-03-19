@@ -114,6 +114,28 @@ def generate_phase1a_stats():
         subtype_by_proptype[ptype] = subtypes.head(20).index.tolist()
     stats["subtypes_by_property_type"] = subtype_by_proptype
 
+    # State-level distance in miles (median JobDistanceMiles per state)
+    # JobDistanceMiles is categorical: "Less than 10 Miles", "10-29 Miles", etc.
+    # Convert to numeric midpoints first.
+    if "JobDistanceMiles" in df.columns:
+        dist_map = {
+            "Less than 10 Miles": 5.0,
+            "10-29 Miles": 20.0,
+            "30-59 Miles": 45.0,
+            "60-89 Miles": 75.0,
+            "90-119 Miles": 105.0,
+            "120-149 Miles": 135.0,
+            "150-299 Miles": 225.0,
+            "300-499 Miles": 400.0,
+            "500 Miles or More": 600.0,
+        }
+        dist = df["JobDistanceMiles"].map(dist_map)
+        dist_df = pd.DataFrame({"StateName": df["StateName"], "dist": dist})
+        dist_df = dist_df.dropna(subset=["dist", "StateName"])
+        state_dist = dist_df.groupby("StateName")["dist"].median()
+        stats["state_distance_miles"] = {k: round(v, 1) for k, v in state_dist.to_dict().items()}
+        print(f"  State distance: {len(stats['state_distance_miles'])} states")
+
     # Save
     output_path = REPORTS_DIR / "api_precomputed_stats_v2.json"
     with open(output_path, "w") as f:
