@@ -127,12 +127,14 @@ class EnhancedBidPredictor:
         self.win_prob_calibrator = None
         self.stats = {}
         self.feature_defaults = {}
+        self.zip_lookup = {}
         self.band_calculator = EmpiricalBandCalculator()
 
         self._load_models()
         self._load_stats()
         self._load_feature_defaults()
         self._load_empirical_bands()
+        self._load_zip_lookup()
 
     def _load_models(self):
         """Load v2 LightGBM models."""
@@ -191,6 +193,16 @@ class EnhancedBidPredictor:
         if path.exists():
             self.band_calculator.load_bands(path)
 
+    def _load_zip_lookup(self):
+        """Load zip code demographics lookup."""
+        path = REPORTS_DIR / "zip_demographics_lookup.json"
+        if path.exists():
+            with open(path, "r") as f:
+                self.zip_lookup = json.load(f)
+            print(f"[EnhancedPredictor] Zip lookup loaded: {len(self.zip_lookup):,} zip codes")
+        else:
+            print("[EnhancedPredictor] Zip lookup not found, using defaults")
+
     def _generate_features(
         self,
         business_segment: str,
@@ -204,10 +216,12 @@ class EnhancedBidPredictor:
         company_type: str = "Unknown",
         contact_type: str = "Unknown",
         ref_date: Optional[datetime] = None,
+        zip_code: Optional[str] = None,
     ) -> Dict[str, float]:
         """Generate feature vector for v2 model from user inputs."""
         features = {}
         s = self.stats
+        zip_data = self.zip_lookup.get(zip_code, {}) if zip_code else {}
 
         # Segment features
         features["segment_avg_fee"] = s["segment_avg_fee"].get(
@@ -283,9 +297,13 @@ class EnhancedBidPredictor:
         features["DayOfWeek_sin"] = np.sin(2 * np.pi * now.weekday() / 7)
         features["DayOfWeek_cos"] = np.cos(2 * np.pi * now.weekday() / 7)
 
-        # Geographic
-        features["RooftopLatitude"] = s.get("state_latitude", {}).get(property_state, 35.0)
-        features["RooftopLongitude"] = s.get("state_longitude", {}).get(property_state, -95.0)
+        # Geographic — prefer zip-level coordinates when available
+        if zip_data.get("latitude"):
+            features["RooftopLatitude"] = zip_data["latitude"]
+            features["RooftopLongitude"] = zip_data.get("longitude", -95.0)
+        else:
+            features["RooftopLatitude"] = s.get("state_latitude", {}).get(property_state, 35.0)
+            features["RooftopLongitude"] = s.get("state_longitude", {}).get(property_state, -95.0)
 
         # JobLength features (NEW in v2)
         jl = delivery_days if delivery_days and delivery_days > 0 else 30
@@ -303,7 +321,7 @@ class EnhancedBidPredictor:
         features["land_acres_log"] = 0
         features["YearBuilt"] = 2000
 
-        # Zip features (use medians)
+        # Zip features — use real demographics when zip_code is provided
         zip_defaults = {
             "Zip_Population": 3362, "Zip_PopDensity": 7282,
             "Zip_HouseholdsPerZip": 11901, "Zip_GrowthRank": 231200,
@@ -315,7 +333,7 @@ class EnhancedBidPredictor:
             "Zip_WorkersOutZip": 1671683,
         }
         for k, v in zip_defaults.items():
-            features[k] = v
+            features[k] = zip_data.get(k, v)
 
         features["income_x_segment_fee"] = features["Zip_IncomePerHousehold"] * features["segment_avg_fee"]
         features["pop_density_log"] = np.log1p(features["Zip_PopDensity"])
@@ -332,8 +350,11 @@ class EnhancedBidPredictor:
         features["TargetTime"] = target_time
         features["targettime_log"] = np.log1p(target_time)
 
-        # Distance: no ZIP code at inference — use state-level average or 25-mile fallback
-        dist_miles = s.get("state_distance_miles", {}).get(property_state, 25.0)
+        # Distance: prefer zip-level, then state-level, then 25-mile fallback
+        if zip_data.get("distance_miles"):
+            dist_miles = zip_data["distance_miles"]
+        else:
+            dist_miles = s.get("state_distance_miles", {}).get(property_state, 25.0)
         features["DistanceInMiles"] = dist_miles
         features["distance_log"] = np.log1p(dist_miles)
 
@@ -374,6 +395,7 @@ class EnhancedBidPredictor:
         company_type: str = "Unknown",
         contact_type: str = "Unknown",
         open_date: Optional[str] = None,
+        zip_code: Optional[str] = None,
     ) -> Dict[str, Any]:
         """Predict bid fee, win probability, and expected value."""
 
@@ -388,6 +410,20 @@ class EnhancedBidPredictor:
             except ValueError:
                 ref_date = None
 
+        # Clean and validate zip_code
+        zip_found = False
+        zip_derived_state = None
+        zip_state_mismatch = False
+        if zip_code:
+            zip_code = str(zip_code).strip()
+            zip_data = self.zip_lookup.get(zip_code, {})
+            zip_found = bool(zip_data)
+            if zip_found and zip_data.get("state"):
+                zip_derived_state = zip_data["state"]
+                # Auto-derive state if not provided or if user wants zip to drive it
+                if property_state and zip_derived_state != property_state:
+                    zip_state_mismatch = True
+
         features = self._generate_features(
             business_segment=business_segment,
             property_type=property_type,
@@ -400,6 +436,7 @@ class EnhancedBidPredictor:
             company_type=company_type,
             contact_type=contact_type,
             ref_date=ref_date,
+            zip_code=zip_code,
         )
 
         # Build feature vector in model order
@@ -584,7 +621,14 @@ class EnhancedBidPredictor:
                 "data_coverage": {
                     "segment_samples": seg_count,
                     "state_samples": state_count,
+                    "total_training_samples": sum(self.stats.get("segment_count", {}).values()),
                 },
+                "zip_info": {
+                    "zip_code": zip_code,
+                    "zip_found": zip_found,
+                    "zip_derived_state": zip_derived_state,
+                    "zip_state_mismatch": zip_state_mismatch,
+                } if zip_code else None,
             },
         }
 
