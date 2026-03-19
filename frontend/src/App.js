@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import Header from './components/Header';
 import BidForm from './components/BidForm';
 import ResultDisplay from './components/ResultDisplay';
-import { fetchV2Options, predictV2BidFee } from './services/api';
+import { fetchV2Options, predictV2BidFee, lookupZip } from './services/api';
 import './App.css';
 
 function App() {
@@ -29,7 +29,9 @@ function App() {
     sub_property_type: '',
     office_location: '',
     open_date: '',
+    zip_code: '',
   });
+  const [zipStatus, setZipStatus] = useState(null); // { found, state, loading }
 
   useEffect(() => { loadOptions(); }, []);
 
@@ -71,6 +73,23 @@ function App() {
       newData.sub_property_type = subtypesForProp[0] || '';
     }
 
+    // When zip code reaches 5 digits, auto-lookup state
+    if (name === 'zip_code') {
+      const cleaned = value.replace(/\D/g, '').slice(0, 5);
+      newData.zip_code = cleaned;
+      if (cleaned.length === 5) {
+        setZipStatus({ loading: true });
+        lookupZip(cleaned).then(data => {
+          setZipStatus({ found: data.found, state: data.state, loading: false });
+          if (data.found && data.state) {
+            setFormData(prev => ({ ...prev, property_state: data.state }));
+          }
+        }).catch(() => setZipStatus({ found: false, loading: false }));
+      } else {
+        setZipStatus(null);
+      }
+    }
+
     setFormData(newData);
   };
 
@@ -93,6 +112,7 @@ function App() {
       if (formData.sub_property_type) payload.sub_property_type = formData.sub_property_type;
       if (formData.office_location)    payload.office_location = formData.office_location;
       if (formData.open_date)          payload.open_date = formData.open_date;
+      if (formData.zip_code && formData.zip_code.length === 5) payload.zip_code = formData.zip_code;
 
       const result = await predictV2BidFee(payload);
       setPrediction(result);
@@ -142,6 +162,7 @@ function App() {
                 onSubmit={handleSubmit}
                 onReset={handleReset}
                 loading={predicting}
+                zipStatus={zipStatus}
               />
 
               {error && <div className="error-message">{error}</div>}

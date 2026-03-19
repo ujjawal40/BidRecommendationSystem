@@ -138,6 +138,25 @@ export async function predictV2BidFee(formData) {
 }
 
 /**
+ * Look up a zip code to get its state and validity
+ */
+export async function lookupZip(zipCode) {
+  const response = await fetch(`${API_BASE_URL}/v2/zip/${encodeURIComponent(zipCode)}`);
+
+  if (!response.ok) {
+    throw new Error('Failed to look up zip code');
+  }
+
+  const data = await response.json();
+
+  if (!data.success) {
+    throw new Error(data.error || 'Failed to look up zip code');
+  }
+
+  return data.data;
+}
+
+/**
  * Health check
  */
 export async function checkHealth() {
