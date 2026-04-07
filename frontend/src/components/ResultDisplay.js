@@ -338,48 +338,53 @@ function ResultDisplay({ prediction, formData }) {
           </span>
         </div>
 
-        {/* Three anchors */}
-        <div className="bid-anchors">
+        {/* Bid anchors — 2 columns when capped, 3 otherwise */}
+        <div className={recEqualsMax ? 'bid-anchors-two' : 'bid-anchors'}>
 
           <div className="anchor">
             <span className="anchor-tag">Floor</span>
             <span className="anchor-fee">${fmt(floorFee)}</span>
-            <p className="anchor-legend">
-              The lower boundary of what similar assignments in this market typically charge.
-              Bidding below this is unusual and may signal underpricing.
-            </p>
           </div>
 
-          <div className="anchor anchor-center">
-            <span
-              className={`anchor-tag ${evCapped ? 'anchor-tag-capped' : 'anchor-tag-rec'}`}
-              title={evCapped ? 'The EV-maximizing fee exceeds the 30% win threshold — capped at the highest fee with a viable shot at winning.' : undefined}
-            >
-              {evCapped ? 'Max Recommended' : 'Optimal Bid'}
-            </span>
-            <div className="anchor-rec-fee">
-              <span className="anchor-rec-currency">$</span>
-              <span className="anchor-rec-amount">{fmt(recFee)}</span>
+          {recEqualsMax ? (
+            <div className="anchor anchor-right">
+              <span
+                className={`anchor-tag ${evCapped ? 'anchor-tag-capped' : 'anchor-tag-rec'}`}
+              >
+                Recommended Bid
+              </span>
+              <div className="anchor-rec-fee" style={{ justifyContent: 'flex-end' }}>
+                <span className="anchor-rec-currency">$</span>
+                <span className="anchor-rec-amount">{fmt(recFee)}</span>
+              </div>
+              {evCapped && (
+                <span className="capped-badge">⚠ capped at 30% win floor</span>
+              )}
+              <span className="ceiling-subtitle">(at bid ceiling)</span>
             </div>
-            {evCapped && (
-              <span className="capped-badge">⚠ capped at 30% win floor</span>
-            )}
-            <p className="anchor-legend">
-              {evCapped
-                ? <>The true EV-maximizing fee falls above the Bid Ceiling. This is the <strong>highest fee with a viable shot at winning</strong> (≥ 30% odds).</>
-                : <>The fee most likely to maximize your earnings — it weighs both your chance of winning <em>and</em> the revenue when you do.</>
-              }
-            </p>
-          </div>
+          ) : (
+            <>
+              <div className="anchor anchor-center">
+                <span
+                  className={`anchor-tag ${evCapped ? 'anchor-tag-capped' : 'anchor-tag-rec'}`}
+                >
+                  Optimal Bid
+                </span>
+                <div className="anchor-rec-fee">
+                  <span className="anchor-rec-currency">$</span>
+                  <span className="anchor-rec-amount">{fmt(recFee)}</span>
+                </div>
+                {evCapped && (
+                  <span className="capped-badge">⚠ capped at 30% win floor</span>
+                )}
+              </div>
 
-          <div className="anchor anchor-right">
-            <span className="anchor-tag">Bid Ceiling</span>
-            <span className="anchor-fee">${fmt(maxFee)}</span>
-            <p className="anchor-legend">
-              The highest fee where you still have a reasonable shot at winning.
-              Above this, your odds drop below our 30% business threshold — a long shot.
-            </p>
-          </div>
+              <div className="anchor anchor-right">
+                <span className="anchor-tag">Bid Ceiling</span>
+                <span className="anchor-fee">${fmt(maxFee)}</span>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Static scale */}
@@ -429,13 +434,15 @@ function ResultDisplay({ prediction, formData }) {
       )}
 
       {/* ── Contextual insight card (client-side, always fresh) ── */}
-      <div className={`card result-insight signal-${ctxMsg.signal}`}>
-        <p className="insight-headline">{ctxMsg.headline}</p>
-        <p className="insight-body">{ctxMsg.body}</p>
-        {ctxMsg.tip && (
-          <p className="insight-tip">{ctxMsg.tip}</p>
-        )}
-      </div>
+      {!evCapped && (
+        <div className={`card result-insight signal-${ctxMsg.signal}`}>
+          <p className="insight-headline">{ctxMsg.headline}</p>
+          <p className="insight-body">{ctxMsg.body}</p>
+          {ctxMsg.tip && (
+            <p className="insight-tip">{ctxMsg.tip}</p>
+          )}
+        </div>
+      )}
 
       {/* ── Fee analysis chart (expandable) ── */}
       {curvePoints.length > 1 && (

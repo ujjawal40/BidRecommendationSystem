@@ -70,12 +70,26 @@
   font-weight: 400;
 }
 
-/* ── Three anchors grid ── */
+/* ── Anchors grid ── */
 .bid-anchors {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   gap: var(--s-lg);
   margin-bottom: var(--s-lg);
+}
+
+.bid-anchors-two {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s-lg);
+  margin-bottom: var(--s-lg);
+}
+
+.ceiling-subtitle {
+  font-size: var(--font-xs);
+  color: var(--text-muted);
+  opacity: 0.7;
+  margin-top: 2px;
 }
 
 .anchor {
@@ -150,15 +164,6 @@
   margin-bottom: 4px;
 }
 
-/* Legend text below each anchor */
-.anchor-legend {
-  font-size: var(--font-xs);
-  color: var(--text-muted);
-  line-height: 1.55;
-  margin: 0;
-}
-.anchor-legend strong { color: var(--text-secondary); font-weight: 600; }
-.anchor-legend em { font-style: normal; color: var(--text-secondary); }
 
 /* ── Range scale (static — not a slider) ── */
 .range-scale-wrap {
