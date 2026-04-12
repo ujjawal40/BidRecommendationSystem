@@ -116,6 +116,46 @@ LOCATION_TO_REGION = {
 }
 
 
+# ============================================================================
+# Heuristic win-probability fallback
+# ============================================================================
+# The v2 LightGBM classifier (AUC 0.948 on the test set) is saturated at
+# inference: raw output is pinned to 0.97-0.98 across a 10x fee range for every
+# realistic input, because gradient boosting latched onto categorical frequency
+# features (subtype_frequency, office_region_avg_fee) and essentially ignored
+# BidFee. Neither the price_ratio retraining (scripts/28) nor the fee_sensitive
+# v3 attempt (scripts/29, never ran) produced a model with real fee sensitivity.
+#
+# Until a retraining lands with demonstrable fee signal, inference uses a
+# heuristic sigmoid anchored to the blended market price when the model
+# saturates. Shape is calibrated to the empirically observed win-rate-by-fee
+# pattern recorded in session notes: Q1-Q3 bids (ratio ~0.7-1.2) win ~55% of
+# the time; Q4 bids (ratio >1.3) drop to ~32%.
+
+SATURATION_THRESHOLD = 0.93      # raw model output >= this => treat as saturated
+CURVE_FLAT_THRESHOLD_PP = 5.0    # curve-wide prob span < this => replace with heuristic
+
+
+def _heuristic_win_prob(fee: float, blended_market: float) -> float:
+    """
+    Heuristic P(Win) as a function of fee relative to blended market price.
+
+    Logistic curve with:
+      - inflection near the market benchmark (ratio = 1.0)
+      - asymptotes at ~80% (aggressive pricing) and ~22% (stretch pricing)
+    Calibrated to match session-note-recorded quartile win rates.
+    """
+    if blended_market is None or blended_market <= 0:
+        return 0.5
+    ratio = float(fee) / float(blended_market)
+    P_HIGH, P_LOW = 0.80, 0.22
+    k, r0 = 3.5, 1.0
+    z = max(-20.0, min(20.0, k * (ratio - r0)))   # overflow guard
+    p = P_LOW + (P_HIGH - P_LOW) / (1.0 + float(np.exp(z)))
+    return max(PREDICTION_CONFIG["win_prob_min"],
+               min(PREDICTION_CONFIG["win_prob_max"], p))
+
+
 class EnhancedBidPredictor:
     """v2 prediction service using JobsData-trained models."""
 
@@ -135,6 +175,7 @@ class EnhancedBidPredictor:
         self._load_feature_defaults()
         self._load_empirical_bands()
         self._load_zip_lookup()
+        self._run_startup_canary()
 
     def _load_models(self):
         """Load v2 LightGBM models."""
@@ -202,6 +243,56 @@ class EnhancedBidPredictor:
             print(f"[EnhancedPredictor] Zip lookup loaded: {len(self.zip_lookup):,} zip codes")
         else:
             print("[EnhancedPredictor] Zip lookup not found, using defaults")
+
+    def _run_startup_canary(self):
+        """Check if the win prob model is saturated on a canonical input.
+
+        Runs once at startup, calls the raw booster directly (not the heuristic-
+        wrapped _predict_win_probability) so that saturation detection works.
+        Prints a warning if active — purely informational, no error thrown.
+        """
+        if self.win_prob_model is None or self.win_prob_features is None:
+            return
+        try:
+            feats = self._generate_features(
+                business_segment="Financing",
+                property_type="Multifamily",
+                property_state="Illinois",
+                target_time=30,
+                delivery_days=30,
+            )
+            segment_avg = self.stats["segment_avg_fee"].get("Financing", 3000)
+            raws = []
+            for fee in (500, 3000, 10000):
+                f = dict(feats)
+                f["BidFee"] = fee
+                seg = f.get("segment_avg_fee", segment_avg) or segment_avg
+                st = f.get("state_avg_fee", segment_avg) or segment_avg
+                f["fee_vs_segment_ratio"]  = fee / seg if seg > 0 else 1.0
+                f["fee_diff_from_segment"] = fee - seg
+                f["bid_vs_state_ratio"]    = fee / st if st > 0 else 1.0
+                f["fee_percentile_segment"] = min(1.0, max(0.0, fee / (2 * seg)))
+                f["bid_vs_client_ratio"]   = f["fee_vs_segment_ratio"]
+                fv = []
+                for n in self.win_prob_features:
+                    if n in f:
+                        fv.append(f[n])
+                    elif n in self.feature_defaults:
+                        fv.append(self.feature_defaults[n].get("global_median", 0))
+                    else:
+                        fv.append(0)
+                raws.append(float(self.win_prob_model.predict(np.array([fv]))[0]))
+            span_pp = (max(raws) - min(raws)) * 100
+            if span_pp < 5.0 or min(raws) >= SATURATION_THRESHOLD:
+                print(
+                    f"[EnhancedPredictor] WARNING: win prob model is SATURATED "
+                    f"(raw span {span_pp:.1f}pp, min raw {min(raws):.3f}) — "
+                    f"heuristic fallback is ACTIVE for fee sensitivity"
+                )
+            else:
+                print(f"[EnhancedPredictor] Win prob canary OK ({span_pp:.1f}pp span)")
+        except Exception as e:
+            print(f"[EnhancedPredictor] Canary failed: {type(e).__name__}: {e}")
 
     def _generate_features(
         self,
@@ -501,9 +592,19 @@ class EnhancedBidPredictor:
         rank_label = {0: "low", 1: "medium", 2: "high"}
         confidence = rank_label[min(conf_rank[data_conf], conf_rank[band_conf])]
 
+        # Blended benchmark — computed here (before win prob / curve) so both
+        # can use it as the heuristic anchor when the model is saturated.
+        blended = (
+            0.4 * features["segment_avg_fee"]
+            + 0.3 * features["state_avg_fee"]
+            + 0.3 * features["propertytype_avg_fee"]
+        )
+
         # Win probability
         features["BidFee"] = prediction
-        win_prob_result = self._predict_win_probability(features, prediction, segment_avg)
+        win_prob_result = self._predict_win_probability(
+            features, prediction, segment_avg, blended_market=blended
+        )
 
         # Expected value
         expected_value = win_prob_result["probability"] * prediction
@@ -513,13 +614,7 @@ class EnhancedBidPredictor:
             features=features,
             recommended_fee=prediction,
             segment_avg=segment_avg,
-        )
-
-        # Blended benchmark
-        blended = (
-            0.4 * features["segment_avg_fee"]
-            + 0.3 * features["state_avg_fee"]
-            + 0.3 * features["propertytype_avg_fee"]
+            blended_market=blended,
         )
 
         diff_pct = ((prediction - blended) / blended) * 100
@@ -633,25 +728,34 @@ class EnhancedBidPredictor:
         }
 
     def _predict_win_probability(
-        self, features: Dict, predicted_fee: float, segment_benchmark: float
+        self, features: Dict, predicted_fee: float, segment_benchmark: float,
+        blended_market: float = None,
     ) -> Dict[str, Any]:
-        """Predict win probability using v2 classification model."""
+        """Predict win probability using v2 classification model.
+
+        When the model's raw output is saturated (>= SATURATION_THRESHOLD),
+        falls back to a heuristic sigmoid anchored on blended market price
+        so that win probability actually varies with fee.
+        """
         if self.win_prob_model is None:
             return self._fallback_win_probability(predicted_fee, segment_benchmark)
 
-        # Compute fee-relative features here — BidFee is known at this point
+        # Compute blended_market fallback when caller doesn't provide it
+        if blended_market is None:
+            seg = features.get("segment_avg_fee", segment_benchmark) or segment_benchmark
+            state = features.get("state_avg_fee", segment_benchmark) or segment_benchmark
+            prop = features.get("propertytype_avg_fee", segment_benchmark) or segment_benchmark
+            blended_market = 0.4 * seg + 0.3 * state + 0.3 * prop
+
+        # Compute fee-relative features — BidFee is known at this point
         # but was not available when _generate_features() ran.
-        # Defaulting these to 0 tells the model "fee is at zero relative to market"
-        # which pushes win probability to ~98% for every prediction.
         seg_avg  = features.get("segment_avg_fee", segment_benchmark) or segment_benchmark
         state_avg = features.get("state_avg_fee", segment_benchmark) or segment_benchmark
         fee = features.get("BidFee", predicted_fee) or predicted_fee
         features["fee_vs_segment_ratio"]  = fee / seg_avg if seg_avg > 0 else 1.0
         features["fee_diff_from_segment"] = fee - seg_avg
         features["bid_vs_state_ratio"]    = fee / state_avg if state_avg > 0 else 1.0
-        # fee_percentile_segment: approximate as ratio clamped 0-1
         features["fee_percentile_segment"] = min(1.0, max(0.0, fee / (2 * seg_avg)))
-        # bid_vs_client_ratio: no client history available at inference → use segment ratio
         features["bid_vs_client_ratio"] = features["fee_vs_segment_ratio"]
 
         feature_vector = []
@@ -665,6 +769,26 @@ class EnhancedBidPredictor:
 
         X = np.array([feature_vector])
         raw_probability = float(self.win_prob_model.predict(X)[0])
+
+        # --- Saturation check ---
+        # If the raw model output is saturated (>= SATURATION_THRESHOLD), the
+        # classifier has no meaningful fee discrimination for this input. Fall back
+        # to the heuristic sigmoid so win probability actually responds to fee.
+        if raw_probability >= SATURATION_THRESHOLD:
+            probability = _heuristic_win_prob(fee, blended_market)
+            dist = abs(probability - 0.5)
+            if dist > 0.3:
+                win_conf = "high"
+            elif dist > 0.15:
+                win_conf = "medium"
+            else:
+                win_conf = "low"
+            return {
+                "probability": round(probability, 4),
+                "probability_pct": round(probability * 100, 1),
+                "confidence": win_conf,
+                "model_used": "Heuristic (v2 classifier saturated)",
+            }
 
         # Apply isotonic calibration if available.
         # Wrapped in try/except: calibrator was saved under sklearn 1.3.0 but may be
@@ -714,8 +838,21 @@ class EnhancedBidPredictor:
         recommended_fee: float,
         segment_avg: float,
         num_points: int = 20,
+        blended_market: float = None,
     ) -> Dict[str, Any]:
-        """Generate P(Win) across a range of fee levels."""
+        """Generate P(Win) across a range of fee levels.
+
+        If the model-based curve is effectively flat (< CURVE_FLAT_THRESHOLD_PP
+        spread), replaces the entire curve with a heuristic sigmoid anchored on
+        blended_market. This prevents the EV optimizer from blindly selecting the
+        highest fee in the sweep.
+        """
+        if blended_market is None:
+            seg = features.get("segment_avg_fee", segment_avg) or segment_avg
+            state = features.get("state_avg_fee", segment_avg) or segment_avg
+            prop = features.get("propertytype_avg_fee", segment_avg) or segment_avg
+            blended_market = 0.4 * seg + 0.3 * state + 0.3 * prop
+
         fee_low = max(500, recommended_fee * 0.40)
         fee_high = recommended_fee * 2.0
 
@@ -729,13 +866,29 @@ class EnhancedBidPredictor:
             features_copy["BidFee"] = float(fee)
 
             wp_result = self._predict_win_probability(
-                features_copy, float(fee), segment_avg
+                features_copy, float(fee), segment_avg, blended_market=blended_market
             )
 
             curve_points.append({
                 "fee": round(float(fee), 0),
                 "win_probability": round(wp_result["probability"] * 100, 1),
             })
+
+        # Safety net: if the curve is still flat (possible if individual points
+        # fell just below SATURATION_THRESHOLD so the per-point heuristic didn't
+        # kick in, but variation is negligible), force-replace with the heuristic.
+        probs = [p["win_probability"] for p in curve_points]
+        prob_range = max(probs) - min(probs) if probs else 0.0
+        if prob_range < CURVE_FLAT_THRESHOLD_PP:
+            curve_points = [
+                {
+                    "fee": p["fee"],
+                    "win_probability": round(
+                        _heuristic_win_prob(p["fee"], blended_market) * 100, 1
+                    ),
+                }
+                for p in curve_points
+            ]
 
         return {
             "curve_points": curve_points,
