@@ -549,7 +549,7 @@
 }
 .rush-icon  { font-size: 1.1rem; flex-shrink: 0; line-height: 1.5; }
 .rush-title { font-size: var(--font-sm); font-weight: 700; color: #fcd34d; margin-bottom: 2px; }
-.rush-body  { font-size: var(--font-sm); color: #a16207; margin: 0; }
+.rush-body  { font-size: var(--font-sm); color: var(--text-muted); margin: 0; }
 
 /* ── Recommendation ── */
 .result-recommendation {
