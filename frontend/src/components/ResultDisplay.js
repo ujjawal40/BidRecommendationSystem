@@ -263,6 +263,7 @@ function ResultDisplay({ prediction, formData }) {
 
   const [showDetails, setShowDetails] = useState(false);
   const [showChart,   setShowChart]   = useState(false);
+  const [whatIfFee,   setWhatIfFee]   = useState('');
 
   const curvePoints = fee_curve?.curve_points || [];
 
@@ -423,6 +424,48 @@ function ResultDisplay({ prediction, formData }) {
         </div>
 
       </div>
+
+      {/* ── What-if quick input ── */}
+      {curvePoints.length > 1 && (
+        <div className="card what-if-card">
+          <div className="what-if-row">
+            <label className="what-if-label" htmlFor="what-if-fee">What if I bid</label>
+            <div className="what-if-input-wrap">
+              <span className="what-if-dollar">$</span>
+              <input
+                id="what-if-fee"
+                type="number"
+                className="what-if-input"
+                placeholder={fmt(recFee)}
+                value={whatIfFee}
+                onChange={e => setWhatIfFee(e.target.value)}
+                min={0}
+                step={50}
+              />
+            </div>
+            {whatIfFee && Number(whatIfFee) > 0 && (() => {
+              const wf = Number(whatIfFee);
+              const wp = Math.round(interpolateWinProb(wf, curvePoints) ?? 50);
+              const ev = Math.round((wp / 100) * wf);
+              const evDelta = ev - evAtRec;
+              return (
+                <div className="what-if-result">
+                  <span className="what-if-prob" style={{ color: winColor(wp) }}>{wp}%</span>
+                  <span className="what-if-detail">
+                    win · EV ${fmt(ev)}
+                    <span className={`what-if-delta ${evDelta >= 0 ? 'positive' : 'negative'}`}>
+                      {evDelta >= 0 ? '+' : ''}{fmt(evDelta)} EV
+                    </span>
+                  </span>
+                </div>
+              );
+            })()}
+          </div>
+          {whatIfFee && Number(whatIfFee) > 0 && Number(whatIfFee) > maxFee && (
+            <p className="what-if-warn">Above bid ceiling — win odds drop below 30%</p>
+          )}
+        </div>
+      )}
 
       {/* ── Flat curve note ── */}
       {isFlatCurve && !evCapped && (
