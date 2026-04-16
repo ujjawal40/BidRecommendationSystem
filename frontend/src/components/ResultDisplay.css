@@ -437,12 +437,17 @@
   font-size: var(--font-sm);
   font-weight: 500;
   cursor: pointer;
-  padding: var(--s-xs) 0;
+  padding: var(--s-sm) var(--s-md);
   text-align: left;
-  transition: color var(--ease-fast);
+  transition: color var(--ease-fast), background var(--ease-fast);
   letter-spacing: 0.01em;
+  border-radius: var(--r-md);
+  width: 100%;
 }
-.chart-toggle:hover { color: var(--accent-dark); }
+.chart-toggle:hover {
+  color: var(--accent-dark);
+  background: rgba(59, 130, 246, 0.06);
+}
 
 .chart-card { padding: var(--s-lg); }
 
@@ -765,12 +770,17 @@
   font-size: var(--font-sm);
   font-weight: 500;
   cursor: pointer;
-  padding: var(--s-xs) 0;
+  padding: var(--s-sm) var(--s-md);
   text-align: left;
-  transition: color var(--ease-fast);
+  transition: color var(--ease-fast), background var(--ease-fast);
   letter-spacing: 0.01em;
+  border-radius: var(--r-md);
+  width: 100%;
 }
-.details-toggle:hover { color: var(--text-secondary); }
+.details-toggle:hover {
+  color: var(--text-secondary);
+  background: rgba(148, 163, 184, 0.06);
+}
 
 .result-details { display: flex; flex-direction: column; gap: var(--s-sm); }
 
