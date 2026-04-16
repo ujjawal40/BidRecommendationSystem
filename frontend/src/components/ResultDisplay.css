@@ -592,37 +592,51 @@
 /* ── Market context ── */
 .result-context { padding: var(--s-md) var(--s-lg); }
 
-.context-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: var(--s-sm);
+.context-top {
+  margin-bottom: var(--s-sm);
 }
 
 .context-segment {
-  font-size: var(--font-sm);
-  font-weight: 600;
-  color: var(--text-secondary);
+  font-size: var(--font-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
 }
 
-.context-right {
-  display: flex;
-  align-items: center;
+.context-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: var(--s-md);
 }
 
-.context-bench { font-size: var(--font-sm); color: var(--text-muted); }
+.context-metric {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.context-metric-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  opacity: 0.7;
+}
+
+.context-metric-value {
+  font-size: var(--font-base);
+  font-weight: 700;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
 
 .context-diff {
-  font-size: var(--font-xs);
-  font-weight: 700;
-  padding: 3px 10px;
-  border-radius: var(--r-pill);
-  letter-spacing: 0.04em;
+  font-weight: 800;
 }
-.context-diff.above { background: rgba(245, 158, 11, 0.10); color: #fcd34d; }
-.context-diff.below { background: rgba(59, 130, 246, 0.10); color: var(--accent-dark); }
+.context-diff.above { color: #fcd34d; }
+.context-diff.below { color: var(--accent-dark); }
 
 /* ── Rush callout ── */
 .result-rush {

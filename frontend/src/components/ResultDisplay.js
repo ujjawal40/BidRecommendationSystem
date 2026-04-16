@@ -510,20 +510,28 @@ function ResultDisplay({ prediction, formData }) {
 
       {/* ── Market context ── */}
       <div className="card result-context">
-        <div className="context-row">
+        <div className="context-top">
           <span className="context-segment">
             {formData.business_segment} · {formData.property_state}
             {formData.zip_code && formData.zip_code.length === 5 && (
               <span className="context-zip"> · ZIP {formData.zip_code}</span>
             )}
           </span>
-          <div className="context-right">
-            <span className="context-bench">
-              {formData.business_segment} avg ${fmt(segment_benchmark)}
+        </div>
+        <div className="context-metrics">
+          <div className="context-metric">
+            <span className="context-metric-label">Segment avg</span>
+            <span className="context-metric-value">${fmt(segment_benchmark)}</span>
+          </div>
+          <div className="context-metric">
+            <span className="context-metric-label">Your bid vs segment</span>
+            <span className={`context-metric-value context-diff ${vsMarket >= 0 ? 'above' : 'below'}`}>
+              {vsMarketStr}
             </span>
-            <span className={`context-diff ${vsMarket >= 0 ? 'above' : 'below'}`}>
-              {vsMarketStr} vs segment
-            </span>
+          </div>
+          <div className="context-metric">
+            <span className="context-metric-label">Floor–Ceiling spread</span>
+            <span className="context-metric-value">${fmt(maxFee - floorFee)}</span>
           </div>
         </div>
       </div>
