@@ -19,11 +19,12 @@
   background: rgba(245, 158, 11, 0.08);
   border: 1px solid rgba(245, 158, 11, 0.2);
   border-radius: var(--r-lg);
-  padding: var(--s-md);
+  padding: var(--s-md) var(--s-lg);
   font-size: var(--font-sm);
   color: #fcd34d;
+  line-height: 1.5;
 }
-.warning-icon { font-size: 1rem; line-height: 1.5; flex-shrink: 0; }
+.warning-icon { font-size: 1rem; line-height: 1.4; flex-shrink: 0; margin-top: 1px; }
 
 /* ── Hero card ── */
 .result-hero { padding: var(--s-xl); }
