@@ -399,7 +399,7 @@ function ResultDisplay({ prediction, formData }) {
             <span className="scale-label-left">Floor</span>
             <span className="scale-label-right">Ceiling</span>
           </div>
-          <p className="band-note">80% of similar bids in this segment fall within this range (Floor to Ceiling)</p>
+          <p className="band-note">The defensible pricing range based on historical outcomes in this segment</p>
         </div>
 
         {/* Win probability */}
