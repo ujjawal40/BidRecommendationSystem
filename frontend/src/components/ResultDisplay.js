@@ -145,8 +145,8 @@ function FeeChart({ curvePoints, recFee, maxFee, floorFee, evCapped }) {
   const chartColor   = winColor(chartWinProb);
 
   // SVG dimensions
-  const W = 560, H = 170;
-  const PAD = { top: 14, right: 16, bottom: 28, left: 36 };
+  const W = 560, H = 182;
+  const PAD = { top: 14, right: 16, bottom: 40, left: 36 };
   const cW = W - PAD.left - PAD.right;
   const cH = H - PAD.top  - PAD.bottom;
 
@@ -205,14 +205,22 @@ function FeeChart({ curvePoints, recFee, maxFee, floorFee, evCapped }) {
         <circle cx={selX} cy={selY} r="5" fill={chartColor} stroke="#0c111d" strokeWidth="2" />
 
         {/* X-axis labels */}
-        <text x={floorX} y={H - 6} fill="#475569" fontSize="9" textAnchor="middle"
+        <text x={floorX} y={H - 14} fill="#475569" fontSize="9" textAnchor="middle"
           fontFamily="Inter, sans-serif">Floor</text>
-        <text x={recX} y={H - 6} fill="#60a5fa" fontSize="9" textAnchor="middle"
+        <text x={floorX} y={H - 4} fill="#64748b" fontSize="8" textAnchor="middle"
+          fontFamily="Inter, sans-serif">${fmt(floorFee)}</text>
+
+        <text x={recX} y={H - 14} fill="#60a5fa" fontSize="9" textAnchor="middle"
           fontFamily="Inter, sans-serif">{evCapped ? 'Max Rec.' : 'Optimal'}</text>
-        {Math.abs(recX - maxX) > 30 && (
-          <text x={maxX} y={H - 6} fill="#475569" fontSize="9" textAnchor="middle"
+        <text x={recX} y={H - 4} fill="#60a5fa" fontSize="8" textAnchor="middle"
+          fontFamily="Inter, sans-serif">${fmt(recFee)}</text>
+
+        {Math.abs(recX - maxX) > 30 && (<>
+          <text x={maxX} y={H - 14} fill="#475569" fontSize="9" textAnchor="middle"
             fontFamily="Inter, sans-serif">Ceiling</text>
-        )}
+          <text x={maxX} y={H - 4} fill="#64748b" fontSize="8" textAnchor="middle"
+            fontFamily="Inter, sans-serif">${fmt(maxFee)}</text>
+        </>)}
       </svg>
 
       {/* Slider */}
