@@ -392,7 +392,7 @@
 
 .chart-card { padding: var(--s-lg); }
 
-.fee-chart { display: flex; flex-direction: column; gap: var(--s-sm); }
+.fee-chart { display: flex; flex-direction: column; gap: var(--s-sm); touch-action: pan-y; }
 
 .fee-chart-title {
   font-size: var(--font-xs);
@@ -485,6 +485,18 @@
   border: 1px solid rgba(244, 63, 94, 0.2);
   padding: 2px 8px;
   border-radius: var(--r-pill);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 640px) {
+  .bid-anchors { grid-template-columns: 1fr 1fr 1fr; gap: var(--s-sm); }
+  .anchor-rec-amount { font-size: var(--font-3xl); }
+  .context-metrics { grid-template-columns: repeat(3, 1fr); gap: var(--s-sm); }
+  .context-metric-value { font-size: var(--font-sm); }
+  .what-if-row { flex-direction: column; align-items: flex-start; gap: var(--s-sm); }
+  .what-if-result { padding-left: 0; }
+  .chart-stats { font-size: var(--font-xs); }
+  .chart-fee { font-size: var(--font-base); }
 }
 
 /* ── What-if input ── */
