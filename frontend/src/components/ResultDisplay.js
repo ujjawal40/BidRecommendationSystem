@@ -35,7 +35,7 @@ function winColor(pct) {
 
 // ── Client-side contextual message ──────────────────────────────────────────
 
-function buildContextMessage({ recFee, maxFee, winProbPct, confidence, segment, evCapped, isFlatCurve, segBenchmark }) {
+function buildContextMessage({ recFee, maxFee, floorFee, winProbPct, confidence, segment, evCapped, isFlatCurve, segBenchmark }) {
   const aboveBench = recFee > segBenchmark;
   const diffPct    = Math.abs(((recFee - segBenchmark) / segBenchmark) * 100).toFixed(0);
 
@@ -122,7 +122,7 @@ function buildContextMessage({ recFee, maxFee, winProbPct, confidence, segment, 
           `putting you ${aboveBench ? `${diffPct}% above` : `${diffPct}% below`} that benchmark.`,
     tip: winProbPct < 40
       ? `Win odds are modest — if this client is price-sensitive, consider whether sliding closer to the ` +
-        `floor ($${fmt(maxFee > segBenchmark ? segBenchmark : maxFee)}) would meaningfully improve your chances.`
+        `floor ($${fmt(recFee > floorFee ? floorFee : recFee)}) would meaningfully improve your chances.`
       : null,
     signal: 'neutral',
   };
@@ -301,6 +301,7 @@ function ResultDisplay({ prediction, formData }) {
   const ctxMsg = buildContextMessage({
     recFee,
     maxFee,
+    floorFee,
     winProbPct,
     confidence: confidence_level,
     segment:    formData.business_segment,
