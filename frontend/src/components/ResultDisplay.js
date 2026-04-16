@@ -22,9 +22,8 @@ function interpolateWinProb(fee, curvePoints) {
 }
 
 function winLabel(pct) {
-  if (pct >= 65) return 'Strong chance of winning';
-  if (pct >= 45) return 'Solid chance of winning';
-  if (pct >= 30) return 'Moderate chance of winning';
+  if (pct >= 55) return 'Strong chance of winning';
+  if (pct >= 35) return 'Moderate chance of winning';
   return 'Low chance of winning';
 }
 
@@ -36,7 +35,7 @@ function winColor(pct) {
 
 // ── Client-side contextual message ──────────────────────────────────────────
 
-function buildContextMessage({ recFee, maxFee, winProbPct, confidence, segment, evCapped, isFlatCurve, segBenchmark }) {
+function buildContextMessage({ recFee, maxFee, floorFee, winProbPct, confidence, segment, evCapped, isFlatCurve, segBenchmark }) {
   const aboveBench = recFee > segBenchmark;
   const diffPct    = Math.abs(((recFee - segBenchmark) / segBenchmark) * 100).toFixed(0);
 
@@ -123,7 +122,7 @@ function buildContextMessage({ recFee, maxFee, winProbPct, confidence, segment, 
           `putting you ${aboveBench ? `${diffPct}% above` : `${diffPct}% below`} that benchmark.`,
     tip: winProbPct < 40
       ? `Win odds are modest — if this client is price-sensitive, consider whether sliding closer to the ` +
-        `floor ($${fmt(maxFee > segBenchmark ? segBenchmark : maxFee)}) would meaningfully improve your chances.`
+        `floor ($${fmt(recFee > floorFee ? floorFee : recFee)}) would meaningfully improve your chances.`
       : null,
     signal: 'neutral',
   };
@@ -139,13 +138,15 @@ function FeeChart({ curvePoints, recFee, maxFee, floorFee, evCapped }) {
 
   const minFee     = pts[0].fee;
   const maxCurFee  = pts[pts.length - 1].fee;
+  const feeRange   = maxCurFee - minFee;
+  const sliderStep = feeRange < 1000 ? 10 : feeRange < 3000 ? 25 : 50;
   const chartWinProb = Math.round(interpolateWinProb(chartFee, pts) ?? 50);
   const chartEV      = Math.round((chartWinProb / 100) * chartFee);
   const chartColor   = winColor(chartWinProb);
 
   // SVG dimensions
-  const W = 560, H = 170;
-  const PAD = { top: 14, right: 16, bottom: 28, left: 36 };
+  const W = 560, H = 182;
+  const PAD = { top: 14, right: 16, bottom: 40, left: 36 };
   const cW = W - PAD.left - PAD.right;
   const cH = H - PAD.top  - PAD.bottom;
 
@@ -181,7 +182,7 @@ function FeeChart({ curvePoints, recFee, maxFee, floorFee, evCapped }) {
         {[0, 25, 50, 75, 100].map(v => (
           <g key={v}>
             <line x1={PAD.left} y1={yS(v)} x2={PAD.left + cW} y2={yS(v)}
-              stroke="rgba(148,163,184,0.06)" strokeWidth="1" />
+              stroke="rgba(148,163,184,0.10)" strokeWidth="1" />
             <text x={PAD.left - 4} y={yS(v) + 3.5} fill="#475569" fontSize="9"
               textAnchor="end" fontFamily="Inter, sans-serif">{v}%</text>
           </g>
@@ -189,9 +190,13 @@ function FeeChart({ curvePoints, recFee, maxFee, floorFee, evCapped }) {
 
         {/* Floor, Ceiling vertical markers */}
         <line x1={floorX} y1={PAD.top} x2={floorX} y2={PAD.top + cH}
-          stroke="rgba(148,163,184,0.2)" strokeWidth="1" strokeDasharray="3,3" />
+          stroke="rgba(148,163,184,0.25)" strokeWidth="1" strokeDasharray="3,3" />
         <line x1={maxX} y1={PAD.top} x2={maxX} y2={PAD.top + cH}
-          stroke="rgba(59,130,246,0.25)" strokeWidth="1" strokeDasharray="3,3" />
+          stroke="rgba(59,130,246,0.3)" strokeWidth="1" strokeDasharray="3,3" />
+
+        {/* Shaded viable region between floor and ceiling */}
+        <rect x={floorX} y={PAD.top} width={Math.max(0, maxX - floorX)} height={cH}
+          fill="rgba(59,130,246,0.03)" />
 
         {/* Curve */}
         <path d={pathD} fill="none" stroke="#3b82f6" strokeWidth="1.5" strokeLinejoin="round" />
@@ -204,14 +209,22 @@ function FeeChart({ curvePoints, recFee, maxFee, floorFee, evCapped }) {
         <circle cx={selX} cy={selY} r="5" fill={chartColor} stroke="#0c111d" strokeWidth="2" />
 
         {/* X-axis labels */}
-        <text x={floorX} y={H - 6} fill="#475569" fontSize="9" textAnchor="middle"
+        <text x={floorX} y={H - 14} fill="#475569" fontSize="9" textAnchor="middle"
           fontFamily="Inter, sans-serif">Floor</text>
-        <text x={recX} y={H - 6} fill="#60a5fa" fontSize="9" textAnchor="middle"
+        <text x={floorX} y={H - 4} fill="#64748b" fontSize="8" textAnchor="middle"
+          fontFamily="Inter, sans-serif">${fmt(floorFee)}</text>
+
+        <text x={recX} y={H - 14} fill="#60a5fa" fontSize="9" textAnchor="middle"
           fontFamily="Inter, sans-serif">{evCapped ? 'Max Rec.' : 'Optimal'}</text>
-        {Math.abs(recX - maxX) > 30 && (
-          <text x={maxX} y={H - 6} fill="#475569" fontSize="9" textAnchor="middle"
+        <text x={recX} y={H - 4} fill="#60a5fa" fontSize="8" textAnchor="middle"
+          fontFamily="Inter, sans-serif">${fmt(recFee)}</text>
+
+        {Math.abs(recX - maxX) > 30 && (<>
+          <text x={maxX} y={H - 14} fill="#475569" fontSize="9" textAnchor="middle"
             fontFamily="Inter, sans-serif">Ceiling</text>
-        )}
+          <text x={maxX} y={H - 4} fill="#64748b" fontSize="8" textAnchor="middle"
+            fontFamily="Inter, sans-serif">${fmt(maxFee)}</text>
+        </>)}
       </svg>
 
       {/* Slider */}
@@ -221,9 +234,11 @@ function FeeChart({ curvePoints, recFee, maxFee, floorFee, evCapped }) {
           className="chart-slider"
           min={minFee}
           max={maxCurFee}
-          step={50}
+          step={sliderStep}
           value={chartFee}
           onChange={e => setChartFee(Number(e.target.value))}
+          aria-label="Explore fee vs. win probability"
+          aria-valuetext={`$${fmt(chartFee)} fee, ${chartWinProb}% win probability`}
         />
       </div>
 
@@ -263,7 +278,9 @@ function ResultDisplay({ prediction, formData }) {
   } = prediction;
 
   const [showDetails, setShowDetails] = useState(false);
-  const [showChart,   setShowChart]   = useState(false);
+  const [showChart,   setShowChart]   = useState(true);
+  const [whatIfFee,   setWhatIfFee]   = useState('');
+  const [copied,      setCopied]      = useState(false);
 
   const curvePoints = fee_curve?.curve_points || [];
 
@@ -302,6 +319,7 @@ function ResultDisplay({ prediction, formData }) {
   const ctxMsg = buildContextMessage({
     recFee,
     maxFee,
+    floorFee,
     winProbPct,
     confidence: confidence_level,
     segment:    formData.business_segment,
@@ -309,6 +327,13 @@ function ResultDisplay({ prediction, formData }) {
     isFlatCurve,
     segBenchmark: segment_benchmark,
   });
+
+  // Bid quality summary
+  const bidQuality = (() => {
+    if (winProbPct >= 55 && confidence_level !== 'low') return { label: 'Good bid', cls: 'quality-good' };
+    if (winProbPct >= 35 || (winProbPct >= 30 && confidence_level === 'high')) return { label: 'Fair bid', cls: 'quality-fair' };
+    return { label: 'Risky bid', cls: 'quality-risky' };
+  })();
 
   return (
     <div className="result-display">
@@ -325,11 +350,16 @@ function ResultDisplay({ prediction, formData }) {
       <div className="card result-hero">
 
         <div className="bid-range-header">
-          <span className="bid-range-label">Bid Range</span>
+          <div className="bid-range-left">
+            <span className="bid-range-label">Bid Range</span>
+            <span className={`quality-badge ${bidQuality.cls}`}>{bidQuality.label}</span>
+          </div>
           <span className={`confidence-pill confidence-${confidence_level}`} title={
-            metadata?.data_coverage
-              ? `${fmt(metadata.data_coverage.segment_samples)} segment + ${fmt(metadata.data_coverage.state_samples)} state samples`
-              : undefined
+            confidence_level === 'high'
+              ? `Based on ${fmt(metadata?.data_coverage?.segment_samples || 0)} similar bids — estimate is narrow and reliable`
+              : confidence_level === 'medium'
+              ? `Moderate data for this combination — estimate is directional but range is wider`
+              : `Sparse data for this exact combination — treat as a rough guide, cross-reference with experience`
           }>
             {confidence_level} confidence
             {metadata?.data_coverage?.segment_samples && (
@@ -353,9 +383,12 @@ function ResultDisplay({ prediction, formData }) {
               >
                 Recommended Bid
               </span>
-              <div className="anchor-rec-fee" style={{ justifyContent: 'flex-end' }}>
+              <div className="anchor-rec-fee" style={{ justifyContent: 'flex-end', cursor: 'pointer' }}
+                title="Click to copy"
+                onClick={() => { navigator.clipboard.writeText(Math.round(recFee).toString()); setCopied(true); setTimeout(() => setCopied(false), 1500); }}>
                 <span className="anchor-rec-currency">$</span>
                 <span className="anchor-rec-amount">{fmt(recFee)}</span>
+                {copied && <span className="copied-badge">Copied</span>}
               </div>
               {evCapped && (
                 <span className="capped-badge">⚠ capped at 30% win floor</span>
@@ -370,9 +403,13 @@ function ResultDisplay({ prediction, formData }) {
                 >
                   Optimal Bid
                 </span>
-                <div className="anchor-rec-fee">
+                <div className="anchor-rec-fee"
+                  title="Click to copy"
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => { navigator.clipboard.writeText(Math.round(recFee).toString()); setCopied(true); setTimeout(() => setCopied(false), 1500); }}>
                   <span className="anchor-rec-currency">$</span>
                   <span className="anchor-rec-amount">{fmt(recFee)}</span>
+                  {copied && <span className="copied-badge">Copied</span>}
                 </div>
                 {evCapped && (
                   <span className="capped-badge">⚠ capped at 30% win floor</span>
@@ -400,26 +437,84 @@ function ResultDisplay({ prediction, formData }) {
             <span className="scale-label-left">Floor</span>
             <span className="scale-label-right">Ceiling</span>
           </div>
-          <p className="band-note">80% of similar bids in this segment fall within this range (Floor to Ceiling)</p>
+          <p className="band-note">The defensible pricing range based on historical outcomes in this segment</p>
         </div>
 
         {/* Win probability */}
         <div className="win-section">
+          <span className="win-section-label">Win Probability</span>
           <div className="win-row">
             <span className="win-pct" style={{ color: wpColor }}>
               {winProbPct}<span className="win-pct-sym">%</span>
             </span>
             <div className="win-meta">
               <span className="win-label" style={{ color: wpColor }}>{winLabel(winProbPct)}</span>
-              <span className="win-ev">EV · ${fmt(evAtRec)} at {evCapped ? 'max recommended' : 'optimal bid'}</span>
+              <span className="win-ev" title="Expected Value = P(Win) × Fee — your average earnings per bid at this price">
+                EV · ${fmt(evAtRec)} at {evCapped ? 'max recommended' : 'optimal bid'}
+                <span className="ev-help">?</span>
+              </span>
             </div>
           </div>
           <div className="win-bar-track">
             <div className="win-bar-fill" style={{ width: `${winProbPct}%`, background: wpColor }} />
           </div>
+          <p className="win-interpretation">
+            {winProbPct >= 55
+              ? `If you bid $${fmt(recFee)} on 10 similar jobs, you'd expect to win about ${Math.round(winProbPct / 10)} of them.`
+              : winProbPct >= 35
+              ? `About ${Math.round(winProbPct / 10)} in 10 similar bids would be won at this price — non-price factors will tip the balance.`
+              : `At this price you'd win roughly ${Math.round(winProbPct / 10)} in 10 similar bids — relationships and expertise will matter more than price.`}
+          </p>
+          {win_probability?.model_used && win_probability.model_used.includes('Heuristic') && (
+            <span className="model-source-badge" title="The ML model is being supplemented by a calibrated heuristic for fee-sensitivity">
+              Heuristic estimate
+            </span>
+          )}
         </div>
 
       </div>
+
+      {/* ── What-if quick input ── */}
+      {curvePoints.length > 1 && (
+        <div className="card what-if-card">
+          <div className="what-if-row">
+            <label className="what-if-label" htmlFor="what-if-fee">What if I bid</label>
+            <div className="what-if-input-wrap">
+              <span className="what-if-dollar">$</span>
+              <input
+                id="what-if-fee"
+                type="number"
+                className="what-if-input"
+                placeholder={fmt(recFee)}
+                value={whatIfFee}
+                onChange={e => setWhatIfFee(e.target.value)}
+                min={0}
+                step={50}
+              />
+            </div>
+            {whatIfFee && Number(whatIfFee) > 0 && (() => {
+              const wf = Number(whatIfFee);
+              const wp = Math.round(interpolateWinProb(wf, curvePoints) ?? 50);
+              const ev = Math.round((wp / 100) * wf);
+              const evDelta = ev - evAtRec;
+              return (
+                <div className="what-if-result">
+                  <span className="what-if-prob" style={{ color: winColor(wp) }}>{wp}%</span>
+                  <span className="what-if-detail">
+                    win · EV ${fmt(ev)}
+                    <span className={`what-if-delta ${evDelta >= 0 ? 'positive' : 'negative'}`}>
+                      {evDelta >= 0 ? '+' : ''}{fmt(evDelta)} EV
+                    </span>
+                  </span>
+                </div>
+              );
+            })()}
+          </div>
+          {whatIfFee && Number(whatIfFee) > 0 && Number(whatIfFee) > maxFee && (
+            <p className="what-if-warn">Above bid ceiling — win odds drop below 30%</p>
+          )}
+        </div>
+      )}
 
       {/* ── Flat curve note ── */}
       {isFlatCurve && !evCapped && (
@@ -434,15 +529,13 @@ function ResultDisplay({ prediction, formData }) {
       )}
 
       {/* ── Contextual insight card (client-side, always fresh) ── */}
-      {!evCapped && (
-        <div className={`card result-insight signal-${ctxMsg.signal}`}>
-          <p className="insight-headline">{ctxMsg.headline}</p>
-          <p className="insight-body">{ctxMsg.body}</p>
-          {ctxMsg.tip && (
-            <p className="insight-tip">{ctxMsg.tip}</p>
-          )}
-        </div>
-      )}
+      <div className={`card result-insight signal-${ctxMsg.signal}`}>
+        <p className="insight-headline">{ctxMsg.headline}</p>
+        <p className="insight-body">{ctxMsg.body}</p>
+        {ctxMsg.tip && (
+          <p className="insight-tip">{ctxMsg.tip}</p>
+        )}
+      </div>
 
       {/* ── Fee analysis chart (expandable) ── */}
       {curvePoints.length > 1 && (
@@ -466,21 +559,35 @@ function ResultDisplay({ prediction, formData }) {
 
       {/* ── Market context ── */}
       <div className="card result-context">
-        <div className="context-row">
+        <div className="context-top">
           <span className="context-segment">
             {formData.business_segment} · {formData.property_state}
             {formData.zip_code && formData.zip_code.length === 5 && (
               <span className="context-zip"> · ZIP {formData.zip_code}</span>
             )}
           </span>
-          <div className="context-right">
-            <span className="context-bench">
-              {formData.business_segment} avg ${fmt(segment_benchmark)}
-            </span>
-            <span className={`context-diff ${vsMarket >= 0 ? 'above' : 'below'}`}>
-              {vsMarketStr} vs segment
+        </div>
+        <div className="context-metrics">
+          <div className="context-metric">
+            <span className="context-metric-label">Segment avg</span>
+            <span className="context-metric-value">${fmt(segment_benchmark)}</span>
+          </div>
+          <div className="context-metric">
+            <span className="context-metric-label">Your bid vs segment</span>
+            <span className={`context-metric-value context-diff ${vsMarket >= 0 ? 'above' : 'below'}`}>
+              {vsMarketStr}
             </span>
           </div>
+          <div className="context-metric">
+            <span className="context-metric-label">Floor–Ceiling spread</span>
+            <span className="context-metric-value">${fmt(maxFee - floorFee)}</span>
+          </div>
+          {state_benchmark && (
+            <div className="context-metric">
+              <span className="context-metric-label">State avg</span>
+              <span className="context-metric-value">${fmt(state_benchmark)}</span>
+            </div>
+          )}
         </div>
       </div>
 
@@ -506,30 +613,31 @@ function ResultDisplay({ prediction, formData }) {
         <div className="result-details">
           <div className="card detail-card">
             <h5>Market Benchmarks</h5>
+            <p className="detail-explainer">Average historical fees by category — these are reference points, not model inputs.</p>
             <div className="detail-row">
-              <span>Segment ({formData.business_segment})</span>
+              <span>Avg fee in {formData.business_segment}</span>
               <span>${fmt(segment_benchmark)}</span>
             </div>
             {state_benchmark && (
               <div className="detail-row">
-                <span>State ({formData.property_state})</span>
+                <span>Avg fee in {formData.property_state}</span>
                 <span>${fmt(state_benchmark)}</span>
               </div>
             )}
             {factors?.subtype_effect > 0 && (
               <div className="detail-row">
-                <span>Sub-type effect</span>
+                <span>Avg fee for sub-type</span>
                 <span>${fmt(factors.subtype_effect)}</span>
               </div>
             )}
             {factors?.office_region_effect > 0 && (
               <div className="detail-row">
-                <span>Office region effect</span>
+                <span>Avg fee in office region</span>
                 <span>${fmt(factors.office_region_effect)}</span>
               </div>
             )}
-            <div className="detail-row">
-              <span>Market-typical fee (model)</span>
+            <div className="detail-row detail-row-highlight">
+              <span>Model prediction (market-typical fee)</span>
               <span>${fmt(predicted_fee)}</span>
             </div>
           </div>
