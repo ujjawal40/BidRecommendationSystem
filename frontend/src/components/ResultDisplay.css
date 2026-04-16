@@ -118,9 +118,9 @@
 .anchor-tag-capped { color: var(--warning); }
 
 .anchor-fee {
-  font-size: var(--font-xl);
-  font-weight: 700;
-  color: var(--text-secondary);
+  font-size: var(--font-lg);
+  font-weight: 600;
+  color: var(--text-muted);
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.02em;
   margin-bottom: 4px;
