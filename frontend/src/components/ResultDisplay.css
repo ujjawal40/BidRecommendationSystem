@@ -157,6 +157,18 @@
   margin-bottom: 4px;
 }
 
+/* Copied badge */
+.copied-badge {
+  font-size: 10px;
+  font-weight: 600;
+  color: #6ee7b7;
+  background: rgba(16, 185, 129, 0.15);
+  padding: 2px 8px;
+  border-radius: var(--r-pill);
+  margin-left: 6px;
+  animation: fadeUp 0.2s ease-out;
+}
+
 /* Recommended fee — bigger and brighter */
 .anchor-rec-fee {
   display: flex;

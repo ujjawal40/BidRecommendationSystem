@@ -280,6 +280,7 @@ function ResultDisplay({ prediction, formData }) {
   const [showDetails, setShowDetails] = useState(false);
   const [showChart,   setShowChart]   = useState(true);
   const [whatIfFee,   setWhatIfFee]   = useState('');
+  const [copied,      setCopied]      = useState(false);
 
   const curvePoints = fee_curve?.curve_points || [];
 
@@ -382,9 +383,12 @@ function ResultDisplay({ prediction, formData }) {
               >
                 Recommended Bid
               </span>
-              <div className="anchor-rec-fee" style={{ justifyContent: 'flex-end' }}>
+              <div className="anchor-rec-fee" style={{ justifyContent: 'flex-end', cursor: 'pointer' }}
+                title="Click to copy"
+                onClick={() => { navigator.clipboard.writeText(Math.round(recFee).toString()); setCopied(true); setTimeout(() => setCopied(false), 1500); }}>
                 <span className="anchor-rec-currency">$</span>
                 <span className="anchor-rec-amount">{fmt(recFee)}</span>
+                {copied && <span className="copied-badge">Copied</span>}
               </div>
               {evCapped && (
                 <span className="capped-badge">⚠ capped at 30% win floor</span>
@@ -399,9 +403,13 @@ function ResultDisplay({ prediction, formData }) {
                 >
                   Optimal Bid
                 </span>
-                <div className="anchor-rec-fee">
+                <div className="anchor-rec-fee"
+                  title="Click to copy"
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => { navigator.clipboard.writeText(Math.round(recFee).toString()); setCopied(true); setTimeout(() => setCopied(false), 1500); }}>
                   <span className="anchor-rec-currency">$</span>
                   <span className="anchor-rec-amount">{fmt(recFee)}</span>
+                  {copied && <span className="copied-badge">Copied</span>}
                 </div>
                 {evCapped && (
                   <span className="capped-badge">⚠ capped at 30% win floor</span>
