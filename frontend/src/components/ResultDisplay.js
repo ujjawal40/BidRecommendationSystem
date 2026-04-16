@@ -582,6 +582,12 @@ function ResultDisplay({ prediction, formData }) {
             <span className="context-metric-label">Floor–Ceiling spread</span>
             <span className="context-metric-value">${fmt(maxFee - floorFee)}</span>
           </div>
+          {state_benchmark && (
+            <div className="context-metric">
+              <span className="context-metric-label">State avg</span>
+              <span className="context-metric-value">${fmt(state_benchmark)}</span>
+            </div>
+          )}
         </div>
       </div>
 
