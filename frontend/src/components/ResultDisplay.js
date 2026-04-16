@@ -225,6 +225,8 @@ function FeeChart({ curvePoints, recFee, maxFee, floorFee, evCapped }) {
           step={sliderStep}
           value={chartFee}
           onChange={e => setChartFee(Number(e.target.value))}
+          aria-label="Explore fee vs. win probability"
+          aria-valuetext={`$${fmt(chartFee)} fee, ${chartWinProb}% win probability`}
         />
       </div>
 
