@@ -22,9 +22,8 @@ function interpolateWinProb(fee, curvePoints) {
 }
 
 function winLabel(pct) {
-  if (pct >= 65) return 'Strong chance of winning';
-  if (pct >= 45) return 'Solid chance of winning';
-  if (pct >= 30) return 'Moderate chance of winning';
+  if (pct >= 55) return 'Strong chance of winning';
+  if (pct >= 35) return 'Moderate chance of winning';
   return 'Low chance of winning';
 }
 
