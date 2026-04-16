@@ -506,30 +506,31 @@ function ResultDisplay({ prediction, formData }) {
         <div className="result-details">
           <div className="card detail-card">
             <h5>Market Benchmarks</h5>
+            <p className="detail-explainer">Average historical fees by category — these are reference points, not model inputs.</p>
             <div className="detail-row">
-              <span>Segment ({formData.business_segment})</span>
+              <span>Avg fee in {formData.business_segment}</span>
               <span>${fmt(segment_benchmark)}</span>
             </div>
             {state_benchmark && (
               <div className="detail-row">
-                <span>State ({formData.property_state})</span>
+                <span>Avg fee in {formData.property_state}</span>
                 <span>${fmt(state_benchmark)}</span>
               </div>
             )}
             {factors?.subtype_effect > 0 && (
               <div className="detail-row">
-                <span>Sub-type effect</span>
+                <span>Avg fee for sub-type</span>
                 <span>${fmt(factors.subtype_effect)}</span>
               </div>
             )}
             {factors?.office_region_effect > 0 && (
               <div className="detail-row">
-                <span>Office region effect</span>
+                <span>Avg fee in office region</span>
                 <span>${fmt(factors.office_region_effect)}</span>
               </div>
             )}
-            <div className="detail-row">
-              <span>Market-typical fee (model)</span>
+            <div className="detail-row detail-row-highlight">
+              <span>Model prediction (market-typical fee)</span>
               <span>${fmt(predicted_fee)}</span>
             </div>
           </div>

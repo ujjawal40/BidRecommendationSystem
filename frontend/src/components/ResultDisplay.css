@@ -631,3 +631,22 @@
   color: var(--text-secondary);
   font-variant-numeric: tabular-nums;
 }
+
+.detail-explainer {
+  font-size: var(--font-xs);
+  color: var(--text-muted);
+  opacity: 0.65;
+  margin: 0 0 var(--s-sm);
+  line-height: 1.4;
+}
+
+.detail-row-highlight {
+  border-bottom: none;
+  padding-top: var(--s-sm);
+  margin-top: var(--s-xs);
+  border-top: 1px solid rgba(148, 163, 184, 0.12);
+}
+.detail-row-highlight span:last-child {
+  color: var(--text-primary);
+  font-weight: 700;
+}
