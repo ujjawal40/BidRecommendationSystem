@@ -338,6 +338,23 @@
   transition: width 0.4s ease, background 0.3s ease;
 }
 
+/* ── Model source badge ── */
+.model-source-badge {
+  display: inline-block;
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: rgba(148, 163, 184, 0.08);
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  padding: 2px 8px;
+  border-radius: var(--r-pill);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: help;
+  opacity: 0.7;
+  margin-top: var(--s-xs);
+}
+
 /* ── Contextual insight card ── */
 .result-insight {
   border-left: 2px solid transparent;

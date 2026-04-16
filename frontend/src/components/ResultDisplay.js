@@ -423,6 +423,11 @@ function ResultDisplay({ prediction, formData }) {
           <div className="win-bar-track">
             <div className="win-bar-fill" style={{ width: `${winProbPct}%`, background: wpColor }} />
           </div>
+          {win_probability?.model_used && win_probability.model_used.includes('Heuristic') && (
+            <span className="model-source-badge" title="The ML model is being supplemented by a calibrated heuristic for fee-sensitivity">
+              Heuristic estimate
+            </span>
+          )}
         </div>
 
       </div>
