@@ -36,6 +36,12 @@
   margin-bottom: var(--s-xl);
 }
 
+.bid-range-left {
+  display: flex;
+  align-items: center;
+  gap: var(--s-sm);
+}
+
 .bid-range-label {
   font-size: var(--font-xs);
   font-weight: 700;
@@ -43,6 +49,19 @@
   letter-spacing: 0.12em;
   color: var(--text-muted);
 }
+
+/* Quality badge */
+.quality-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 9px;
+  border-radius: var(--r-pill);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.quality-good  { background: rgba(16, 185, 129, 0.12); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.25); }
+.quality-fair   { background: rgba(245, 158, 11, 0.10); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.25); }
+.quality-risky { background: rgba(244, 63, 94, 0.10);  color: #fca5a5; border: 1px solid rgba(244, 63, 94, 0.25); }
 
 /* ── Confidence pill ── */
 .confidence-pill {

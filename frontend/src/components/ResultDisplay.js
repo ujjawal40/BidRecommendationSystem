@@ -313,6 +313,13 @@ function ResultDisplay({ prediction, formData }) {
     segBenchmark: segment_benchmark,
   });
 
+  // Bid quality summary
+  const bidQuality = (() => {
+    if (winProbPct >= 55 && confidence_level !== 'low') return { label: 'Good bid', cls: 'quality-good' };
+    if (winProbPct >= 35 || (winProbPct >= 30 && confidence_level === 'high')) return { label: 'Fair bid', cls: 'quality-fair' };
+    return { label: 'Risky bid', cls: 'quality-risky' };
+  })();
+
   return (
     <div className="result-display">
 
@@ -328,7 +335,10 @@ function ResultDisplay({ prediction, formData }) {
       <div className="card result-hero">
 
         <div className="bid-range-header">
-          <span className="bid-range-label">Bid Range</span>
+          <div className="bid-range-left">
+            <span className="bid-range-label">Bid Range</span>
+            <span className={`quality-badge ${bidQuality.cls}`}>{bidQuality.label}</span>
+          </div>
           <span className={`confidence-pill confidence-${confidence_level}`} title={
             metadata?.data_coverage
               ? `${fmt(metadata.data_coverage.segment_samples)} segment + ${fmt(metadata.data_coverage.state_samples)} state samples`
