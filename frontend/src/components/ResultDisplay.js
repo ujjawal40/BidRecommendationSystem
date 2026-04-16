@@ -433,15 +433,13 @@ function ResultDisplay({ prediction, formData }) {
       )}
 
       {/* ── Contextual insight card (client-side, always fresh) ── */}
-      {!evCapped && (
-        <div className={`card result-insight signal-${ctxMsg.signal}`}>
-          <p className="insight-headline">{ctxMsg.headline}</p>
-          <p className="insight-body">{ctxMsg.body}</p>
-          {ctxMsg.tip && (
-            <p className="insight-tip">{ctxMsg.tip}</p>
-          )}
-        </div>
-      )}
+      <div className={`card result-insight signal-${ctxMsg.signal}`}>
+        <p className="insight-headline">{ctxMsg.headline}</p>
+        <p className="insight-body">{ctxMsg.body}</p>
+        {ctxMsg.tip && (
+          <p className="insight-tip">{ctxMsg.tip}</p>
+        )}
+      </div>
 
       {/* ── Fee analysis chart (expandable) ── */}
       {curvePoints.length > 1 && (
