@@ -342,9 +342,11 @@ function ResultDisplay({ prediction, formData }) {
             <span className={`quality-badge ${bidQuality.cls}`}>{bidQuality.label}</span>
           </div>
           <span className={`confidence-pill confidence-${confidence_level}`} title={
-            metadata?.data_coverage
-              ? `${fmt(metadata.data_coverage.segment_samples)} segment + ${fmt(metadata.data_coverage.state_samples)} state samples`
-              : undefined
+            confidence_level === 'high'
+              ? `Based on ${fmt(metadata?.data_coverage?.segment_samples || 0)} similar bids — estimate is narrow and reliable`
+              : confidence_level === 'medium'
+              ? `Moderate data for this combination — estimate is directional but range is wider`
+              : `Sparse data for this exact combination — treat as a rough guide, cross-reference with experience`
           }>
             {confidence_level} confidence
             {metadata?.data_coverage?.segment_samples && (
