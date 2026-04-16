@@ -418,6 +418,7 @@ function ResultDisplay({ prediction, formData }) {
 
         {/* Win probability */}
         <div className="win-section">
+          <span className="win-section-label">Win Probability</span>
           <div className="win-row">
             <span className="win-pct" style={{ color: wpColor }}>
               {winProbPct}<span className="win-pct-sym">%</span>
