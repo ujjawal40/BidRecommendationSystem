@@ -182,7 +182,7 @@ function FeeChart({ curvePoints, recFee, maxFee, floorFee, evCapped }) {
         {[0, 25, 50, 75, 100].map(v => (
           <g key={v}>
             <line x1={PAD.left} y1={yS(v)} x2={PAD.left + cW} y2={yS(v)}
-              stroke="rgba(148,163,184,0.06)" strokeWidth="1" />
+              stroke="rgba(148,163,184,0.10)" strokeWidth="1" />
             <text x={PAD.left - 4} y={yS(v) + 3.5} fill="#475569" fontSize="9"
               textAnchor="end" fontFamily="Inter, sans-serif">{v}%</text>
           </g>
