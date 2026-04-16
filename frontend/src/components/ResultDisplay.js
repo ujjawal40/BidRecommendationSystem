@@ -190,9 +190,13 @@ function FeeChart({ curvePoints, recFee, maxFee, floorFee, evCapped }) {
 
         {/* Floor, Ceiling vertical markers */}
         <line x1={floorX} y1={PAD.top} x2={floorX} y2={PAD.top + cH}
-          stroke="rgba(148,163,184,0.2)" strokeWidth="1" strokeDasharray="3,3" />
+          stroke="rgba(148,163,184,0.25)" strokeWidth="1" strokeDasharray="3,3" />
         <line x1={maxX} y1={PAD.top} x2={maxX} y2={PAD.top + cH}
-          stroke="rgba(59,130,246,0.25)" strokeWidth="1" strokeDasharray="3,3" />
+          stroke="rgba(59,130,246,0.3)" strokeWidth="1" strokeDasharray="3,3" />
+
+        {/* Shaded viable region between floor and ceiling */}
+        <rect x={floorX} y={PAD.top} width={Math.max(0, maxX - floorX)} height={cH}
+          fill="rgba(59,130,246,0.03)" />
 
         {/* Curve */}
         <path d={pathD} fill="none" stroke="#3b82f6" strokeWidth="1.5" strokeLinejoin="round" />
