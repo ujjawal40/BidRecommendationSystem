@@ -171,7 +171,24 @@ function App() {
 
           {/* Right: Results */}
           <div className="results-section">
-            {prediction ? (
+            {predicting ? (
+              <div className="skeleton-wrap">
+                <div className="card skeleton-card skeleton-hero">
+                  <div className="skeleton-line skeleton-short" />
+                  <div className="skeleton-anchors">
+                    <div className="skeleton-block" />
+                    <div className="skeleton-block skeleton-block-lg" />
+                    <div className="skeleton-block" />
+                  </div>
+                  <div className="skeleton-bar" />
+                  <div className="skeleton-line skeleton-wide" />
+                </div>
+                <div className="card skeleton-card">
+                  <div className="skeleton-line skeleton-mid" />
+                  <div className="skeleton-line skeleton-wide" />
+                </div>
+              </div>
+            ) : prediction ? (
               <ResultDisplay prediction={prediction} formData={formData} />
             ) : (
               <div className="card placeholder-card">
