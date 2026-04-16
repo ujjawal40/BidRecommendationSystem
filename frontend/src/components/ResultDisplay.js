@@ -433,6 +433,13 @@ function ResultDisplay({ prediction, formData }) {
           <div className="win-bar-track">
             <div className="win-bar-fill" style={{ width: `${winProbPct}%`, background: wpColor }} />
           </div>
+          <p className="win-interpretation">
+            {winProbPct >= 55
+              ? `If you bid $${fmt(recFee)} on 10 similar jobs, you'd expect to win about ${Math.round(winProbPct / 10)} of them.`
+              : winProbPct >= 35
+              ? `About ${Math.round(winProbPct / 10)} in 10 similar bids would be won at this price — non-price factors will tip the balance.`
+              : `At this price you'd win roughly ${Math.round(winProbPct / 10)} in 10 similar bids — relationships and expertise will matter more than price.`}
+          </p>
           {win_probability?.model_used && win_probability.model_used.includes('Heuristic') && (
             <span className="model-source-badge" title="The ML model is being supplemented by a calibrated heuristic for fee-sensitivity">
               Heuristic estimate
