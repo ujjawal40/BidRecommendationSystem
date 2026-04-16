@@ -138,6 +138,8 @@ function FeeChart({ curvePoints, recFee, maxFee, floorFee, evCapped }) {
 
   const minFee     = pts[0].fee;
   const maxCurFee  = pts[pts.length - 1].fee;
+  const feeRange   = maxCurFee - minFee;
+  const sliderStep = feeRange < 1000 ? 10 : feeRange < 3000 ? 25 : 50;
   const chartWinProb = Math.round(interpolateWinProb(chartFee, pts) ?? 50);
   const chartEV      = Math.round((chartWinProb / 100) * chartFee);
   const chartColor   = winColor(chartWinProb);
@@ -220,7 +222,7 @@ function FeeChart({ curvePoints, recFee, maxFee, floorFee, evCapped }) {
           className="chart-slider"
           min={minFee}
           max={maxCurFee}
-          step={50}
+          step={sliderStep}
           value={chartFee}
           onChange={e => setChartFee(Number(e.target.value))}
         />
