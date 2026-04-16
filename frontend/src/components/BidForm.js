@@ -184,7 +184,7 @@ function BidForm({ formData, options, onChange, onSubmit, onReset, loading, zipS
         <button
           type="submit"
           className="btn-primary btn-predict"
-          disabled={loading}
+          disabled={loading || !formData.business_segment || !formData.property_type || !formData.property_state}
         >
           {loading ? (
             <><span className="btn-spinner" /> Analyzing…</>
