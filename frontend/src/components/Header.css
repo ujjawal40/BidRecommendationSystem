@@ -8,7 +8,6 @@
   position: sticky;
   top: 0;
   z-index: 100;
-  box-shadow: 0 1px 0 var(--border-light), 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
 .header-inner {
@@ -24,15 +23,6 @@
   display: flex;
   align-items: center;
   gap: 0.6rem;
-}
-
-.brand-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--accent);
-  flex-shrink: 0;
-  box-shadow: 0 0 8px rgba(59, 130, 246, 0.6);
 }
 
 .brand-name {
@@ -57,10 +47,10 @@
 .header-badge {
   font-size: var(--font-xs);
   font-weight: 600;
-  color: var(--accent-dark);
-  background: var(--accent-light);
+  color: var(--text-muted);
+  background: var(--bg-subtle);
   padding: 3px 10px;
   border-radius: var(--r-pill);
   letter-spacing: 0.03em;
-  border: 1px solid rgba(59, 130, 246, 0.2);
+  border: 1px solid var(--border);
 }
