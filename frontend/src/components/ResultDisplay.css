@@ -27,12 +27,12 @@
   display: flex;
   align-items: flex-start;
   gap: var(--s-sm);
-  background: rgba(245, 158, 11, 0.08);
-  border: 1px solid rgba(245, 158, 11, 0.2);
+  background: rgba(161, 98, 7, 0.06);
+  border: 1px solid rgba(161, 98, 7, 0.15);
   border-radius: var(--r-lg);
   padding: var(--s-md) var(--s-lg);
   font-size: var(--font-sm);
-  color: #fcd34d;
+  color: var(--warning);
   line-height: 1.5;
 }
 .warning-icon { font-size: 1rem; line-height: 1.4; flex-shrink: 0; margin-top: 1px; }
@@ -71,9 +71,9 @@
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
-.quality-good  { background: rgba(16, 185, 129, 0.12); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.25); }
-.quality-fair   { background: rgba(245, 158, 11, 0.10); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.25); }
-.quality-risky { background: rgba(244, 63, 94, 0.10);  color: #fca5a5; border: 1px solid rgba(244, 63, 94, 0.25); }
+.quality-good  { background: rgba(26, 122, 76, 0.08); color: #1A7A4C; border: 1px solid rgba(26, 122, 76, 0.18); }
+.quality-fair  { background: rgba(161, 98, 7, 0.07);  color: #92560A; border: 1px solid rgba(161, 98, 7, 0.18); }
+.quality-risky { background: rgba(185, 28, 28, 0.06); color: #B91C1C; border: 1px solid rgba(185, 28, 28, 0.15); }
 
 /* ── Confidence pill ── */
 .confidence-pill {
@@ -85,9 +85,9 @@
   letter-spacing: 0.06em;
   white-space: nowrap;
 }
-.confidence-high   { background: rgba(16, 185, 129, 0.12); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.25); }
-.confidence-medium { background: rgba(245, 158, 11, 0.10); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.25); }
-.confidence-low    { background: rgba(244, 63, 94, 0.10);  color: #fca5a5; border: 1px solid rgba(244, 63, 94, 0.25); }
+.confidence-high   { background: rgba(26, 122, 76, 0.08); color: #1A7A4C; border: 1px solid rgba(26, 122, 76, 0.18); }
+.confidence-medium { background: rgba(161, 98, 7, 0.07);  color: #92560A; border: 1px solid rgba(161, 98, 7, 0.18); }
+.confidence-low    { background: rgba(185, 28, 28, 0.06); color: #B91C1C; border: 1px solid rgba(185, 28, 28, 0.15); }
 
 .coverage-count {
   font-weight: 400;
