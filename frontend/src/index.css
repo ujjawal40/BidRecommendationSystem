@@ -21,12 +21,12 @@
   --border:       rgba(0, 0, 0, 0.09);
   --border-light: rgba(0, 0, 0, 0.04);
 
-  /* Accent — electric blue */
-  --accent:        #3b82f6;
-  --accent-mid:    #60a5fa;
-  --accent-light:  rgba(59, 130, 246, 0.12);
-  --accent-dark:   #93c5fd;
-  --accent-bg:     rgba(59, 130, 246, 0.08);
+  /* Accent — deep slate blue */
+  --accent:        #2B5A83;
+  --accent-mid:    #3A7AB8;
+  --accent-light:  rgba(43, 90, 131, 0.07);
+  --accent-dark:   #1E3F5C;
+  --accent-bg:     rgba(43, 90, 131, 0.04);
 
   /* Semantic */
   --success:     #10b981;
