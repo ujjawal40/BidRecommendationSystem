@@ -216,7 +216,7 @@
 .range-scale {
   position: relative;
   height: 2px;
-  background: rgba(148, 163, 184, 0.12);
+  background: rgba(0, 0, 0, 0.06);
   border-radius: 1px;
   margin-bottom: 6px;
 }
@@ -228,7 +228,7 @@
   top: 0;
   height: 100%;
   background: var(--accent);
-  opacity: 0.45;
+  opacity: 0.35;
   border-radius: 1px;
 }
 
@@ -241,40 +241,32 @@
   border-radius: 1px;
 }
 
-/* Floor tick — short, dim */
 .tick-floor {
   left: 0;
   height: 10px;
-  background: rgba(148, 163, 184, 0.4);
+  background: rgba(0, 0, 0, 0.2);
 }
 
-/* Recommended tick — tall, bright blue */
 .tick-rec {
   height: 18px;
   background: var(--accent);
   width: 2px;
-  box-shadow: 0 0 6px rgba(59, 130, 246, 0.5);
 }
 
-/* Capped tick — amber instead of blue */
 .tick-rec-capped {
   background: var(--warning);
-  box-shadow: 0 0 6px rgba(245, 158, 11, 0.5);
 }
 
-/* Max tick — short, dim */
 .tick-max {
   left: 100%;
   height: 10px;
-  background: rgba(148, 163, 184, 0.4);
+  background: rgba(0, 0, 0, 0.2);
 }
 
-/* When rec = max, single tick that's taller + blue + right-anchored */
 .tick-rec-max {
   left: 100%;
   height: 18px;
   background: var(--accent);
-  box-shadow: 0 0 6px rgba(59, 130, 246, 0.5);
 }
 
 .range-scale-labels {
