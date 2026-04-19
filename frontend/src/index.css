@@ -126,7 +126,7 @@ input, select, textarea {
   font-size: var(--font-sm);
   color: var(--text-primary);
   background: var(--bg-subtle);
-  border: 1.5px solid var(--border);
+  border: 1px solid var(--border);
   border-radius: var(--r-md);
   padding: 0.6rem var(--s-md);
   width: 100%;
@@ -136,14 +136,14 @@ input, select, textarea {
 input:focus, select:focus {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+  box-shadow: 0 0 0 3px rgba(43, 90, 131, 0.10);
   background: var(--bg-elevated);
 }
 
 input::placeholder { color: var(--text-light); }
 
 select option {
-  background: var(--bg-subtle);
+  background: var(--bg-card);
   color: var(--text-primary);
 }
 
