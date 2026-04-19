@@ -28,9 +28,9 @@ function winLabel(pct) {
 }
 
 function winColor(pct) {
-  if (pct >= 55) return '#10b981';
-  if (pct >= 35) return '#f59e0b';
-  return '#f43f5e';
+  if (pct >= 55) return '#1A7A4C';
+  if (pct >= 35) return '#A16207';
+  return '#B91C1C';
 }
 
 // ── Client-side contextual message ──────────────────────────────────────────
