@@ -172,57 +172,57 @@ function FeeChart({ curvePoints, recFee, maxFee, floorFee, evCapped }) {
       <svg viewBox={`0 0 ${W} ${H}`} width="100%" className="fee-chart-svg">
         {/* 30% threshold band */}
         <rect x={PAD.left} y={threshY} width={cW} height={cH + PAD.top - threshY + PAD.top}
-          fill="rgba(244, 63, 94, 0.04)" />
+          fill="rgba(185, 28, 28, 0.03)" />
         <line x1={PAD.left} y1={threshY} x2={PAD.left + cW} y2={threshY}
-          stroke="rgba(244, 63, 94, 0.35)" strokeWidth="1" strokeDasharray="4,3" />
+          stroke="rgba(185, 28, 28, 0.25)" strokeWidth="1" strokeDasharray="4,3" />
         <text x={PAD.left + 4} y={threshY - 4}
-          fill="rgba(244, 63, 94, 0.5)" fontSize="9" fontFamily="Inter, sans-serif">30% min threshold</text>
+          fill="rgba(185, 28, 28, 0.45)" fontSize="9" fontFamily="Inter, sans-serif">30% min threshold</text>
 
         {/* Y-axis gridlines + labels */}
         {[0, 25, 50, 75, 100].map(v => (
           <g key={v}>
             <line x1={PAD.left} y1={yS(v)} x2={PAD.left + cW} y2={yS(v)}
-              stroke="rgba(148,163,184,0.10)" strokeWidth="1" />
-            <text x={PAD.left - 4} y={yS(v) + 3.5} fill="#475569" fontSize="9"
+              stroke="rgba(0,0,0,0.06)" strokeWidth="1" />
+            <text x={PAD.left - 4} y={yS(v) + 3.5} fill="#8C8C88" fontSize="9"
               textAnchor="end" fontFamily="Inter, sans-serif">{v}%</text>
           </g>
         ))}
 
         {/* Floor, Ceiling vertical markers */}
         <line x1={floorX} y1={PAD.top} x2={floorX} y2={PAD.top + cH}
-          stroke="rgba(148,163,184,0.25)" strokeWidth="1" strokeDasharray="3,3" />
+          stroke="rgba(0,0,0,0.12)" strokeWidth="1" strokeDasharray="3,3" />
         <line x1={maxX} y1={PAD.top} x2={maxX} y2={PAD.top + cH}
-          stroke="rgba(59,130,246,0.3)" strokeWidth="1" strokeDasharray="3,3" />
+          stroke="rgba(43,90,131,0.25)" strokeWidth="1" strokeDasharray="3,3" />
 
         {/* Shaded viable region between floor and ceiling */}
         <rect x={floorX} y={PAD.top} width={Math.max(0, maxX - floorX)} height={cH}
-          fill="rgba(59,130,246,0.03)" />
+          fill="rgba(43,90,131,0.04)" />
 
         {/* Curve */}
-        <path d={pathD} fill="none" stroke="#3b82f6" strokeWidth="1.5" strokeLinejoin="round" />
+        <path d={pathD} fill="none" stroke="#2B5A83" strokeWidth="1.5" strokeLinejoin="round" />
 
         {/* Selected fee vertical */}
         <line x1={selX} y1={PAD.top} x2={selX} y2={PAD.top + cH}
-          stroke="rgba(255,255,255,0.15)" strokeWidth="1" />
+          stroke="rgba(0,0,0,0.06)" strokeWidth="1" />
 
         {/* Selected point */}
-        <circle cx={selX} cy={selY} r="5" fill={chartColor} stroke="#0c111d" strokeWidth="2" />
+        <circle cx={selX} cy={selY} r="5" fill={chartColor} stroke="#FFFFFF" strokeWidth="2" />
 
         {/* X-axis labels */}
-        <text x={floorX} y={H - 14} fill="#475569" fontSize="9" textAnchor="middle"
+        <text x={floorX} y={H - 14} fill="#8C8C88" fontSize="9" textAnchor="middle"
           fontFamily="Inter, sans-serif">Floor</text>
-        <text x={floorX} y={H - 4} fill="#64748b" fontSize="8" textAnchor="middle"
+        <text x={floorX} y={H - 4} fill="#8C8C88" fontSize="8" textAnchor="middle"
           fontFamily="Inter, sans-serif">${fmt(floorFee)}</text>
 
-        <text x={recX} y={H - 14} fill="#60a5fa" fontSize="9" textAnchor="middle"
+        <text x={recX} y={H - 14} fill="#2B5A83" fontSize="9" textAnchor="middle"
           fontFamily="Inter, sans-serif">{evCapped ? 'Max Rec.' : 'Optimal'}</text>
-        <text x={recX} y={H - 4} fill="#60a5fa" fontSize="8" textAnchor="middle"
+        <text x={recX} y={H - 4} fill="#2B5A83" fontSize="8" textAnchor="middle"
           fontFamily="Inter, sans-serif">${fmt(recFee)}</text>
 
         {Math.abs(recX - maxX) > 30 && (<>
-          <text x={maxX} y={H - 14} fill="#475569" fontSize="9" textAnchor="middle"
+          <text x={maxX} y={H - 14} fill="#8C8C88" fontSize="9" textAnchor="middle"
             fontFamily="Inter, sans-serif">Ceiling</text>
-          <text x={maxX} y={H - 4} fill="#64748b" fontSize="8" textAnchor="middle"
+          <text x={maxX} y={H - 4} fill="#8C8C88" fontSize="8" textAnchor="middle"
             fontFamily="Inter, sans-serif">${fmt(maxFee)}</text>
         </>)}
       </svg>
