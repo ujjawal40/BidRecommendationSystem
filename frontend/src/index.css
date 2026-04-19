@@ -1,15 +1,15 @@
 /* Global Stat Solutions — Bid Recommendation System
-   Design: Dark, data-forward, Palantir/SpaceX aesthetic
-   Font: Plus Jakarta Sans
-   Palette: Near-black · Slate text · Electric blue accent
+   Design: Clean, warm, professional — financial consultancy aesthetic
+   Font: Inter
+   Palette: Cream · Charcoal text · Deep slate-blue accent
 */
 
 :root {
   /* Surfaces */
-  --bg:        #07090f;
-  --bg-card:   #0c111d;
-  --bg-subtle: #111828;
-  --bg-elevated: #161d2e;
+  --bg:          #F5F4F0;
+  --bg-card:     #FFFFFF;
+  --bg-subtle:   #EDECE8;
+  --bg-elevated: #FFFFFF;
 
   /* Text */
   --text-primary:   #e2e8f0;
