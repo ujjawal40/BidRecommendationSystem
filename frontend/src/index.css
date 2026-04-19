@@ -29,18 +29,18 @@
   --accent-bg:     rgba(43, 90, 131, 0.04);
 
   /* Semantic */
-  --success:     #10b981;
-  --success-bg:  rgba(16, 185, 129, 0.12);
-  --warning:     #f59e0b;
-  --warning-bg:  rgba(245, 158, 11, 0.12);
-  --danger:      #f43f5e;
-  --danger-bg:   rgba(244, 63, 94, 0.12);
-  --info:        #3b82f6;
+  --success:     #1A7A4C;
+  --success-bg:  rgba(26, 122, 76, 0.06);
+  --warning:     #A16207;
+  --warning-bg:  rgba(161, 98, 7, 0.06);
+  --danger:      #B91C1C;
+  --danger-bg:   rgba(185, 28, 28, 0.06);
+  --info:        #2B5A83;
 
   /* Win probability zones */
-  --win-high:    #10b981;
-  --win-mid:     #f59e0b;
-  --win-low:     #f43f5e;
+  --win-high:    #1A7A4C;
+  --win-mid:     #A16207;
+  --win-low:     #B91C1C;
 
   /* Typography */
   --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
