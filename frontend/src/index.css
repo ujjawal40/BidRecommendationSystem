@@ -18,8 +18,8 @@
   --text-light:     #B5B5B0;
 
   /* Borders */
-  --border:       rgba(148, 163, 184, 0.10);
-  --border-light: rgba(148, 163, 184, 0.06);
+  --border:       rgba(0, 0, 0, 0.09);
+  --border-light: rgba(0, 0, 0, 0.04);
 
   /* Accent — electric blue */
   --accent:        #3b82f6;
