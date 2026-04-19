@@ -501,7 +501,7 @@
 
 .chart-slider::-webkit-slider-runnable-track {
   height: 3px;
-  background: rgba(148, 163, 184, 0.15);
+  background: rgba(0, 0, 0, 0.08);
   border-radius: 2px;
 }
 
@@ -512,7 +512,7 @@
   border-radius: 50%;
   background: var(--accent);
   border: 2px solid var(--bg-card);
-  box-shadow: 0 0 0 2px var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
   margin-top: -7px;
   cursor: grab;
   transition: transform var(--ease-fast);
@@ -522,10 +522,10 @@
 .chart-slider::-moz-range-thumb {
   width: 16px; height: 16px; border-radius: 50%;
   background: var(--accent); border: 2px solid var(--bg-card);
-  box-shadow: 0 0 0 2px var(--accent); cursor: grab;
+  box-shadow: 0 0 0 1px var(--accent); cursor: grab;
 }
 .chart-slider::-moz-range-track {
-  height: 3px; background: rgba(148, 163, 184, 0.15); border-radius: 2px;
+  height: 3px; background: rgba(0, 0, 0, 0.08); border-radius: 2px;
 }
 
 /* Live stats row */
@@ -561,9 +561,9 @@
 .chart-below-threshold {
   font-size: var(--font-xs);
   font-weight: 600;
-  color: #f43f5e;
-  background: rgba(244, 63, 94, 0.10);
-  border: 1px solid rgba(244, 63, 94, 0.2);
+  color: var(--danger);
+  background: rgba(185, 28, 28, 0.06);
+  border: 1px solid rgba(185, 28, 28, 0.15);
   padding: 2px 8px;
   border-radius: var(--r-pill);
 }
@@ -601,8 +601,8 @@
   display: flex;
   align-items: center;
   gap: 2px;
-  background: rgba(148, 163, 184, 0.06);
-  border: 1px solid var(--border-light);
+  background: rgba(0, 0, 0, 0.02);
+  border: 1px solid var(--border);
   border-radius: var(--r-md);
   padding: 4px 10px;
   transition: border-color var(--ease-fast);
@@ -628,7 +628,7 @@
   font-variant-numeric: tabular-nums;
   outline: none;
 }
-.what-if-input::placeholder { color: var(--text-muted); opacity: 0.4; }
+.what-if-input::placeholder { color: var(--text-light); opacity: 0.6; }
 .what-if-input::-webkit-inner-spin-button { display: none; }
 
 .what-if-result {
@@ -657,12 +657,12 @@
   padding: 1px 6px;
   border-radius: var(--r-pill);
 }
-.what-if-delta.positive { color: #6ee7b7; background: rgba(16, 185, 129, 0.12); }
-.what-if-delta.negative { color: #fca5a5; background: rgba(244, 63, 94, 0.10); }
+.what-if-delta.positive { color: #1A7A4C; background: rgba(26, 122, 76, 0.08); }
+.what-if-delta.negative { color: #B91C1C; background: rgba(185, 28, 28, 0.06); }
 
 .what-if-warn {
   font-size: var(--font-xs);
-  color: #fca5a5;
+  color: var(--danger);
   margin: var(--s-xs) 0 0;
   opacity: 0.8;
 }
