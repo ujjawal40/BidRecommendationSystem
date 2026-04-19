@@ -672,12 +672,12 @@
   display: flex;
   align-items: flex-start;
   gap: var(--s-sm);
-  background: rgba(59, 130, 246, 0.06);
-  border: 1px solid rgba(59, 130, 246, 0.18);
+  background: rgba(43, 90, 131, 0.04);
+  border: 1px solid rgba(43, 90, 131, 0.12);
   border-radius: var(--r-lg);
   padding: var(--s-md);
   font-size: var(--font-sm);
-  color: #93c5fd;
+  color: var(--text-secondary);
   line-height: 1.55;
 }
 .flat-curve-icon { font-size: 0.9rem; line-height: 1.6; flex-shrink: 0; }
@@ -728,8 +728,8 @@
 .context-diff {
   font-weight: 800;
 }
-.context-diff.above { color: #fcd34d; }
-.context-diff.below { color: var(--accent-dark); }
+.context-diff.above { color: var(--warning); }
+.context-diff.below { color: var(--accent); }
 
 /* ── Rush callout ── */
 .result-rush {
@@ -737,12 +737,12 @@
   align-items: flex-start;
   gap: var(--s-md);
   padding: var(--s-md) var(--s-lg);
-  background: rgba(245, 158, 11, 0.06);
-  border: 1px solid rgba(245, 158, 11, 0.15);
+  background: rgba(161, 98, 7, 0.04);
+  border: 1px solid rgba(161, 98, 7, 0.12);
   border-radius: var(--r-xl);
 }
 .rush-icon  { font-size: 1.1rem; flex-shrink: 0; line-height: 1.5; }
-.rush-title { font-size: var(--font-sm); font-weight: 700; color: #fcd34d; margin-bottom: 2px; }
+.rush-title { font-size: var(--font-sm); font-weight: 700; color: var(--warning); margin-bottom: 2px; }
 .rush-body  { font-size: var(--font-sm); color: var(--text-muted); margin: 0; }
 
 /* ── Recommendation ── */
@@ -751,15 +751,15 @@
 }
 .result-recommendation.signal-positive {
   border-left-color: var(--success);
-  background: rgba(16, 185, 129, 0.05);
+  background: rgba(26, 122, 76, 0.03);
 }
 .result-recommendation.signal-neutral {
   border-left-color: var(--accent);
-  background: rgba(59, 130, 246, 0.05);
+  background: rgba(43, 90, 131, 0.03);
 }
 .result-recommendation.signal-caution {
   border-left-color: var(--warning);
-  background: rgba(245, 158, 11, 0.05);
+  background: rgba(161, 98, 7, 0.03);
 }
 
 .rec-headline {
@@ -776,7 +776,7 @@
 }
 .rec-tip {
   font-size: var(--font-sm);
-  color: var(--accent-dark);
+  color: var(--accent);
   font-style: italic;
   margin: 0;
   padding-top: var(--s-sm);
@@ -801,7 +801,7 @@
 }
 .details-toggle:hover {
   color: var(--text-secondary);
-  background: rgba(148, 163, 184, 0.06);
+  background: rgba(0, 0, 0, 0.03);
 }
 
 .result-details { display: flex; flex-direction: column; gap: var(--s-sm); }
@@ -843,7 +843,7 @@
   border-bottom: none;
   padding-top: var(--s-sm);
   margin-top: var(--s-xs);
-  border-top: 1px solid rgba(148, 163, 184, 0.12);
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
 }
 .detail-row-highlight span:last-child {
   color: var(--text-primary);
