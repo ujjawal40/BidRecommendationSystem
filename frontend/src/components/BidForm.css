@@ -34,7 +34,7 @@
 /* Select arrow */
 .form-group select {
   cursor: pointer;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%23475569' d='M5 6L0 0h10z'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%238C8C88' d='M5 6L0 0h10z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 12px center;
   padding-right: 32px;
@@ -84,14 +84,14 @@
 
 .preset-chip:hover {
   border-color: var(--accent);
-  color: var(--accent-dark);
+  color: var(--accent);
   background: var(--accent-bg);
 }
 
 .preset-chip.active {
   border-color: var(--accent);
   background: var(--accent-light);
-  color: var(--accent-dark);
+  color: var(--accent);
 }
 
 /* Zip code input */
@@ -117,17 +117,17 @@
 }
 
 .zip-found {
-  background: rgba(16, 185, 129, 0.12);
-  color: #059669;
+  background: rgba(26, 122, 76, 0.08);
+  color: #1A7A4C;
 }
 
 .zip-not-found {
-  background: rgba(244, 63, 94, 0.10);
-  color: #e11d48;
+  background: rgba(185, 28, 28, 0.06);
+  color: #B91C1C;
 }
 
 .zip-loading {
-  background: rgba(148, 163, 184, 0.10);
+  background: rgba(0, 0, 0, 0.04);
   color: var(--text-muted);
 }
 
