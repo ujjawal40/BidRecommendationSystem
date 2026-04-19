@@ -6,7 +6,6 @@ function Header() {
     <header className="header">
       <div className="header-inner">
         <div className="header-brand">
-          <div className="brand-dot" />
           <span className="brand-name">Global Stat Solutions</span>
           <span className="brand-sep">·</span>
           <span className="brand-product">Bid Intelligence</span>
