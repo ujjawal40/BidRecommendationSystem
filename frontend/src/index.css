@@ -12,10 +12,10 @@
   --bg-elevated: #FFFFFF;
 
   /* Text */
-  --text-primary:   #e2e8f0;
-  --text-secondary: #94a3b8;
-  --text-muted:     #475569;
-  --text-light:     #334155;
+  --text-primary:   #1A1A18;
+  --text-secondary: #52524E;
+  --text-muted:     #8C8C88;
+  --text-light:     #B5B5B0;
 
   /* Borders */
   --border:       rgba(148, 163, 184, 0.10);
