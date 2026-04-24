@@ -1,4 +1,9 @@
 import { useState } from 'react';
+import {
+  ResponsiveContainer, AreaChart, Area, XAxis, YAxis,
+  ReferenceLine, ReferenceArea, Tooltip as RechartsTooltip,
+  CartesianGrid,
+} from 'recharts';
 import './ResultDisplay.css';
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
