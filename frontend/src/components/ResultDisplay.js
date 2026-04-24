@@ -612,7 +612,9 @@ function ResultDisplay({ prediction, formData }) {
 
       {/* ── Details toggle ── */}
       <button className="details-toggle" onClick={() => setShowDetails(v => !v)}>
-        {showDetails ? '▲ Hide details' : '▾ Benchmarks & model factors'}
+        {showDetails
+          ? <><ChevronUp size={14} /> Hide details</>
+          : <><ChevronDown size={14} /> Benchmarks &amp; model factors</>}
       </button>
 
       {showDetails && (
