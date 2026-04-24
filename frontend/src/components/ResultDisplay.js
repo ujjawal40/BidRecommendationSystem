@@ -523,7 +523,7 @@ function ResultDisplay({ prediction, formData }) {
       {/* ── Flat curve note ── */}
       {isFlatCurve && !evCapped && (
         <div className="flat-curve-note">
-          <span className="flat-curve-icon">ℹ</span>
+          <Info size={16} className="flat-curve-icon" />
           <span>
             For this type of work, your win odds stay roughly the same no matter where you price
             within the range — meaning charging more doesn't hurt your chances. Bidding near the
