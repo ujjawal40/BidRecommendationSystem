@@ -350,18 +350,20 @@ function ResultDisplay({ prediction, formData }) {
             <span className="bid-range-label">Bid Range</span>
             <span className={`quality-badge ${bidQuality.cls}`}>{bidQuality.label}</span>
           </div>
-          <span className={`confidence-pill confidence-${confidence_level}`} title={
+          <InfoTip content={
             confidence_level === 'high'
               ? `Based on ${fmt(metadata?.data_coverage?.segment_samples || 0)} similar bids — estimate is narrow and reliable`
               : confidence_level === 'medium'
               ? `Moderate data for this combination — estimate is directional but range is wider`
               : `Sparse data for this exact combination — treat as a rough guide, cross-reference with experience`
           }>
-            {confidence_level} confidence
-            {metadata?.data_coverage?.segment_samples && (
-              <span className="coverage-count"> · {fmt(metadata.data_coverage.segment_samples)} similar bids</span>
-            )}
-          </span>
+            <span className={`confidence-pill confidence-${confidence_level}`}>
+              {confidence_level} confidence
+              {metadata?.data_coverage?.segment_samples && (
+                <span className="coverage-count"> · {fmt(metadata.data_coverage.segment_samples)} similar bids</span>
+              )}
+            </span>
+          </InfoTip>
         </div>
 
         {/* Bid anchors — 2 columns when capped, 3 otherwise */}
