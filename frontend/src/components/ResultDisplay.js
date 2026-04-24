@@ -468,9 +468,11 @@ function ResultDisplay({ prediction, formData }) {
               : `At this price you'd win roughly ${Math.round(winProbPct / 10)} in 10 similar bids — relationships and expertise will matter more than price.`}
           </p>
           {win_probability?.model_used && win_probability.model_used.includes('Heuristic') && (
-            <span className="model-source-badge" title="The ML model is being supplemented by a calibrated heuristic for fee-sensitivity">
-              Heuristic estimate
-            </span>
+            <InfoTip content="The ML model is being supplemented by a calibrated heuristic for fee-sensitivity">
+              <span className="model-source-badge">
+                Heuristic estimate
+              </span>
+            </InfoTip>
           )}
         </div>
 
