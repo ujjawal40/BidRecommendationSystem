@@ -485,6 +485,23 @@
 
 .fee-chart-svg { display: block; }
 
+/* Recharts custom tooltip */
+.recharts-custom-tooltip {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 8px 12px;
+  box-shadow: var(--shadow-md);
+  font-size: var(--font-xs);
+  font-variant-numeric: tabular-nums;
+}
+.rct-fee  { font-weight: 700; color: var(--text-primary); font-size: var(--font-sm); }
+.rct-prob { font-weight: 600; }
+.rct-ev   { color: var(--text-muted); }
+
 /* Chart slider */
 .chart-slider-wrap {
   padding: 0 2px;
