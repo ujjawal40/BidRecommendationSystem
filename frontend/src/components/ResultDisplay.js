@@ -412,7 +412,7 @@ function ResultDisplay({ prediction, formData }) {
                   </div>
                 </InfoTip>
                 {evCapped && (
-                  <span className="capped-badge">⚠ capped at 30% win floor</span>
+                  <span className="capped-badge"><AlertTriangle size={10} /> capped at 30% win floor</span>
                 )}
               </div>
 
