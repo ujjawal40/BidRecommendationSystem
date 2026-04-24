@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { BarChart3 } from 'lucide-react';
 import Header from './components/Header';
 import BidForm from './components/BidForm';
 import ResultDisplay from './components/ResultDisplay';
