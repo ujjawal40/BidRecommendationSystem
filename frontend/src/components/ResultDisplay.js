@@ -545,7 +545,9 @@ function ResultDisplay({ prediction, formData }) {
       {curvePoints.length > 1 && (
         <div className="chart-section">
           <button className="chart-toggle" onClick={() => setShowChart(v => !v)}>
-            {showChart ? '▲ Hide fee analysis' : '▾ Show fee vs. win probability chart'}
+            {showChart
+              ? <><ChevronUp size={14} /> Hide fee analysis</>
+              : <><ChevronDown size={14} /> Show fee vs. win probability chart</>}
           </button>
           {showChart && (
             <div className="card chart-card">
