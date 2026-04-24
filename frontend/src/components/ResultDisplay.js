@@ -337,7 +337,7 @@ function ResultDisplay({ prediction, formData }) {
       {/* ── Warnings ── */}
       {warnings?.length > 0 && (
         <div className="result-warning">
-          <span className="warning-icon">⚠</span>
+          <AlertTriangle size={16} className="warning-icon" />
           <span>{warnings[0]}</span>
         </div>
       )}
