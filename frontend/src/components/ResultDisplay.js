@@ -449,9 +449,11 @@ function ResultDisplay({ prediction, formData }) {
             </span>
             <div className="win-meta">
               <span className="win-label" style={{ color: wpColor }}>{winLabel(winProbPct)}</span>
-              <span className="win-ev" title="Expected Value = P(Win) × Fee — your average earnings per bid at this price">
+              <span className="win-ev">
                 EV · ${fmt(evAtRec)} at {evCapped ? 'max recommended' : 'optimal bid'}
-                <span className="ev-help">?</span>
+                <InfoTip content="Expected Value = P(Win) × Fee — your average earnings per bid at this price">
+                  <span className="ev-help"><HelpCircle size={10} /></span>
+                </InfoTip>
               </span>
             </div>
           </div>
