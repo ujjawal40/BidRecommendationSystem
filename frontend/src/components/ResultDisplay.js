@@ -156,6 +156,23 @@ function InfoTip({ children, content, side = 'top' }) {
   );
 }
 
+// ── Custom Recharts tooltip ──────────────────────────────────────────────────
+
+function ChartTooltipContent({ active, payload }) {
+  if (!active || !payload || payload.length === 0) return null;
+  const data = payload[0].payload;
+  const wp = Math.round(data.win_probability);
+  const ev = Math.round((wp / 100) * data.fee);
+  const color = winColor(wp);
+  return (
+    <div className="recharts-custom-tooltip">
+      <span className="rct-fee">${fmt(data.fee)}</span>
+      <span className="rct-prob" style={{ color }}>{wp}% win</span>
+      <span className="rct-ev">EV ${fmt(ev)}</span>
+    </div>
+  );
+}
+
 // ── SVG Fee Chart ─────────────────────────────────────────────────────────────
 
 function FeeChart({ curvePoints, recFee, maxFee, floorFee, evCapped }) {
