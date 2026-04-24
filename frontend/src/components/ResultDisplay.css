@@ -670,7 +670,7 @@
   border: 1px solid rgba(161, 98, 7, 0.12);
   border-radius: var(--r-xl);
 }
-.rush-icon  { font-size: 1.1rem; flex-shrink: 0; line-height: 1.5; }
+.rush-icon  { flex-shrink: 0; color: var(--warning); margin-top: 2px; }
 .rush-title { font-size: var(--font-sm); font-weight: 700; color: var(--warning); margin-bottom: 2px; }
 .rush-body  { font-size: var(--font-sm); color: var(--text-muted); margin: 0; }
 
