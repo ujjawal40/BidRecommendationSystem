@@ -194,9 +194,7 @@ function App() {
             ) : (
               <div className="card placeholder-card">
                 <div className="placeholder-icon">
-                  <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                    <path d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                  </svg>
+                  <BarChart3 size={48} strokeWidth={1.5} />
                 </div>
                 <h3>Ready to Analyze</h3>
                 <p>Fill out the form and click "Get Recommendation" to see your optimal bid with live win probability.</p>
