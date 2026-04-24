@@ -600,7 +600,7 @@ function ResultDisplay({ prediction, formData }) {
       {/* ── Rush callout ── */}
       {isRush && (
         <div className="card result-rush">
-          <span className="rush-icon">⚡</span>
+          <Zap size={18} className="rush-icon" />
           <div>
             <p className="rush-title">Short turnaround premium included</p>
             <p className="rush-body">
