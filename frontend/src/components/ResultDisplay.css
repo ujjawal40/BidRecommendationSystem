@@ -354,19 +354,14 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: rgba(0, 0, 0, 0.06);
   color: var(--text-muted);
-  font-size: 9px;
-  font-weight: 700;
   margin-left: 4px;
   vertical-align: middle;
-  opacity: 0.7;
+  opacity: 0.5;
+  cursor: help;
   transition: opacity var(--ease-fast);
 }
-.win-ev:hover .ev-help { opacity: 1; }
+.ev-help:hover { opacity: 1; }
 
 .win-bar-track {
   height: 4px;
