@@ -179,126 +179,77 @@ function FeeChart({ curvePoints, recFee, maxFee, floorFee, evCapped }) {
   const pts = [...curvePoints].sort((a, b) => a.fee - b.fee);
   if (pts.length < 2) return null;
 
-  const [chartFee, setChartFee] = useState(recFee);
-
-  const minFee     = pts[0].fee;
-  const maxCurFee  = pts[pts.length - 1].fee;
-  const feeRange   = maxCurFee - minFee;
-  const sliderStep = feeRange < 1000 ? 10 : feeRange < 3000 ? 25 : 50;
-  const chartWinProb = Math.round(interpolateWinProb(chartFee, pts) ?? 50);
-  const chartEV      = Math.round((chartWinProb / 100) * chartFee);
-  const chartColor   = winColor(chartWinProb);
-
-  // SVG dimensions
-  const W = 560, H = 182;
-  const PAD = { top: 14, right: 16, bottom: 40, left: 36 };
-  const cW = W - PAD.left - PAD.right;
-  const cH = H - PAD.top  - PAD.bottom;
-
-  const xS = fee  => PAD.left + ((fee  - minFee) / (maxCurFee - minFee)) * cW;
-  const yS = prob => PAD.top  + cH - (prob / 100) * cH;
-
-  const pathD = pts.map((p, i) =>
-    `${i === 0 ? 'M' : 'L'}${xS(p.fee).toFixed(1)},${yS(p.win_probability).toFixed(1)}`
-  ).join(' ');
-
-  const selX = xS(chartFee);
-  const selY = yS(chartWinProb);
-  const threshY = yS(30);
-
-  // Clamp marker positions to visible range
-  const recX   = Math.min(Math.max(xS(recFee),  PAD.left), PAD.left + cW);
-  const maxX   = Math.min(Math.max(xS(maxFee),  PAD.left), PAD.left + cW);
-  const floorX = Math.min(Math.max(xS(floorFee), PAD.left), PAD.left + cW);
-
   return (
     <div className="fee-chart">
       <div className="fee-chart-title">Fee vs. Win Probability</div>
-      <svg viewBox={`0 0 ${W} ${H}`} width="100%" className="fee-chart-svg">
-        {/* 30% threshold band */}
-        <rect x={PAD.left} y={threshY} width={cW} height={cH + PAD.top - threshY + PAD.top}
-          fill="rgba(185, 28, 28, 0.03)" />
-        <line x1={PAD.left} y1={threshY} x2={PAD.left + cW} y2={threshY}
-          stroke="rgba(185, 28, 28, 0.25)" strokeWidth="1" strokeDasharray="4,3" />
-        <text x={PAD.left + 4} y={threshY - 4}
-          fill="rgba(185, 28, 28, 0.45)" fontSize="9" fontFamily="Inter, sans-serif">30% min threshold</text>
-
-        {/* Y-axis gridlines + labels */}
-        {[0, 25, 50, 75, 100].map(v => (
-          <g key={v}>
-            <line x1={PAD.left} y1={yS(v)} x2={PAD.left + cW} y2={yS(v)}
-              stroke="rgba(0,0,0,0.06)" strokeWidth="1" />
-            <text x={PAD.left - 4} y={yS(v) + 3.5} fill="#8C8C88" fontSize="9"
-              textAnchor="end" fontFamily="Inter, sans-serif">{v}%</text>
-          </g>
-        ))}
-
-        {/* Floor, Ceiling vertical markers */}
-        <line x1={floorX} y1={PAD.top} x2={floorX} y2={PAD.top + cH}
-          stroke="rgba(0,0,0,0.12)" strokeWidth="1" strokeDasharray="3,3" />
-        <line x1={maxX} y1={PAD.top} x2={maxX} y2={PAD.top + cH}
-          stroke="rgba(43,90,131,0.25)" strokeWidth="1" strokeDasharray="3,3" />
-
-        {/* Shaded viable region between floor and ceiling */}
-        <rect x={floorX} y={PAD.top} width={Math.max(0, maxX - floorX)} height={cH}
-          fill="rgba(43,90,131,0.04)" />
-
-        {/* Curve */}
-        <path d={pathD} fill="none" stroke="#2B5A83" strokeWidth="1.5" strokeLinejoin="round" />
-
-        {/* Selected fee vertical */}
-        <line x1={selX} y1={PAD.top} x2={selX} y2={PAD.top + cH}
-          stroke="rgba(0,0,0,0.06)" strokeWidth="1" />
-
-        {/* Selected point */}
-        <circle cx={selX} cy={selY} r="5" fill={chartColor} stroke="#FFFFFF" strokeWidth="2" />
-
-        {/* X-axis labels */}
-        <text x={floorX} y={H - 14} fill="#8C8C88" fontSize="9" textAnchor="middle"
-          fontFamily="Inter, sans-serif">Floor</text>
-        <text x={floorX} y={H - 4} fill="#8C8C88" fontSize="8" textAnchor="middle"
-          fontFamily="Inter, sans-serif">${fmt(floorFee)}</text>
-
-        <text x={recX} y={H - 14} fill="#2B5A83" fontSize="9" textAnchor="middle"
-          fontFamily="Inter, sans-serif">{evCapped ? 'Max Rec.' : 'Optimal'}</text>
-        <text x={recX} y={H - 4} fill="#2B5A83" fontSize="8" textAnchor="middle"
-          fontFamily="Inter, sans-serif">${fmt(recFee)}</text>
-
-        {Math.abs(recX - maxX) > 30 && (<>
-          <text x={maxX} y={H - 14} fill="#8C8C88" fontSize="9" textAnchor="middle"
-            fontFamily="Inter, sans-serif">Ceiling</text>
-          <text x={maxX} y={H - 4} fill="#8C8C88" fontSize="8" textAnchor="middle"
-            fontFamily="Inter, sans-serif">${fmt(maxFee)}</text>
-        </>)}
-      </svg>
-
-      {/* Slider */}
-      <div className="chart-slider-wrap">
-        <input
-          type="range"
-          className="chart-slider"
-          min={minFee}
-          max={maxCurFee}
-          step={sliderStep}
-          value={chartFee}
-          onChange={e => setChartFee(Number(e.target.value))}
-          aria-label="Explore fee vs. win probability"
-          aria-valuetext={`$${fmt(chartFee)} fee, ${chartWinProb}% win probability`}
-        />
-      </div>
-
-      {/* Live stats */}
-      <div className="chart-stats">
-        <span className="chart-fee">${fmt(chartFee)}</span>
-        <span className="chart-arrow">→</span>
-        <span className="chart-prob" style={{ color: chartColor }}>
-          {chartWinProb}% chance of winning
-        </span>
-        <span className="chart-ev">· EV ${fmt(chartEV)}</span>
-        {chartWinProb < 30 && (
-          <span className="chart-below-threshold">below viable threshold</span>
-        )}
-      </div>
+      <ResponsiveContainer width="100%" height={200}>
+        <AreaChart data={pts} margin={{ top: 10, right: 16, bottom: 0, left: -12 }}>
+          <defs>
+            <linearGradient id="winProbGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#2B5A83" stopOpacity={0.12} />
+              <stop offset="100%" stopColor="#2B5A83" stopOpacity={0.01} />
+            </linearGradient>
+          </defs>
+          <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.05)" vertical={false} />
+          <XAxis
+            dataKey="fee"
+            tickFormatter={v => `$${fmt(v)}`}
+            tick={{ fontSize: 10, fill: '#8C8C88' }}
+            axisLine={{ stroke: 'rgba(0,0,0,0.08)' }}
+            tickLine={false}
+          />
+          <YAxis
+            domain={[0, 100]}
+            tickFormatter={v => `${v}%`}
+            tick={{ fontSize: 10, fill: '#8C8C88' }}
+            axisLine={false}
+            tickLine={false}
+          />
+          <ReferenceArea
+            x1={Math.max(floorFee, pts[0].fee)}
+            x2={Math.min(maxFee, pts[pts.length - 1].fee)}
+            fill="rgba(43,90,131,0.04)"
+            ifOverflow="hidden"
+          />
+          <ReferenceLine
+            y={30}
+            stroke="rgba(185,28,28,0.25)"
+            strokeDasharray="4 3"
+            label={{ value: '30% min', position: 'insideTopLeft', fontSize: 9, fill: 'rgba(185,28,28,0.5)' }}
+          />
+          <ReferenceLine
+            x={floorFee}
+            stroke="rgba(0,0,0,0.15)"
+            strokeDasharray="3 3"
+            label={{ value: 'Floor', position: 'insideTopLeft', fontSize: 9, fill: '#8C8C88' }}
+          />
+          <ReferenceLine
+            x={maxFee}
+            stroke="rgba(43,90,131,0.3)"
+            strokeDasharray="3 3"
+            label={{ value: 'Ceiling', position: 'insideTopRight', fontSize: 9, fill: '#8C8C88' }}
+          />
+          <ReferenceLine
+            x={recFee}
+            stroke="#2B5A83"
+            strokeWidth={1.5}
+            label={{ value: evCapped ? 'Max Rec.' : 'Optimal', position: 'insideTopRight', fontSize: 9, fill: '#2B5A83', fontWeight: 600 }}
+          />
+          <Area
+            type="monotone"
+            dataKey="win_probability"
+            stroke="#2B5A83"
+            strokeWidth={2}
+            fill="url(#winProbGrad)"
+            dot={false}
+            activeDot={{ r: 5, fill: '#2B5A83', stroke: '#fff', strokeWidth: 2 }}
+          />
+          <RechartsTooltip
+            content={<ChartTooltipContent />}
+            cursor={{ stroke: 'rgba(0,0,0,0.08)', strokeWidth: 1 }}
+          />
+        </AreaChart>
+      </ResponsiveContainer>
     </div>
   );
 }
