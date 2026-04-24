@@ -138,6 +138,24 @@ function buildContextMessage({ recFee, maxFee, floorFee, winProbPct, confidence,
   };
 }
 
+// ── Radix Tooltip wrapper ────────────────────────────────────────────────────
+
+function InfoTip({ children, content, side = 'top' }) {
+  return (
+    <Tip.Provider delayDuration={200}>
+      <Tip.Root>
+        <Tip.Trigger asChild>{children}</Tip.Trigger>
+        <Tip.Portal>
+          <Tip.Content className="tooltip-content" side={side} sideOffset={6}>
+            {content}
+            <Tip.Arrow className="tooltip-arrow" />
+          </Tip.Content>
+        </Tip.Portal>
+      </Tip.Root>
+    </Tip.Provider>
+  );
+}
+
 // ── SVG Fee Chart ─────────────────────────────────────────────────────────────
 
 function FeeChart({ curvePoints, recFee, maxFee, floorFee, evCapped }) {
