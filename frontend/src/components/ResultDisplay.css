@@ -502,47 +502,6 @@
 .rct-prob { font-weight: 600; }
 .rct-ev   { color: var(--text-muted); }
 
-
-/* Live stats row */
-.chart-stats {
-  display: flex;
-  align-items: center;
-  gap: var(--s-sm);
-  flex-wrap: wrap;
-  padding-top: var(--s-xs);
-  border-top: 1px solid var(--border-light);
-  font-variant-numeric: tabular-nums;
-}
-
-.chart-fee {
-  font-size: var(--font-lg);
-  font-weight: 700;
-  color: var(--text-primary);
-  letter-spacing: -0.02em;
-}
-
-.chart-arrow { color: var(--text-muted); font-size: var(--font-sm); }
-
-.chart-prob {
-  font-size: var(--font-base);
-  font-weight: 700;
-}
-
-.chart-ev {
-  font-size: var(--font-sm);
-  color: var(--text-muted);
-}
-
-.chart-below-threshold {
-  font-size: var(--font-xs);
-  font-weight: 600;
-  color: var(--danger);
-  background: rgba(185, 28, 28, 0.06);
-  border: 1px solid rgba(185, 28, 28, 0.15);
-  padding: 2px 8px;
-  border-radius: var(--r-pill);
-}
-
 /* Mobile responsiveness */
 @media (max-width: 640px) {
   .bid-anchors { grid-template-columns: 1fr 1fr 1fr; gap: var(--s-sm); }
