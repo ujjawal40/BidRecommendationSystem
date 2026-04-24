@@ -381,13 +381,14 @@ function ResultDisplay({ prediction, formData }) {
               >
                 Recommended Bid
               </span>
-              <div className="anchor-rec-fee" style={{ justifyContent: 'flex-end', cursor: 'pointer' }}
-                title="Click to copy"
-                onClick={() => { navigator.clipboard.writeText(Math.round(recFee).toString()); setCopied(true); setTimeout(() => setCopied(false), 1500); }}>
-                <span className="anchor-rec-currency">$</span>
-                <span className="anchor-rec-amount">{fmt(recFee)}</span>
-                {copied && <span className="copied-badge">Copied</span>}
-              </div>
+              <InfoTip content="Click to copy">
+                <div className="anchor-rec-fee" style={{ justifyContent: 'flex-end', cursor: 'pointer' }}
+                  onClick={() => { navigator.clipboard.writeText(Math.round(recFee).toString()); setCopied(true); setTimeout(() => setCopied(false), 1500); }}>
+                  <span className="anchor-rec-currency">$</span>
+                  <span className="anchor-rec-amount">{fmt(recFee)}</span>
+                  {copied && <span className="copied-badge"><Check size={10} /> Copied</span>}
+                </div>
+              </InfoTip>
               {evCapped && (
                 <span className="capped-badge">⚠ capped at 30% win floor</span>
               )}
