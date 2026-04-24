@@ -609,7 +609,7 @@
   color: var(--text-secondary);
   line-height: 1.55;
 }
-.flat-curve-icon { font-size: 0.9rem; line-height: 1.6; flex-shrink: 0; }
+.flat-curve-icon { flex-shrink: 0; margin-top: 2px; color: var(--accent); }
 
 /* ── Market context ── */
 .result-context { padding: var(--s-md) var(--s-lg); }
