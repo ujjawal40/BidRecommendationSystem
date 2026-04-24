@@ -4,6 +4,10 @@ import {
   ReferenceLine, ReferenceArea, Tooltip as RechartsTooltip,
   CartesianGrid,
 } from 'recharts';
+import {
+  AlertTriangle, Zap, Info, HelpCircle,
+  ChevronUp, ChevronDown, Check,
+} from 'lucide-react';
 import './ResultDisplay.css';
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
