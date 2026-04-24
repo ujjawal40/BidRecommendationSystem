@@ -8,6 +8,7 @@ import {
   AlertTriangle, Zap, Info, HelpCircle,
   ChevronUp, ChevronDown, Check,
 } from 'lucide-react';
+import * as Tip from '@radix-ui/react-tooltip';
 import './ResultDisplay.css';
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
