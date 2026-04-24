@@ -502,48 +502,6 @@
 .rct-prob { font-weight: 600; }
 .rct-ev   { color: var(--text-muted); }
 
-/* Chart slider */
-.chart-slider-wrap {
-  padding: 0 2px;
-  margin-top: var(--s-xs);
-}
-
-.chart-slider {
-  width: 100%;
-  height: 20px;
-  appearance: none;
-  background: transparent;
-  cursor: pointer;
-}
-
-.chart-slider::-webkit-slider-runnable-track {
-  height: 3px;
-  background: rgba(0, 0, 0, 0.08);
-  border-radius: 2px;
-}
-
-.chart-slider::-webkit-slider-thumb {
-  appearance: none;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: var(--accent);
-  border: 2px solid var(--bg-card);
-  box-shadow: 0 0 0 1px var(--accent);
-  margin-top: -7px;
-  cursor: grab;
-  transition: transform var(--ease-fast);
-}
-
-.chart-slider::-webkit-slider-thumb:active { cursor: grabbing; transform: scale(1.1); }
-.chart-slider::-moz-range-thumb {
-  width: 16px; height: 16px; border-radius: 50%;
-  background: var(--accent); border: 2px solid var(--bg-card);
-  box-shadow: 0 0 0 1px var(--accent); cursor: grab;
-}
-.chart-slider::-moz-range-track {
-  height: 3px; background: rgba(0, 0, 0, 0.08); border-radius: 2px;
-}
 
 /* Live stats row */
 .chart-stats {
