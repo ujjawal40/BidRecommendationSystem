@@ -718,6 +718,9 @@
 
 /* ── Details toggle ── */
 .details-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   background: none;
   border: none;
   color: var(--text-muted);
