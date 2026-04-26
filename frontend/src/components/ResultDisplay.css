@@ -347,9 +347,11 @@
   letter-spacing: -0.03em;
 }
 
-@keyframes fillBar {
-  from { transform: scaleX(0); }
-  to   { transform: scaleX(1); }
+.gauge-label {
+  font-size: 9px;
+  font-family: var(--font);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
 }
 
 /* ── Win interpretation ── */
