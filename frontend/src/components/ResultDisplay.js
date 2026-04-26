@@ -105,7 +105,6 @@ function buildContextMessage({ recFee, maxFee, floorFee, winProbPct, confidence,
     };
   }
 
-  // Case 5: Strong odds — well positioned
   if (winProbPct >= 55) {
     return {
       headline: aboveBench
