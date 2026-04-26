@@ -321,23 +321,6 @@
 .gauge-column {
   display: flex;
   flex-direction: column;
-  gap: var(--s-sm);
-  padding-top: var(--s-lg);
-  border-top: 1px solid var(--border-light);
-  margin-top: var(--s-md);
-}
-
-.win-section-label {
-  font-size: var(--font-xs);
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--text-muted);
-  margin-bottom: var(--s-xs);
-}
-
-.win-row {
-  display: flex;
   align-items: center;
   gap: var(--s-md);
 }
