@@ -64,7 +64,6 @@ function buildContextMessage({ recFee, maxFee, floorFee, winProbPct, confidence,
     };
   }
 
-  // Case 2: Flat curve — price barely matters
   if (isFlatCurve) {
     return {
       headline: 'Price has little effect on your win odds here',
@@ -445,6 +444,12 @@ function ResultDisplay({ prediction, formData }) {
   const rawWinProb = interpolateWinProb(recFee, curvePoints);
   const winProbPct = Math.round(rawWinProb ?? win_probability?.probability_pct ?? 50);
   const evAtRec    = Math.round((winProbPct / 100) * recFee);
+
+  // EV at floor and ceiling for comparison
+  const wpAtFloor = Math.round(interpolateWinProb(floorFee, curvePoints) ?? 50);
+  const evAtFloor = Math.round((wpAtFloor / 100) * floorFee);
+  const wpAtMax   = Math.round(interpolateWinProb(maxFee, curvePoints) ?? 30);
+  const evAtMax   = Math.round((wpAtMax / 100) * maxFee);
 
   // Track position (2-98%)
   const recTrackPct = maxFee > floorFee
