@@ -900,12 +900,23 @@
   to   { opacity: 1; transform: scale(1); }
 }
 
-/* ── Inline SVG icon alignment in badges ── */
-.copied-badge svg {
-  vertical-align: -1px;
-  margin-right: 2px;
+/* ══════════════════════════════════════════════════════════════════════════════
+   RESPONSIVE
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+  .kpi-row { grid-template-columns: 1fr; }
+  .range-gauge-grid { grid-template-columns: 1fr; }
+  .gauge-column { margin-top: var(--s-md); }
+  .ev-strip { flex-direction: column; gap: 0; }
+  .ev-strip-divider { width: 80%; height: 1px; }
 }
-.capped-badge svg {
-  vertical-align: -1px;
-  margin-right: 2px;
+
+@media (max-width: 640px) {
+  .range-anchors { gap: var(--s-sm); }
+  .range-anchor-value { font-size: var(--font-base); }
+  .range-anchor-value-rec { font-size: var(--font-lg); }
+  .what-if-row { flex-direction: column; align-items: flex-start; gap: var(--s-sm); }
+  .what-if-result { padding-left: 0; }
+  .kpi-value-fee { font-size: var(--font-2xl); }
 }
