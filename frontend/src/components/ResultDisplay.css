@@ -354,8 +354,7 @@
   letter-spacing: 0.1em;
 }
 
-/* ── Win interpretation ── */
-.win-interpretation {
+.gauge-sublabel {
   font-size: var(--font-xs);
   color: var(--text-muted);
   opacity: 0.7;
