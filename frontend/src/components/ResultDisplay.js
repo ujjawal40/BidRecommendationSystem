@@ -392,7 +392,6 @@ function ResultDisplay({ prediction, formData }) {
   } = prediction;
 
   const [showDetails, setShowDetails] = useState(false);
-  const [showChart,   setShowChart]   = useState(true);
   const [whatIfFee,   setWhatIfFee]   = useState('');
   const [copied,      setCopied]      = useState(false);
 
