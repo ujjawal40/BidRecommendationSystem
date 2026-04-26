@@ -420,7 +420,7 @@ function ResultDisplay({ prediction, formData }) {
   const probRange   = probValues.length > 1 ? Math.max(...probValues) - Math.min(...probValues) : 0;
   const isFlatCurve = probRange < 8;
 
-  // Market context — use recFee (what the user is told to bid) not predicted_fee
+  // Market context
   const vsMarket    = ((recFee - segment_benchmark) / segment_benchmark * 100);
   const vsMarketStr = (vsMarket >= 0 ? '+' : '') + vsMarket.toFixed(0) + '%';
 
