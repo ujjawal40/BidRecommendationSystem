@@ -459,13 +459,54 @@ function ResultDisplay({ prediction, formData }) {
         </div>
       )}
 
-      {/* ── Bid Range Panel ── */}
-      <div className="card result-hero">
+      {/* ── KPI Summary Row ── */}
+      <div className="kpi-row">
+        <div className="kpi-card kpi-fee">
+          <div className="kpi-icon-wrap kpi-icon-accent">
+            <DollarSign size={18} />
+          </div>
+          <div className="kpi-body">
+            <span className="kpi-label">
+              {evCapped ? 'Max Recommended' : 'Optimal Bid'}
+            </span>
+            <InfoTip content="Click to copy">
+              <span
+                className="kpi-value kpi-value-fee"
+                style={{ cursor: 'pointer' }}
+                onClick={() => { navigator.clipboard.writeText(Math.round(recFee).toString()); setCopied(true); setTimeout(() => setCopied(false), 1500); }}
+              >
+                ${fmt(recFee)}
+                {copied && <span className="copied-badge"><Check size={10} /> Copied</span>}
+              </span>
+            </InfoTip>
+          </div>
+          {evCapped && (
+            <span className="capped-badge"><AlertTriangle size={10} /> capped at ceiling</span>
+          )}
+        </div>
 
-        <div className="bid-range-header">
-          <div className="bid-range-left">
-            <span className="bid-range-label">Bid Range</span>
-            <span className={`quality-badge ${bidQuality.cls}`}>{bidQuality.label}</span>
+        <div className="kpi-card kpi-win">
+          <div className={`kpi-icon-wrap kpi-icon-${winProbPct >= 55 ? 'success' : winProbPct >= 35 ? 'warning' : 'danger'}`}>
+            <Target size={18} />
+          </div>
+          <div className="kpi-body">
+            <span className="kpi-label">Win Probability</span>
+            <span className="kpi-value" style={{ color: wpColor }}>{winProbPct}%</span>
+          </div>
+          <span className={`kpi-tag ${bidQuality.cls}`}>{bidQuality.label}</span>
+        </div>
+
+        <div className="kpi-card kpi-ev">
+          <div className="kpi-icon-wrap kpi-icon-success">
+            <TrendingUp size={18} />
+          </div>
+          <div className="kpi-body">
+            <InfoTip content="Expected Value = P(Win) x Fee — your average earnings per bid at this price">
+              <span className="kpi-label kpi-label-help">
+                Expected Value <HelpCircle size={10} />
+              </span>
+            </InfoTip>
+            <span className="kpi-value kpi-value-ev">${fmt(evAtRec)}</span>
           </div>
           <InfoTip content={
             confidence_level === 'high'
