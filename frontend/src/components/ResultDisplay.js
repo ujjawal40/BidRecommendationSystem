@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import {
-  ResponsiveContainer, AreaChart, Area, XAxis, YAxis,
+  ResponsiveContainer, ComposedChart, Area, Line, XAxis, YAxis,
   ReferenceLine, ReferenceArea, Tooltip as RechartsTooltip,
   CartesianGrid,
 } from 'recharts';
 import {
   AlertTriangle, Zap, Info, HelpCircle,
   ChevronUp, ChevronDown, Check,
+  DollarSign, Target, TrendingUp,
+  ArrowUpRight, ArrowDownRight,
 } from 'lucide-react';
 import * as Tip from '@radix-ui/react-tooltip';
 import './ResultDisplay.css';
@@ -49,7 +51,6 @@ function buildContextMessage({ recFee, maxFee, floorFee, winProbPct, confidence,
   const aboveBench = recFee > segBenchmark;
   const diffPct    = Math.abs(((recFee - segBenchmark) / segBenchmark) * 100).toFixed(0);
 
-  // Case 1: Recommended was capped at ceiling — the model wanted to go higher
   if (evCapped) {
     return {
       headline: 'Max Recommended — the EV-optimal fee exceeds the 30% win threshold',
