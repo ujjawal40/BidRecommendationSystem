@@ -690,7 +690,7 @@ function ResultDisplay({ prediction, formData }) {
         </div>
       )}
 
-      {/* ── Contextual insight card (client-side, always fresh) ── */}
+      {/* ── Contextual insight card ── */}
       <div className={`card result-insight signal-${ctxMsg.signal}`}>
         <p className="insight-headline">{ctxMsg.headline}</p>
         <p className="insight-body">{ctxMsg.body}</p>
