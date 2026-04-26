@@ -34,9 +34,9 @@ function interpolateWinProb(fee, curvePoints) {
 }
 
 function winLabel(pct) {
-  if (pct >= 55) return 'Strong chance of winning';
-  if (pct >= 35) return 'Moderate chance of winning';
-  return 'Low chance of winning';
+  if (pct >= 55) return 'Strong';
+  if (pct >= 35) return 'Moderate';
+  return 'Low';
 }
 
 function winColor(pct) {
@@ -92,7 +92,6 @@ function buildContextMessage({ recFee, maxFee, floorFee, winProbPct, confidence,
     };
   }
 
-  // Case 4: Low confidence (wide fee spread or sparse data)
   if (confidence === 'low') {
     return {
       headline: 'Estimate is directional — fees vary widely in this market',
