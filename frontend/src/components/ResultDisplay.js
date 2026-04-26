@@ -77,7 +77,6 @@ function buildContextMessage({ recFee, maxFee, floorFee, winProbPct, confidence,
     };
   }
 
-  // Case 3: Low win probability (below 30%)
   if (winProbPct < 30) {
     const dataNote = confidence === 'low'
       ? ' The model also has limited data for this exact combination, so treat this as a rough estimate.'
