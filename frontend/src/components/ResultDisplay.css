@@ -322,7 +322,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--s-md);
+  gap: var(--s-xs);
+  min-width: 160px;
 }
 
 .win-pct {
