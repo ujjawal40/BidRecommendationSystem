@@ -731,27 +731,18 @@ function ResultDisplay({ prediction, formData }) {
             )}
           </span>
         </div>
-        <div className="context-metrics">
-          <div className="context-metric">
-            <span className="context-metric-label">Segment avg</span>
-            <span className="context-metric-value">${fmt(segment_benchmark)}</span>
-          </div>
-          <div className="context-metric">
-            <span className="context-metric-label">Your bid vs segment</span>
-            <span className={`context-metric-value context-diff ${vsMarket >= 0 ? 'above' : 'below'}`}>
-              {vsMarketStr}
-            </span>
-          </div>
-          <div className="context-metric">
-            <span className="context-metric-label">Floor–Ceiling spread</span>
-            <span className="context-metric-value">${fmt(maxFee - floorFee)}</span>
-          </div>
+        <div className="market-bars">
+          <MarketBar label="Segment Avg" value={segment_benchmark} bidValue={recFee} />
           {state_benchmark && (
-            <div className="context-metric">
-              <span className="context-metric-label">State avg</span>
-              <span className="context-metric-value">${fmt(state_benchmark)}</span>
-            </div>
+            <MarketBar label="State Avg" value={state_benchmark} bidValue={recFee} />
           )}
+        </div>
+        <div className="market-summary">
+          <span className={`market-diff ${vsMarket >= 0 ? 'above' : 'below'}`}>
+            {vsMarket >= 0 ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
+            {vsMarketStr} vs segment
+          </span>
+          <span className="market-spread">Spread: ${fmt(maxFee - floorFee)}</span>
         </div>
       </div>
 
