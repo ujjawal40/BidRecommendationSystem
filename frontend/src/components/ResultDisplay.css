@@ -330,24 +330,10 @@
   display: block;
 }
 
-.win-ev {
-  font-size: var(--font-xs);
-  color: var(--text-muted);
-  letter-spacing: 0.02em;
-  font-variant-numeric: tabular-nums;
-  cursor: help;
-}
-
-.ev-help {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-muted);
-  margin-left: 4px;
-  vertical-align: middle;
-  opacity: 0.5;
-  cursor: help;
-  transition: opacity var(--ease-fast);
+.gauge-fill {
+  animation: gaugeReveal 1s ease-out forwards;
+  stroke-dasharray: 400;
+  stroke-dashoffset: 400;
 }
 .ev-help:hover { opacity: 1; }
 
