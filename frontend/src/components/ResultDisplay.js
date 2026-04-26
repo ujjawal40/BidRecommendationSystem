@@ -155,86 +155,205 @@ function InfoTip({ children, content, side = 'top' }) {
   );
 }
 
+// ── SVG Semicircular Gauge ──────────────────────────────────────────────────
+
+function WinGauge({ value, size = 140 }) {
+  const r = (size - 16) / 2;
+  const cx = size / 2;
+  const cy = size / 2 + 8;
+  const startAngle = Math.PI;
+  const sweep = Math.PI;
+  const pct = Math.max(0, Math.min(100, value)) / 100;
+
+  const arcPath = (startPct, endPct) => {
+    const a1 = startAngle - startPct * sweep;
+    const a2 = startAngle - endPct * sweep;
+    const x1 = cx + r * Math.cos(a1);
+    const y1 = cy - r * Math.sin(a1);
+    const x2 = cx + r * Math.cos(a2);
+    const y2 = cy - r * Math.sin(a2);
+    const large = endPct - startPct > 0.5 ? 1 : 0;
+    return `M${x1},${y1} A${r},${r} 0 ${large} 0 ${x2},${y2}`;
+  };
+
+  const color = winColor(value);
+
+  return (
+    <svg width={size} height={size / 2 + 24} viewBox={`0 0 ${size} ${size / 2 + 24}`} className="win-gauge-svg">
+      {/* Background arc */}
+      <path d={arcPath(0, 1)} fill="none" stroke="rgba(0,0,0,0.06)" strokeWidth="8" strokeLinecap="round" />
+      {/* Red zone 0-30% */}
+      <path d={arcPath(0, 0.3)} fill="none" stroke="rgba(185,28,28,0.1)" strokeWidth="8" strokeLinecap="round" />
+      {/* Amber zone 30-55% */}
+      <path d={arcPath(0.3, 0.55)} fill="none" stroke="rgba(161,98,7,0.08)" strokeWidth="8" strokeLinecap="round" />
+      {/* Value fill */}
+      <path
+        d={arcPath(0, pct)}
+        fill="none"
+        stroke={color}
+        strokeWidth="8"
+        strokeLinecap="round"
+        className="gauge-fill"
+      />
+      {/* Threshold marker at 30% */}
+      {(() => {
+        const angle = startAngle - 0.3 * sweep;
+        const mx = cx + (r - 12) * Math.cos(angle);
+        const my = cy - (r - 12) * Math.sin(angle);
+        return <text x={mx} y={my} fontSize="7" fill="rgba(185,28,28,0.4)" textAnchor="middle">30%</text>;
+      })()}
+      {/* Center value */}
+      <text x={cx} y={cy - 6} textAnchor="middle" className="gauge-value" fill={color}>
+        {value}%
+      </text>
+      <text x={cx} y={cy + 10} textAnchor="middle" className="gauge-label" fill="#8C8C88">
+        win probability
+      </text>
+    </svg>
+  );
+}
+
 // ── Custom Recharts tooltip ──────────────────────────────────────────────────
 
-function ChartTooltipContent({ active, payload }) {
+function DualChartTooltip({ active, payload }) {
   if (!active || !payload || payload.length === 0) return null;
   const data = payload[0].payload;
   const wp = Math.round(data.win_probability);
-  const ev = Math.round((wp / 100) * data.fee);
+  const ev = Math.round(data.ev);
   const color = winColor(wp);
   return (
     <div className="recharts-custom-tooltip">
-      <span className="rct-fee">${fmt(data.fee)}</span>
-      <span className="rct-prob" style={{ color }}>{wp}% win</span>
-      <span className="rct-ev">EV ${fmt(ev)}</span>
+      <div className="rct-row">
+        <span className="rct-label">Fee</span>
+        <span className="rct-fee">${fmt(data.fee)}</span>
+      </div>
+      <div className="rct-row">
+        <span className="rct-label">Win Prob</span>
+        <span className="rct-prob" style={{ color }}>{wp}%</span>
+      </div>
+      <div className="rct-row rct-row-highlight">
+        <span className="rct-label">Exp. Value</span>
+        <span className="rct-ev-val">${fmt(ev)}</span>
+      </div>
+      {wp < 30 && <span className="rct-warn">Below 30% threshold</span>}
     </div>
   );
 }
 
-// ── SVG Fee Chart ─────────────────────────────────────────────────────────────
+// ── Dual-Axis Fee Chart ──────────────────────────────────────────────────────
 
-function FeeChart({ curvePoints, recFee, maxFee, floorFee, evCapped }) {
+function FeeChart({ curvePoints, recFee, maxFee, floorFee, evCapped, evAtRec }) {
   const pts = [...curvePoints].sort((a, b) => a.fee - b.fee);
   if (pts.length < 2) return null;
 
+  // Compute EV for each point
+  const data = pts.map(p => ({
+    ...p,
+    ev: Math.round((p.win_probability / 100) * p.fee),
+  }));
+
+  const maxEV = Math.max(...data.map(d => d.ev));
+
   return (
     <div className="fee-chart">
-      <div className="fee-chart-title">Fee vs. Win Probability</div>
-      <ResponsiveContainer width="100%" height={200}>
-        <AreaChart data={pts} margin={{ top: 10, right: 16, bottom: 0, left: -12 }}>
+      <div className="fee-chart-header">
+        <span className="fee-chart-title">Fee Optimization Curve</span>
+        <div className="chart-legend">
+          <span className="legend-item">
+            <span className="legend-dot legend-dot-wp" />
+            Win Probability
+          </span>
+          <span className="legend-item">
+            <span className="legend-dot legend-dot-ev" />
+            Expected Value
+          </span>
+        </div>
+      </div>
+      <ResponsiveContainer width="100%" height={260}>
+        <ComposedChart data={data} margin={{ top: 10, right: 12, bottom: 0, left: -8 }}>
           <defs>
             <linearGradient id="winProbGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#2B5A83" stopOpacity={0.12} />
+              <stop offset="0%" stopColor="#2B5A83" stopOpacity={0.15} />
               <stop offset="100%" stopColor="#2B5A83" stopOpacity={0.01} />
             </linearGradient>
+            <linearGradient id="evGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#1A7A4C" stopOpacity={0.10} />
+              <stop offset="100%" stopColor="#1A7A4C" stopOpacity={0.01} />
+            </linearGradient>
           </defs>
-          <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.05)" vertical={false} />
+          <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.04)" vertical={false} />
           <XAxis
             dataKey="fee"
             tickFormatter={v => `$${fmt(v)}`}
             tick={{ fontSize: 10, fill: '#8C8C88' }}
-            axisLine={{ stroke: 'rgba(0,0,0,0.08)' }}
+            axisLine={{ stroke: 'rgba(0,0,0,0.06)' }}
             tickLine={false}
           />
           <YAxis
+            yAxisId="wp"
             domain={[0, 100]}
             tickFormatter={v => `${v}%`}
             tick={{ fontSize: 10, fill: '#8C8C88' }}
             axisLine={false}
             tickLine={false}
           />
+          <YAxis
+            yAxisId="ev"
+            orientation="right"
+            domain={[0, Math.ceil(maxEV / 100) * 100]}
+            tickFormatter={v => `$${fmt(v)}`}
+            tick={{ fontSize: 10, fill: '#1A7A4C', opacity: 0.6 }}
+            axisLine={false}
+            tickLine={false}
+          />
+
+          {/* Viable zone */}
           <ReferenceArea
             x1={Math.max(floorFee, pts[0].fee)}
             x2={Math.min(maxFee, pts[pts.length - 1].fee)}
-            fill="rgba(43,90,131,0.04)"
+            yAxisId="wp"
+            fill="rgba(43,90,131,0.03)"
             ifOverflow="hidden"
           />
+
+          {/* 30% threshold */}
           <ReferenceLine
-            y={30}
-            stroke="rgba(185,28,28,0.25)"
+            y={30} yAxisId="wp"
+            stroke="rgba(185,28,28,0.2)"
             strokeDasharray="4 3"
-            label={{ value: '30% min', position: 'insideTopLeft', fontSize: 9, fill: 'rgba(185,28,28,0.5)' }}
+            label={{ value: '30% min', position: 'insideTopLeft', fontSize: 9, fill: 'rgba(185,28,28,0.45)' }}
           />
+
+          {/* Floor */}
           <ReferenceLine
             x={floorFee}
-            stroke="rgba(0,0,0,0.15)"
+            stroke="rgba(0,0,0,0.12)"
             strokeDasharray="3 3"
+            yAxisId="wp"
             label={{ value: 'Floor', position: 'insideTopLeft', fontSize: 9, fill: '#8C8C88' }}
           />
+
+          {/* Ceiling */}
           <ReferenceLine
             x={maxFee}
-            stroke="rgba(43,90,131,0.3)"
+            stroke="rgba(43,90,131,0.25)"
             strokeDasharray="3 3"
+            yAxisId="wp"
             label={{ value: 'Ceiling', position: 'insideTopRight', fontSize: 9, fill: '#8C8C88' }}
           />
+
+          {/* Recommended */}
           <ReferenceLine
             x={recFee}
             stroke="#2B5A83"
             strokeWidth={1.5}
+            yAxisId="wp"
             label={{ value: evCapped ? 'Max Rec.' : 'Optimal', position: 'insideTopRight', fontSize: 9, fill: '#2B5A83', fontWeight: 600 }}
           />
+
+          {/* Win probability area */}
           <Area
+            yAxisId="wp"
             type="monotone"
             dataKey="win_probability"
             stroke="#2B5A83"
