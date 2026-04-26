@@ -340,12 +340,11 @@
   to { stroke-dashoffset: 0; }
 }
 
-.win-bar-fill {
-  height: 100%;
-  border-radius: var(--r-pill);
-  min-width: 4px;
-  animation: fillBar 0.8s ease-out forwards;
-  transform-origin: left;
+.gauge-value {
+  font-size: 24px;
+  font-weight: 800;
+  font-family: var(--font);
+  letter-spacing: -0.03em;
 }
 
 @keyframes fillBar {
