@@ -336,11 +336,8 @@
   stroke-dashoffset: 400;
 }
 
-.win-bar-track {
-  height: 4px;
-  background: rgba(0, 0, 0, 0.05);
-  border-radius: var(--r-pill);
-  overflow: hidden;
+@keyframes gaugeReveal {
+  to { stroke-dashoffset: 0; }
 }
 
 .win-bar-fill {
