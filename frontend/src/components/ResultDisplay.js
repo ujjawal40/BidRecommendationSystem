@@ -552,125 +552,119 @@ function ResultDisplay({ prediction, formData }) {
               : `Sparse data for this exact combination — treat as a rough guide, cross-reference with experience`
           }>
             <span className={`confidence-pill confidence-${confidence_level}`}>
-              {confidence_level} confidence
+              {confidence_level}
               {metadata?.data_coverage?.segment_samples && (
-                <span className="coverage-count"> · {fmt(metadata.data_coverage.segment_samples)} similar bids</span>
+                <span className="coverage-count"> · {fmt(metadata.data_coverage.segment_samples)}</span>
               )}
             </span>
           </InfoTip>
         </div>
-
-        {/* Bid anchors — 2 columns when capped, 3 otherwise */}
-        <div className={recEqualsMax ? 'bid-anchors-two' : 'bid-anchors'}>
-
-          <div className="anchor">
-            <span className="anchor-tag">Floor</span>
-            <span className="anchor-fee">${fmt(floorFee)}</span>
-          </div>
-
-          {recEqualsMax ? (
-            <div className="anchor anchor-right">
-              <span
-                className={`anchor-tag ${evCapped ? 'anchor-tag-capped' : 'anchor-tag-rec'}`}
-              >
-                Recommended Bid
-              </span>
-              <InfoTip content="Click to copy">
-                <div className="anchor-rec-fee" style={{ justifyContent: 'flex-end', cursor: 'pointer' }}
-                  onClick={() => { navigator.clipboard.writeText(Math.round(recFee).toString()); setCopied(true); setTimeout(() => setCopied(false), 1500); }}>
-                  <span className="anchor-rec-currency">$</span>
-                  <span className="anchor-rec-amount">{fmt(recFee)}</span>
-                  {copied && <span className="copied-badge"><Check size={10} /> Copied</span>}
-                </div>
-              </InfoTip>
-              {evCapped && (
-                <span className="capped-badge"><AlertTriangle size={10} /> capped at 30% win floor</span>
-              )}
-              <span className="ceiling-subtitle">(at bid ceiling)</span>
-            </div>
-          ) : (
-            <>
-              <div className="anchor anchor-center">
-                <span
-                  className={`anchor-tag ${evCapped ? 'anchor-tag-capped' : 'anchor-tag-rec'}`}
-                >
-                  Optimal Bid
-                </span>
-                <InfoTip content="Click to copy">
-                  <div className="anchor-rec-fee"
-                    style={{ cursor: 'pointer' }}
-                    onClick={() => { navigator.clipboard.writeText(Math.round(recFee).toString()); setCopied(true); setTimeout(() => setCopied(false), 1500); }}>
-                    <span className="anchor-rec-currency">$</span>
-                    <span className="anchor-rec-amount">{fmt(recFee)}</span>
-                    {copied && <span className="copied-badge"><Check size={10} /> Copied</span>}
-                  </div>
-                </InfoTip>
-                {evCapped && (
-                  <span className="capped-badge"><AlertTriangle size={10} /> capped at 30% win floor</span>
-                )}
-              </div>
-
-              <div className="anchor anchor-right">
-                <span className="anchor-tag">Bid Ceiling</span>
-                <span className="anchor-fee">${fmt(maxFee)}</span>
-              </div>
-            </>
-          )}
-        </div>
-
-        {/* Static scale */}
-        <div className="range-scale-wrap">
-          <div className="range-scale">
-            <div className="range-scale-fill" style={{ width: `${recTrackPct}%`, opacity: evCapped ? 0.6 : 0.45, background: evCapped ? 'var(--warning)' : 'var(--accent)' }} />
-            <div className="scale-tick tick-floor" />
-            <div className={`scale-tick tick-rec${evCapped ? ' tick-rec-capped' : ''}`} style={{ left: `${recTrackPct}%` }} />
-            {!recEqualsMax && <div className="scale-tick tick-max" />}
-            {recEqualsMax  && <div className="scale-tick tick-rec-max" />}
-          </div>
-          <div className="range-scale-labels">
-            <span className="scale-label-left">Floor</span>
-            <span className="scale-label-right">Ceiling</span>
-          </div>
-          <p className="band-note">The defensible pricing range based on historical outcomes in this segment</p>
-        </div>
-
-        {/* Win probability */}
-        <div className="win-section">
-          <span className="win-section-label">Win Probability</span>
-          <div className="win-row">
-            <span className="win-pct" style={{ color: wpColor }}>
-              {winProbPct}<span className="win-pct-sym">%</span>
-            </span>
-            <div className="win-meta">
-              <span className="win-label" style={{ color: wpColor }}>{winLabel(winProbPct)}</span>
-              <span className="win-ev">
-                EV · ${fmt(evAtRec)} at {evCapped ? 'max recommended' : 'optimal bid'}
-                <InfoTip content="Expected Value = P(Win) × Fee — your average earnings per bid at this price">
-                  <span className="ev-help"><HelpCircle size={10} /></span>
-                </InfoTip>
-              </span>
-            </div>
-          </div>
-          <div className="win-bar-track">
-            <div className="win-bar-fill" style={{ width: `${winProbPct}%`, background: wpColor }} />
-          </div>
-          <p className="win-interpretation">
-            {winProbPct >= 55
-              ? `If you bid $${fmt(recFee)} on 10 similar jobs, you'd expect to win about ${Math.round(winProbPct / 10)} of them.`
-              : winProbPct >= 35
-              ? `About ${Math.round(winProbPct / 10)} in 10 similar bids would be won at this price — non-price factors will tip the balance.`
-              : `At this price you'd win roughly ${Math.round(winProbPct / 10)} in 10 similar bids — relationships and expertise will matter more than price.`}
-          </p>
-          {win_probability?.model_used && win_probability.model_used.includes('Heuristic') && (
-            <InfoTip content="The ML model is being supplemented by a calibrated heuristic for fee-sensitivity">
-              <span className="model-source-badge">
-                Heuristic estimate
-              </span>
-            </InfoTip>
-          )}
-        </div>
-
       </div>
+
+      {/* ── Bid Range + Gauge Panel ── */}
+      <div className="card range-gauge-panel">
+        <div className="range-gauge-grid">
+          {/* Left: Bid Range */}
+          <div className="range-column">
+            <span className="section-label">Bid Range</span>
+
+            {/* Anchors */}
+            <div className="range-anchors">
+              <div className="range-anchor">
+                <span className="range-anchor-label">Floor</span>
+                <span className="range-anchor-value">${fmt(floorFee)}</span>
+                <span className="range-anchor-detail">{wpAtFloor}% win · EV ${fmt(evAtFloor)}</span>
+              </div>
+              <div className="range-anchor range-anchor-rec">
+                <span className="range-anchor-label">{evCapped ? 'Max Rec.' : 'Optimal'}</span>
+                <span className="range-anchor-value range-anchor-value-rec">${fmt(recFee)}</span>
+                <span className="range-anchor-detail">{winProbPct}% win · EV ${fmt(evAtRec)}</span>
+              </div>
+              {!recEqualsMax && (
+                <div className="range-anchor">
+                  <span className="range-anchor-label">Ceiling</span>
+                  <span className="range-anchor-value">${fmt(maxFee)}</span>
+                  <span className="range-anchor-detail">{wpAtMax}% win · EV ${fmt(evAtMax)}</span>
+                </div>
+              )}
+            </div>
+
+            {/* Gradient range bar */}
+            <div className="gradient-range">
+              <div className="gradient-bar">
+                <div className="gradient-bar-fill" />
+                <div
+                  className="gradient-pointer"
+                  style={{ left: `${recTrackPct}%` }}
+                >
+                  <div className="pointer-diamond" style={{ borderColor: evCapped ? 'var(--warning)' : 'var(--accent)' }} />
+                </div>
+              </div>
+              <div className="gradient-labels">
+                <span>$<span>{fmt(floorFee)}</span></span>
+                <span>$<span>{fmt(maxFee)}</span></span>
+              </div>
+            </div>
+
+            <p className="band-note">Defensible pricing range based on historical outcomes</p>
+          </div>
+
+          {/* Right: Win Gauge */}
+          <div className="gauge-column">
+            <WinGauge value={winProbPct} size={160} />
+            <span className="gauge-sublabel" style={{ color: wpColor }}>
+              {winLabel(winProbPct)} chance
+            </span>
+            {win_probability?.model_used && win_probability.model_used.includes('Heuristic') && (
+              <InfoTip content="The ML model is being supplemented by a calibrated heuristic for fee-sensitivity">
+                <span className="model-source-badge">Heuristic estimate</span>
+              </InfoTip>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* ── EV Comparison Strip ── */}
+      <div className="ev-strip">
+        <div className="ev-strip-item">
+          <span className="ev-strip-label">EV at Floor</span>
+          <span className="ev-strip-value">${fmt(evAtFloor)}</span>
+        </div>
+        <div className="ev-strip-divider" />
+        <div className="ev-strip-item ev-strip-peak">
+          <span className="ev-strip-label">EV at Optimal</span>
+          <span className="ev-strip-value ev-strip-value-peak">${fmt(evAtRec)}</span>
+          {evAtRec > evAtFloor && (
+            <span className="ev-strip-delta positive">
+              <ArrowUpRight size={12} />+${fmt(evAtRec - evAtFloor)}
+            </span>
+          )}
+        </div>
+        <div className="ev-strip-divider" />
+        <div className="ev-strip-item">
+          <span className="ev-strip-label">EV at Ceiling</span>
+          <span className="ev-strip-value">${fmt(evAtMax)}</span>
+          {evAtMax < evAtRec && (
+            <span className="ev-strip-delta negative">
+              <ArrowDownRight size={12} />-${fmt(evAtRec - evAtMax)}
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* ── Dual-Axis Chart ── */}
+      {curvePoints.length > 1 && (
+        <div className="card chart-card">
+          <FeeChart
+            curvePoints={curvePoints}
+            recFee={recFee}
+            maxFee={maxFee}
+            floorFee={floorFee}
+            evCapped={evCapped}
+            evAtRec={evAtRec}
+          />
+        </div>
+      )}
 
       {/* ── What-if quick input ── */}
       {curvePoints.length > 1 && (
