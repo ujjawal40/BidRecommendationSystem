@@ -537,9 +537,7 @@
   padding: 4px 10px;
   transition: border-color var(--ease-fast);
 }
-.what-if-input-wrap:focus-within {
-  border-color: var(--accent);
-}
+.what-if-input-wrap:focus-within { border-color: var(--accent); }
 
 .what-if-dollar {
   font-size: var(--font-sm);
