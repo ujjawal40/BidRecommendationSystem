@@ -361,12 +361,51 @@ function FeeChart({ curvePoints, recFee, maxFee, floorFee, evCapped, evAtRec }) 
             dot={false}
             activeDot={{ r: 5, fill: '#2B5A83', stroke: '#fff', strokeWidth: 2 }}
           />
-          <RechartsTooltip
-            content={<ChartTooltipContent />}
-            cursor={{ stroke: 'rgba(0,0,0,0.08)', strokeWidth: 1 }}
+
+          {/* EV line */}
+          <Line
+            yAxisId="ev"
+            type="monotone"
+            dataKey="ev"
+            stroke="#1A7A4C"
+            strokeWidth={2}
+            strokeDasharray="6 3"
+            dot={false}
+            activeDot={{ r: 5, fill: '#1A7A4C', stroke: '#fff', strokeWidth: 2 }}
           />
-        </AreaChart>
+
+          <RechartsTooltip
+            content={<DualChartTooltip />}
+            cursor={{ stroke: 'rgba(0,0,0,0.06)', strokeWidth: 1 }}
+          />
+        </ComposedChart>
       </ResponsiveContainer>
+    </div>
+  );
+}
+
+// ── Market Position Bar ──────────────────────────────────────────────────────
+
+function MarketBar({ label, value, bidValue, max }) {
+  const barMax = Math.max(value, bidValue) * 1.3;
+  const valPct = (value / barMax) * 100;
+  const bidPct = (bidValue / barMax) * 100;
+  const isAbove = bidValue > value;
+  return (
+    <div className="market-bar-item">
+      <div className="market-bar-labels">
+        <span className="market-bar-label">{label}</span>
+        <span className="market-bar-value">${fmt(value)}</span>
+      </div>
+      <div className="market-bar-track">
+        <div className="market-bar-fill" style={{ width: `${valPct}%` }} />
+        <div
+          className={`market-bar-marker ${isAbove ? 'above' : 'below'}`}
+          style={{ left: `${bidPct}%` }}
+        >
+          <span className="marker-flag">Your bid</span>
+        </div>
+      </div>
     </div>
   );
 }
