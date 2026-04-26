@@ -731,31 +731,10 @@ function ResultDisplay({ prediction, formData }) {
         )}
       </div>
 
-      {/* ── Fee analysis chart (expandable) ── */}
-      {curvePoints.length > 1 && (
-        <div className="chart-section">
-          <button className="chart-toggle" onClick={() => setShowChart(v => !v)}>
-            {showChart
-              ? <><ChevronUp size={14} /> Hide fee analysis</>
-              : <><ChevronDown size={14} /> Show fee vs. win probability chart</>}
-          </button>
-          {showChart && (
-            <div className="card chart-card">
-              <FeeChart
-                curvePoints={curvePoints}
-                recFee={recFee}
-                maxFee={maxFee}
-                floorFee={floorFee}
-                evCapped={evCapped}
-              />
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* ── Market context ── */}
-      <div className="card result-context">
-        <div className="context-top">
+      {/* ── Market Context with visual bars ── */}
+      <div className="card market-card">
+        <div className="market-header">
+          <span className="section-label">Market Position</span>
           <span className="context-segment">
             {formData.business_segment} · {formData.property_state}
             {formData.zip_code && formData.zip_code.length === 5 && (
