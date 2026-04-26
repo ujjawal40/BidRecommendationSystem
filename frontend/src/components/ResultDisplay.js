@@ -466,20 +466,14 @@ function ResultDisplay({ prediction, formData }) {
   const isRush         = turnaroundDays <= 21;
   const wpColor        = winColor(winProbPct);
 
-  // Build contextual message client-side (always fresh, no stale API text)
   const ctxMsg = buildContextMessage({
-    recFee,
-    maxFee,
-    floorFee,
-    winProbPct,
+    recFee, maxFee, floorFee, winProbPct,
     confidence: confidence_level,
-    segment:    formData.business_segment,
-    evCapped,
-    isFlatCurve,
+    segment: formData.business_segment,
+    evCapped, isFlatCurve,
     segBenchmark: segment_benchmark,
   });
 
-  // Bid quality summary
   const bidQuality = (() => {
     if (winProbPct >= 55 && confidence_level !== 'low') return { label: 'Good bid', cls: 'quality-good' };
     if (winProbPct >= 35 || (winProbPct >= 30 && confidence_level === 'high')) return { label: 'Fair bid', cls: 'quality-fair' };
