@@ -860,46 +860,10 @@
 .rush-title { font-size: var(--font-sm); font-weight: 700; color: var(--warning); margin-bottom: 2px; }
 .rush-body  { font-size: var(--font-sm); color: var(--text-muted); margin: 0; }
 
-/* ── Recommendation ── */
-.result-recommendation {
-  border-left: 2px solid transparent;
-}
-.result-recommendation.signal-positive {
-  border-left-color: var(--success);
-  background: rgba(26, 122, 76, 0.03);
-}
-.result-recommendation.signal-neutral {
-  border-left-color: var(--accent);
-  background: rgba(43, 90, 131, 0.03);
-}
-.result-recommendation.signal-caution {
-  border-left-color: var(--warning);
-  background: rgba(161, 98, 7, 0.03);
-}
+/* ══════════════════════════════════════════════════════════════════════════════
+   DETAILS TOGGLE + PANEL
+   ══════════════════════════════════════════════════════════════════════════════ */
 
-.rec-headline {
-  font-size: var(--font-base);
-  font-weight: 700;
-  color: var(--text-primary);
-  margin: 0 0 var(--s-xs);
-}
-.rec-detail {
-  font-size: var(--font-sm);
-  color: var(--text-secondary);
-  margin: 0 0 var(--s-xs);
-  line-height: 1.65;
-}
-.rec-tip {
-  font-size: var(--font-sm);
-  color: var(--accent);
-  font-style: italic;
-  margin: 0;
-  padding-top: var(--s-sm);
-  border-top: 1px solid var(--border-light);
-  line-height: 1.55;
-}
-
-/* ── Details toggle ── */
 .details-toggle {
   display: flex;
   align-items: center;
