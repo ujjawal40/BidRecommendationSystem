@@ -119,7 +119,6 @@ function buildContextMessage({ recFee, maxFee, floorFee, winProbPct, confidence,
     };
   }
 
-  // Case 6: Default — moderate odds, normal range
   return {
     headline: aboveBench
       ? `Above market with moderate odds`
