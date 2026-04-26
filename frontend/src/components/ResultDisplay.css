@@ -326,29 +326,8 @@
   min-width: 160px;
 }
 
-.win-pct {
-  font-size: var(--font-3xl);
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-  flex-shrink: 0;
-}
-.win-pct-sym {
-  font-size: var(--font-xl);
-  font-weight: 700;
-  letter-spacing: 0;
-}
-
-.win-meta {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.win-label {
-  font-size: var(--font-sm);
-  font-weight: 600;
+.win-gauge-svg {
+  display: block;
 }
 
 .win-ev {
