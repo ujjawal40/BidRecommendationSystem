@@ -873,6 +873,41 @@ class EnhancedBidPredictor:
             "model_used": "Heuristic fallback (no v2 classification model)",
         }
 
+    def _predict_v3_fee_sensitive(self, features: Dict, fee: float) -> float:
+        """Predict win probability via v3_fee_sensitive model.
+
+        Returns a probability in [0.05, 0.95]. The caller is expected to have
+        populated the v3 features (win-rate lookups, fee-relative features)
+        in the features dict — see _populate_v3_features.
+
+        Returns None if the v3 model isn't loaded.
+        """
+        if self.win_prob_v3 is None:
+            return None
+
+        feature_vector = []
+        for feat_name in self.win_prob_v3_features:
+            if feat_name == "BidFee":
+                feature_vector.append(fee)
+            elif feat_name in features:
+                feature_vector.append(features[feat_name])
+            elif feat_name in self.feature_defaults:
+                feature_vector.append(self.feature_defaults[feat_name].get("global_median", 0))
+            else:
+                feature_vector.append(0)
+
+        X = np.array([feature_vector])
+        raw = float(self.win_prob_v3.predict(X)[0])
+
+        if self.win_prob_v3_calibrator is not None:
+            try:
+                prob = float(self.win_prob_v3_calibrator.predict([raw])[0])
+            except Exception:
+                prob = raw
+        else:
+            prob = raw
+        return max(0.05, min(0.95, prob))
+
     def get_fee_sensitivity_curve(
         self,
         features: Dict[str, float],
