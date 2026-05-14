@@ -87,6 +87,10 @@ def debug_info():
         base / "outputs/models/lightgbm_win_probability_v2.txt",
         base / "outputs/reports/api_precomputed_stats_v2.json",
         base / "outputs/reports/feature_defaults_v2.json",
+        # v3 fee-sensitive saturation fallback
+        base / "outputs/models/lightgbm_win_probability_v3_fee_sensitive.txt",
+        base / "outputs/models/lightgbm_win_probability_v3_fee_sensitive_metadata.json",
+        base / "outputs/reports/win_rate_lookups_v3.json",
     ]
 
     file_status = {}
