@@ -165,12 +165,19 @@ class EnhancedBidPredictor:
         self.win_prob_model = None
         self.win_prob_features = None
         self.win_prob_calibrator = None
+        # v3_fee_sensitive: replacement for the hand-tuned heuristic sigmoid.
+        # When v2 saturates, we call this model instead of _heuristic_win_prob.
+        self.win_prob_v3 = None
+        self.win_prob_v3_features = None
+        self.win_prob_v3_calibrator = None
+        self.win_rate_lookups_v3 = {}
         self.stats = {}
         self.feature_defaults = {}
         self.zip_lookup = {}
         self.band_calculator = EmpiricalBandCalculator()
 
         self._load_models()
+        self._load_v3_fee_sensitive()
         self._load_stats()
         self._load_feature_defaults()
         self._load_empirical_bands()
@@ -209,6 +216,40 @@ class EnhancedBidPredictor:
                 print("[EnhancedPredictor] Win prob calibrator loaded")
         else:
             print("[EnhancedPredictor] Win prob v2 not found, using fallback")
+
+    def _load_v3_fee_sensitive(self):
+        """Load the v3 fee-sensitive win prob model.
+
+        Optional — when present, replaces the hand-tuned heuristic sigmoid in
+        the saturation fallback path. AUC ~0.88 (lower than v2's 0.948) but
+        produces a real ~24pp fee-elasticity curve that v2 lacks.
+        """
+        model_path = MODELS_DIR / "lightgbm_win_probability_v3_fee_sensitive.txt"
+        if not model_path.exists():
+            print("[EnhancedPredictor] v3_fee_sensitive not found — heuristic fallback remains active")
+            return
+
+        self.win_prob_v3 = lgb.Booster(model_file=str(model_path))
+        self.win_prob_v3_features = self.win_prob_v3.feature_name()
+        print(f"[EnhancedPredictor] v3_fee_sensitive loaded: {len(self.win_prob_v3_features)} features")
+
+        cal_path = MODELS_DIR / "win_probability_v3_fee_sensitive_calibrator.pkl"
+        if cal_path.exists():
+            try:
+                with open(cal_path, "rb") as f:
+                    self.win_prob_v3_calibrator = pickle.load(f)
+                print("[EnhancedPredictor] v3_fee_sensitive calibrator loaded")
+            except Exception as e:
+                print(f"[EnhancedPredictor] v3_fee_sensitive calibrator failed: {e}")
+                self.win_prob_v3_calibrator = None
+
+        lookups_path = REPORTS_DIR / "win_rate_lookups_v3.json"
+        if lookups_path.exists():
+            with open(lookups_path, "r") as f:
+                self.win_rate_lookups_v3 = json.load(f)
+            n = len(self.win_rate_lookups_v3.get("segment_win_rate", {}))
+            print(f"[EnhancedPredictor] v3 win-rate lookups loaded: {n} segments, "
+                  f"global rate={self.win_rate_lookups_v3.get('global_win_rate', 0.5):.3f}")
 
     def _load_stats(self):
         """Load precomputed statistics."""
