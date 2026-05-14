@@ -128,18 +128,43 @@ EXCLUDE_COLUMNS = [
     "Jobs_Office_Region", "Jobs_PropertyType", "Jobs_MarketOrientation",
 ]
 
-# Features nulled out for lost bids (differential imputation leakage)
+# Features nulled out for lost bids (differential imputation leakage).
+# MUST stay in sync with scripts/25_enhanced_win_probability.py — the derivative
+# features (*_log, fee_per_*, *_x_segment_fee) are computed from Jobs_* columns
+# that have differential imputation and leak the target.
 LEAKY_JOB_DERIVED_FEATURES = [
     "JobCount", "IECount", "LeaseCount", "SaleCount",
     "Jobs_PropertyID", "Jobs_OfficeID",
+    "Jobs_PropertyType",
     "Jobs_GrossBuildingSF", "Jobs_GLARentableSF",
     "Jobs_GrossLandAreaAcres", "Jobs_JobLength_Days",
-    "Jobs_YearBuilt",
+    "Jobs_YearBuilt", "Jobs_MarketOrientation",
     "Jobs_Zip_Population", "Jobs_Zip_PopDensity", "Jobs_Zip_HouseholdsPerZip",
     "Jobs_Zip_GrowthRank", "Jobs_Zip_AverageHouseValue", "Jobs_Zip_IncomePerHousehold",
     "Jobs_Zip_MedianAge", "Jobs_Zip_MedianIncome", "Jobs_Zip_NumberOfBusinesses",
     "Jobs_Zip_NumberOfEmployees", "Jobs_Zip_LandArea", "Jobs_Zip_PopulationEstimate",
     "Jobs_Zip_PopCount", "Jobs_Zip_DeliveryTotal", "Jobs_Zip_WorkersOutZip",
+    # Derivatives of differentially-imputed Jobs_ columns — equally leaky.
+    "land_acres_log",
+    "building_sf_log",
+    "fee_per_sqft",
+    "fee_per_day",
+    "joblength_log",
+    "joblength_bucket",
+    "joblength_x_segment_fee",
+    "income_x_segment_fee",
+    "pop_density_log",
+]
+
+# Pre-existing target-encoded columns in BidData_features_v2.csv that are NOT
+# computed with LOO and therefore leak. v3 re-creates these with proper
+# expanding-window LOO under the same column names, so the engineered values
+# overwrite the leaky originals — but we keep this list as documentation.
+PREEXISTING_LEAKY_RATE_COLS = [
+    "client_win_rate",
+    "office_win_rate",
+    "cumulative_wins_client",
+    "cumulative_winrate_client",
 ]
 
 # Frequency count features replaced by LOO win rates in v3
@@ -441,13 +466,12 @@ def main():
     print(f"\n[Stats] Win rate lookups saved: {lookup_path}")
 
     # ---- Feature selection ---------------------------------------------
-    exclude = list(EXCLUDE_COLUMNS) + list(LEAKY_JOB_DERIVED_FEATURES) + list(FREQUENCY_FEATURES_REPLACED)
-    # Also exclude old leaky win rate features that may exist from earlier runs
-    leaky_raw = [
-        "segment_win_rate_old", "client_win_rate", "office_win_rate",
-        "cumulative_wins_client", "cumulative_winrate_client",
-    ]
-    exclude += leaky_raw
+    exclude = (
+        list(EXCLUDE_COLUMNS)
+        + list(LEAKY_JOB_DERIVED_FEATURES)
+        + list(FREQUENCY_FEATURES_REPLACED)
+        + list(PREEXISTING_LEAKY_RATE_COLS)
+    )
 
     feature_cols = select_features_v3(df, exclude=exclude)
 
