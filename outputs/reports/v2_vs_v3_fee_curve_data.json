@@ -1,0 +1,22 @@
+{
+  "Financing / Multifamily / Illinois": {
+    "predicted_fee": 2707.0,
+    "v2_span_pp": 14.5,
+    "v3_span_pp": 27.2
+  },
+  "Litigation / Industrial / California": {
+    "predicted_fee": 2652.0,
+    "v2_span_pp": 0.0,
+    "v3_span_pp": 18.8
+  },
+  "Financial Reporting / Hospitality / Florida": {
+    "predicted_fee": 1145.0,
+    "v2_span_pp": 5.0,
+    "v3_span_pp": 11.9
+  },
+  "Consulting / Office / New York": {
+    "predicted_fee": 1111.0,
+    "v2_span_pp": 0.0,
+    "v3_span_pp": 10.3
+  }
+}
