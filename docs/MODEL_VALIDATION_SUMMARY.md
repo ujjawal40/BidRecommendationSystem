@@ -5,6 +5,12 @@
 **Model**: LightGBM (Optuna Optimized)
 **Status**: ⚠️ **OVERFITTING DETECTED - NOT PRODUCTION READY**
 
+> **Update 2026-05-13**: A `## Phase 1B v3` section was appended to this
+> file documenting the three v3 variants trained on 2026-05-13:
+> v3 default (AUC 0.936), v3 leaky (AUC 0.9998 — archived), and the
+> deployed v3_fee_sensitive variant (AUC 0.883 with a real ~24pp
+> fee-elasticity curve). See bottom of file.
+
 ---
 
 ## Executive Summary
@@ -462,3 +468,45 @@ Expected timeline to production-ready model: **1-2 weeks** with proper fixes.
 **Model Version**: LightGBM Optimized Phase 1A
 **Validation Method**: 5-Fold Walk-Forward Backtesting
 **Dataset**: 114,503 bids (Jan 2018 - Dec 2025)
+
+---
+
+## Phase 1B v3 — Fee-Sensitive Win Probability (2026-05-13)
+
+### Background
+Phase 1B v2 (AUC 0.948) was found to be saturated at inference — raw output
+~0.97 across realistic inputs, calibrator clipping to 0.95 ceiling. The EV
+optimizer was always picking max fee because the win-probability curve was
+flat. The hand-tuned heuristic sigmoid (in `enhanced_prediction_service.py`)
+was a temporary fix.
+
+v3 set out to fix this by replacing frequency-count features with
+expanding-window LOO win-rate target encodings.
+
+### Three Variants Trained
+
+| Variant | Test AUC | Brier | Span at Inference | Status |
+|---------|----------|-------|-------------------|--------|
+| v3 default | 0.9359 | 0.097 | 0pp (still saturated) | not deployed |
+| v3 leaky run | 0.9998 | 0.003 | 0pp | archived (target leakage via `land_acres_log`) |
+| **v3_fee_sensitive** | **0.8830** | 0.140 | **~24pp training, 37pp inference canary** | **deployed as v2 saturation fallback** |
+
+### Key Insight
+LOO encoding alone was not enough to make the model fee-sensitive — even
+with clean features, `subtype_avg_fee` and other context-fee aggregates
+absorbed the signal. The `V3_DROP_CONTEXT_FEE` ablation removed 13 such
+features, dropping AUC by 5.3pp but unlocking the fee curve.
+
+### Deployment
+v3_fee_sensitive does NOT replace v2 as the primary classifier (it would
+hurt ranking accuracy). Instead, it replaces the hand-tuned heuristic
+sigmoid in the saturation fallback path. When v2 raw output >= 0.93, the
+API now calls v3_fee_sensitive instead of the heuristic.
+
+### Files
+- `outputs/models/lightgbm_win_probability_v3_fee_sensitive.txt`
+- `outputs/models/lightgbm_win_probability_v3_fee_sensitive_metadata.json`
+- `outputs/models/win_probability_v3_fee_sensitive_calibrator.pkl`
+- `outputs/reports/win_rate_lookups_v3.json` (API-side category → win-rate)
+- `outputs/reports/v3_api_integration_smoke_test.json`
+- `outputs/reports/win_probability_v3_run{01,02,03,04_05}_results.json`
