@@ -139,6 +139,10 @@ def initialize_predictor():
 @app.route('/api/health', methods=['GET'])
 def health_check():
     """Health check endpoint."""
+    v3_loaded = bool(
+        enhanced_predictor is not None
+        and getattr(enhanced_predictor, "win_prob_v3", None) is not None
+    )
     return jsonify({
         "status": "healthy",
         "service": "Global Stat Solutions - Bid Recommendation API",
@@ -146,6 +150,7 @@ def health_check():
         "timestamp": datetime.now().isoformat(),
         "model_loaded": predictor is not None,
         "v2_model_loaded": enhanced_predictor is not None,
+        "v3_fee_sensitive_loaded": v3_loaded,
     })
 
 
