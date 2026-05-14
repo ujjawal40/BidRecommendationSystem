@@ -699,22 +699,30 @@ def main():
     print(f"[Plot] Saved: {fig_path}")
 
     # ---- Save model if AUC meets threshold -----------------------------
-    AUC_THRESHOLD = 0.930   # Within ~2% of v2 baseline (0.9475)
+    # Ablation variant: distinct filename + lower AUC threshold. The ablated
+    # model intentionally trades AUC for a non-flat fee-sensitivity curve,
+    # so the 0.93 threshold doesn't apply.
+    if DROP_CONTEXT_FEE_AGGREGATES:
+        variant_suffix = "_fee_sensitive"
+        AUC_THRESHOLD = 0.870
+    else:
+        variant_suffix = ""
+        AUC_THRESHOLD = 0.930
     should_save = cal_test["auc"] >= AUC_THRESHOLD
 
     if should_save:
-        print(f"\n[Save] AUC {cal_test['auc']:.4f} >= {AUC_THRESHOLD} threshold — SAVING as v3 model")
+        print(f"\n[Save] AUC {cal_test['auc']:.4f} >= {AUC_THRESHOLD} — SAVING as v3{variant_suffix} model")
 
-        model_path = MODELS_DIR / "lightgbm_win_probability_v3.txt"
+        model_path = MODELS_DIR / f"lightgbm_win_probability_v3{variant_suffix}.txt"
         model.save_model(str(model_path))
         print(f"  Model: {model_path}")
 
-        cal_path = MODELS_DIR / "win_probability_v3_calibrator.pkl"
+        cal_path = MODELS_DIR / f"win_probability_v3{variant_suffix}_calibrator.pkl"
         with open(cal_path, "wb") as f:
             pickle.dump(calibrator, f)
         print(f"  Calibrator: {cal_path}")
 
-        imp_path = REPORTS_DIR / "win_probability_v3_feature_importance.csv"
+        imp_path = REPORTS_DIR / f"win_probability_v3{variant_suffix}_feature_importance.csv"
         importance_df.to_csv(str(imp_path), index=False)
         print(f"  Importance: {imp_path}")
 
@@ -746,7 +754,9 @@ def main():
                 "global_win_rate": float(df["Won"].mean()),
             },
         }
-        meta_path = MODELS_DIR / "lightgbm_win_probability_v3_metadata.json"
+        meta["variant"] = "fee_sensitive_ablation" if DROP_CONTEXT_FEE_AGGREGATES else "default"
+        meta["curve_span_pp_at_inference_test"] = "see logs"
+        meta_path = MODELS_DIR / f"lightgbm_win_probability_v3{variant_suffix}_metadata.json"
         with open(meta_path, "w") as f:
             json.dump(meta, f, indent=2)
         print(f"  Metadata: {meta_path}")
