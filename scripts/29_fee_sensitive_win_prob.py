@@ -393,7 +393,11 @@ def main():
     print("=" * 65)
 
     # ---- Load data -------------------------------------------------------
-    data_path = DATA_DIR / "processed" / "BidData_enriched_v2.csv"
+    # NOTE: must read the FEATURE-ENGINEERED CSV (same source as v2 win prob,
+    # script 25), not the raw enriched CSV. The processed/enriched_v2 file
+    # has only raw columns; market-stat aggregates / fee ratios / client
+    # history are added by script 23 and live in features/BidData_features_v2.csv.
+    data_path = DATA_DIR / "features" / "BidData_features_v2.csv"
     print(f"\n[Data] Loading {data_path}...")
     df = pd.read_csv(data_path, low_memory=False)
     print(f"[Data] Raw shape: {df.shape}")
