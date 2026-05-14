@@ -1001,20 +1001,36 @@ class EnhancedBidPredictor:
     ) -> float:
         """Predict win probability via v3_fee_sensitive model.
 
-        Returns a probability in [0.05, 0.95]. The caller is expected to have
-        populated the v3 features (win-rate lookups, fee-relative features)
-        in the features dict — see _populate_v3_features.
+        Returns a probability in [0.05, 0.95]. The caller must have populated
+        the LOO win-rate features via _populate_v3_features. All fee-relative
+        features (ratios, percentiles, diffs) are recomputed here per fee
+        point — this is what makes v3's curve actually move with fee.
 
         Returns None if the v3 model isn't loaded.
         """
         if self.win_prob_v3 is None:
             return None
 
-        # fee_percentile_empirical depends on BidFee + segment, so compute it
-        # here rather than at feature-generation time.
+        # Derive segment hint if not provided
         if business_segment is None:
-            # Try to derive from a previously-set segment hint
             business_segment = features.get("_business_segment")
+
+        # Recompute ALL fee-relative features per fee point. v3 has ~8% of its
+        # importance distributed across these features — if we leave them stale
+        # the model collapses to a constant prediction.
+        seg_avg = features.get("segment_avg_fee") or 1.0
+        state_avg = features.get("state_avg_fee") or seg_avg
+        client_avg = features.get("client_avg_fee") or seg_avg
+        seg_avg = max(seg_avg, 1.0)
+        state_avg = max(state_avg, 1.0)
+        client_avg = max(client_avg, 1.0)
+
+        features["fee_vs_segment_ratio"]    = fee / seg_avg
+        features["fee_diff_from_segment"]   = fee - seg_avg
+        features["bid_vs_state_ratio"]      = fee / state_avg
+        features["bid_vs_client_ratio"]     = fee / client_avg
+        features["fee_percentile_segment"]  = min(1.0, max(0.0, fee / (2 * seg_avg)))
+
         if business_segment:
             features["fee_percentile_empirical"] = self._fee_percentile_v3(fee, business_segment)
 
