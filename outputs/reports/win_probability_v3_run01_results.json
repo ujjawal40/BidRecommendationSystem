@@ -1,0 +1,75 @@
+{
+  "run_id": "v3_run01_baseline",
+  "experiment_date": "2026-05-13",
+  "script": "scripts/29_fee_sensitive_win_prob.py",
+  "config": {
+    "data_start_date": "2018-01-01",
+    "loo_smoothing_k": 30,
+    "loo_min_history": 5,
+    "num_boost_round": 2000,
+    "early_stopping": 100,
+    "num_leaves": 24,
+    "learning_rate": 0.02,
+    "reg_alpha": 2.0,
+    "reg_lambda": 2.0
+  },
+  "data": {
+    "raw_rows": 166372,
+    "after_date_filter": 166372,
+    "after_anomaly_filter": 161788,
+    "anomaly_removed": 4584,
+    "win_rate": 0.504,
+    "train_size": 97072,
+    "val_size": 32358,
+    "test_size": 32358
+  },
+  "feature_count": 20,
+  "best_iteration": 1998,
+  "metrics": {
+    "train": {"auc": 0.9543, "brier": 0.0951},
+    "val":   {"auc": 0.8992, "brier": 0.1303},
+    "test":  {"auc": 0.8708, "brier": 0.1541},
+    "test_calibrated": {"auc": 0.8706, "brier": 0.1462},
+    "overfit_ratio_auc": 1.10
+  },
+  "vs_v2_baseline": {
+    "v2_auc": 0.9475,
+    "v3_auc": 0.8706,
+    "delta_auc": -0.0769,
+    "v2_brier": 0.0929,
+    "v3_brier": 0.1462,
+    "verdict": "BELOW_THRESHOLD"
+  },
+  "feature_importance_pct": {
+    "office_region_win_rate": 21.08,
+    "state_win_rate": 19.64,
+    "company_location_win_rate": 15.79,
+    "RooftopLatitude": 8.80,
+    "RooftopLongitude": 7.65,
+    "segment_win_rate": 4.79,
+    "propertytype_win_rate": 3.71,
+    "subtype_win_rate": 2.79,
+    "DistanceInMiles": 2.73,
+    "BidFee": 2.70,
+    "TargetTime": 2.15,
+    "fee_percentile_empirical": 1.88
+  },
+  "fee_sensitivity_financing_seg_avg_3000": {
+    "0.4x_$1200":  60.7,
+    "0.6x_$1800":  60.4,
+    "0.8x_$2400":  44.0,
+    "1.0x_$3000":  44.0,
+    "1.2x_$3600":  45.2,
+    "1.5x_$4500":  45.2,
+    "2.0x_$6000":  51.1,
+    "span_pp": 16.7
+  },
+  "fee_pct_importance": 4.6,
+  "win_rate_pct_importance": 67.8,
+  "diagnosis": "Feature count collapsed from 44 (v2) to 20 — too many features stripped. v2 EXCLUDE_COLUMNS list plus the v3 frequency exclusions removed ~24 useful market stat aggregates. Win-rate features are doing most of the lifting but at the cost of finer-grained context features that v2 had. Fee curve is non-flat (good — 16.7pp span) but AUC dropped 7.7pp.",
+  "next_steps": [
+    "Audit which v2 features were dropped accidentally",
+    "Reintroduce numeric market-stat features that aren't frequency counts",
+    "Re-train and compare"
+  ]
+}
