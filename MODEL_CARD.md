@@ -71,6 +71,21 @@ Predict optimal bid fees for commercial real estate appraisal engagements to max
 
 *Note: Overfitting ratio < 2.0x indicates acceptable generalization.*
 
+### Phase 1B (Win Probability) — Model Versions
+
+| Version | Test AUC | Test Brier | Features | Fee Curve Span | Role |
+|---------|---------|-----------|----------|---------------|------|
+| v1      | 0.870   | 0.140     | 72       | flat          | retired |
+| v2 (production for ranking) | 0.948 | 0.093 | 44 | flat (saturated at inference) | primary classifier; isotonic calibrated |
+| v3 default | 0.936 | 0.097 | 33 | flat | not deployed (no advantage over v2) |
+| **v3_fee_sensitive** | **0.883** | 0.140 | 32 | **~24pp (training) / 36pp (canary)** | **EV-curve provider — replaces heuristic sigmoid in saturation fallback** |
+
+The fee-elasticity gap matters more than the AUC gap for the EV use case.
+v2 ranks reliably but produces a constant probability across the fee
+sweep, leaving the EV optimizer with no interior maximum. v3_fee_sensitive
+trades 6pp AUC for a real fee-elasticity curve and is the new
+saturation fallback in `api/enhanced_prediction_service.py`.
+
 ## Model Architecture
 
 ### LightGBM Parameters
