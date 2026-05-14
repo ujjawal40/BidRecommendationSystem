@@ -431,5 +431,78 @@ class TestStateDistanceMiles:
                 f"{state} missing from state_distance_miles"
 
 
+class TestWinRateLookupsV3:
+    """Validate the v3 win-rate lookup JSON shape and bounds."""
+
+    def _load(self):
+        import json
+        from config.model_config import REPORTS_DIR
+        path = REPORTS_DIR / "win_rate_lookups_v3.json"
+        if not path.exists():
+            pytest.skip("win_rate_lookups_v3.json not present")
+        with open(path) as f:
+            return json.load(f)
+
+    def test_required_keys_present(self):
+        d = self._load()
+        for key in [
+            "global_win_rate",
+            "segment_win_rate",
+            "propertytype_win_rate",
+            "state_win_rate",
+            "subtype_win_rate",
+            "office_region_win_rate",
+            "company_location_win_rate",
+            "segment_fee_cdf",
+        ]:
+            assert key in d, f"missing key: {key}"
+
+    def test_global_win_rate_in_unit_interval(self):
+        d = self._load()
+        assert 0.0 < d["global_win_rate"] < 1.0
+
+    def test_segment_win_rates_in_unit_interval(self):
+        d = self._load()
+        for seg, rate in d["segment_win_rate"].items():
+            assert 0.0 <= rate <= 1.0, f"{seg} win rate out of range: {rate}"
+
+    def test_segment_fee_cdf_monotonic(self):
+        d = self._load()
+        for seg, q in d["segment_fee_cdf"].items():
+            assert len(q) == 5, f"{seg} fee CDF wrong length: {len(q)}"
+            for a, b in zip(q[:-1], q[1:]):
+                assert a <= b, f"{seg} fee CDF not monotonic: {q}"
+
+
+class TestV3FeeSensitiveModelMetadata:
+    """Validate the v3_fee_sensitive metadata file."""
+
+    def _load(self):
+        import json
+        from config.model_config import MODELS_DIR
+        path = MODELS_DIR / "lightgbm_win_probability_v3_fee_sensitive_metadata.json"
+        if not path.exists():
+            pytest.skip("v3_fee_sensitive metadata not present")
+        with open(path) as f:
+            return json.load(f)
+
+    def test_marked_as_ablation_variant(self):
+        d = self._load()
+        assert d.get("variant") == "fee_sensitive_ablation", \
+            "v3_fee_sensitive metadata must declare variant=fee_sensitive_ablation"
+
+    def test_auc_above_minimum_threshold(self):
+        d = self._load()
+        auc = d["metrics"]["test_calibrated"]["auc"]
+        assert auc >= 0.85, f"v3_fee_sensitive AUC too low: {auc}"
+
+    def test_overfit_ratio_reasonable(self):
+        d = self._load()
+        train_auc = d["metrics"]["train"]["auc"]
+        test_auc = d["metrics"]["test_calibrated"]["auc"]
+        ratio = train_auc / max(test_auc, 1e-6)
+        assert ratio <= 1.25, f"v3_fee_sensitive overfit too high: {ratio:.2f}x"
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
