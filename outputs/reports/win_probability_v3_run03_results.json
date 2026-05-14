@@ -1,0 +1,78 @@
+{
+  "run_id": "v3_run03_clean",
+  "experiment_date": "2026-05-13",
+  "script": "scripts/29_fee_sensitive_win_prob.py",
+  "change_from_run02": "Synced LEAKY_JOB_DERIVED_FEATURES with v2 (commit 55ca5da) — added land_acres_log, building_sf_log, fee_per_sqft, fee_per_day, joblength_log, joblength_bucket, joblength_x_segment_fee, income_x_segment_fee, pop_density_log, Jobs_PropertyType, Jobs_MarketOrientation.",
+  "result": "CLEAN — AUC=0.9359, Brier=0.097, top features look sane (subtype_avg_fee, win_rates, state_count)",
+  "data": {
+    "train_size": 97072,
+    "val_size": 32358,
+    "test_size": 32358,
+    "win_rate": 0.504
+  },
+  "metrics_calibrated": {
+    "test": {"auc": 0.9359, "brier": 0.0969}
+  },
+  "top_feature_importance_pct": {
+    "subtype_avg_fee":           19.99,
+    "state_win_rate":            12.17,
+    "company_location_win_rate": 12.06,
+    "office_region_win_rate":    11.93,
+    "RooftopLatitude":            5.57,
+    "propertytype_avg_fee":       4.40,
+    "office_region_avg_fee":      4.21,
+    "subtype_win_rate":           3.19,
+    "propertytype_win_rate":      2.76,
+    "RooftopLongitude":           2.59,
+    "state_count":                2.10,
+    "client_avg_fee":             1.65,
+    "segment_avg_fee":            1.17,
+    "segment_win_rate":           1.15,
+    "office_avg_fee":             1.13
+  },
+  "fee_pct_importance": 3.1,
+  "win_rate_pct_importance": 43.3,
+  "segment_test_auc": {
+    "Financing":              {"auc": 0.923, "n": 26771, "win_rate": 0.505},
+    "Financial Reporting":    {"auc": 0.949, "n":  2345, "win_rate": 0.777},
+    "Consulting":             {"auc": 0.927, "n":   746, "win_rate": 0.886},
+    "Lease Negotiation":      {"auc": 0.985, "n":   540, "win_rate": 0.909},
+    "Value Dispute":          {"auc": 0.968, "n":   528, "win_rate": 0.960},
+    "Eminent Domain":         {"auc": 0.997, "n":   399, "win_rate": 0.782},
+    "Estate":                 {"auc": 0.916, "n":   390, "win_rate": 0.856},
+    "Evaluation":             {"auc": 0.995, "n":   327, "win_rate": 0.349},
+    "Review (External)":      {"auc": 0.968, "n":   269, "win_rate": 0.788}
+  },
+  "fee_sensitivity_financing_seg_avg_3000": {
+    "0.4x_$1200":  95.0,
+    "0.6x_$1800":  95.0,
+    "0.8x_$2400":  95.0,
+    "1.0x_$3000":  95.0,
+    "1.2x_$3600":  95.0,
+    "1.5x_$4500":  95.0,
+    "2.0x_$6000":  95.0,
+    "span_pp": 0.0
+  },
+  "vs_v2_baseline": {
+    "v2_test_auc": 0.9475,
+    "v3_test_auc": 0.9359,
+    "delta_auc": -0.0116,
+    "v2_brier": 0.0929,
+    "v3_brier": 0.0969,
+    "delta_brier": 0.0040,
+    "v2_feature_count": 44,
+    "v3_feature_count_estimated": "tba",
+    "verdict": "ABOVE_THRESHOLD_BUT_FLAT"
+  },
+  "interpretation": {
+    "auc_delta": "v3 is 1.2pp worse than v2 on AUC — within tolerance, calibration is similar",
+    "leakage_check": "Top features are clean v2 aggregates and LOO win rates. No Jobs_*-derived log features.",
+    "fee_sensitivity_persists": "Even with cleaner LOO encoding, the sensitivity test shows flat curve (0pp span). The model honestly reproduces the data: within normal fee range firm/market fit dominates, only Q4 extremes hurt.",
+    "deployment_recommendation": "Do NOT deploy v3 as drop-in replacement for v2 — lower AUC + same saturation problem. Heuristic fallback in API remains the right active mechanism. v3 could be evaluated as part of a blended ensemble or used as a feature in v4."
+  },
+  "next_steps": [
+    "Run #4: try dropping subtype_avg_fee + propertytype_avg_fee + office_region_avg_fee (force model to rely on BidFee for fee signal)",
+    "Compare fee curve at multiple inference contexts (not just Financing/Multifamily)",
+    "Decide: keep v2 as production, archive v3 as 'cleaner but not better'"
+  ]
+}
