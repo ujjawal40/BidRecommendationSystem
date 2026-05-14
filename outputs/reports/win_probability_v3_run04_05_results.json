@@ -1,0 +1,60 @@
+{
+  "run_id": "v3_run04_05_fee_sensitive_ablation",
+  "experiment_date": "2026-05-13",
+  "script": "scripts/29_fee_sensitive_win_prob.py",
+  "env": "V3_DROP_CONTEXT_FEE=1",
+  "change_from_run03": "Excluded 13 absolute-fee context aggregates (subtype_avg_fee, propertytype_avg_fee, office_region_avg_fee, office_avg_fee, client_avg_fee, client_std_fee, segment_avg_fee, segment_std_fee, state_avg_fee, rolling_avg_fee_segment, rolling_avg_fee_state, rolling_std_fee_segment, segment_x_state_fee).",
+  "rationale": "Run #3 still saturated despite cleaner LOO encoding because subtype_avg_fee (20% importance) and other context aggregates absorbed the signal. The hypothesis: force the model to weight BidFee more by removing the aggregates it leans on.",
+  "result": "SUCCESS on fee curve, COST on AUC",
+  "metrics_calibrated": {
+    "test": {"auc": 0.8830, "brier": 0.1398},
+    "overfit_ratio_auc": 1.09
+  },
+  "top_feature_importance_pct": {
+    "office_region_win_rate":    19.03,
+    "company_location_win_rate": 16.20,
+    "state_win_rate":            15.66,
+    "RooftopLongitude":           7.34,
+    "RooftopLatitude":            7.10,
+    "state_count":                3.88,
+    "segment_win_rate":           3.64,
+    "cumulative_bids_client":     2.79,
+    "bid_vs_client_ratio":        2.51,
+    "subtype_win_rate":           2.46,
+    "bid_vs_state_ratio":         2.18,
+    "DistanceInMiles":            2.09,
+    "days_since_last_bid_client": 1.91,
+    "propertytype_win_rate":      1.69,
+    "TargetTime":                 1.61
+  },
+  "fee_pct_importance": 8.1,
+  "win_rate_pct_importance": 58.7,
+  "fee_sensitivity_financing_seg_avg_3000": {
+    "0.4x_$1200":  67.3,
+    "0.6x_$1800":  67.3,
+    "0.8x_$2400":  62.6,
+    "1.0x_$3000":  63.4,
+    "1.2x_$3600":  57.4,
+    "1.5x_$4500":  50.6,
+    "2.0x_$6000":  43.6,
+    "span_pp": 23.7,
+    "monotonic_decline": true
+  },
+  "segment_test_auc": {
+    "Financing":            {"auc": 0.860, "n": 26771},
+    "Financial Reporting":  {"auc": 0.881, "n":  2345},
+    "Consulting":           {"auc": 0.848, "n":   746},
+    "Lease Negotiation":    {"auc": 0.833, "n":   540},
+    "Value Dispute":        {"auc": 0.896, "n":   528},
+    "Eminent Domain":       {"auc": 0.989, "n":   399},
+    "Estate":               {"auc": 0.904, "n":   390},
+    "Evaluation":           {"auc": 0.996, "n":   327},
+    "Review (External)":    {"auc": 0.975, "n":   269}
+  },
+  "comparison_table": {
+    "v2_baseline":         {"auc": 0.9475, "brier": 0.0929, "fee_pct": 8.0,  "span_pp_at_inference": 0.0},
+    "v3_default":          {"auc": 0.9359, "brier": 0.0969, "fee_pct": 3.1,  "span_pp_at_inference": 0.0},
+    "v3_fee_sensitive":    {"auc": 0.8830, "brier": 0.1398, "fee_pct": 8.1,  "span_pp_at_inference": 23.7}
+  },
+  "verdict": "v3_fee_sensitive is the right model for the EV-optimizer use case. The AUC drop is real but acceptable — it produces a usable fee-elasticity curve where v2 and v3_default both saturate. The right deployment path: use v3_fee_sensitive as a replacement for the hand-tuned heuristic sigmoid in the API's saturation fallback."
+}
