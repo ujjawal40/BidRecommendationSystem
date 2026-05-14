@@ -1048,19 +1048,32 @@ class EnhancedBidPredictor:
 
         # Safety net: if the curve is still flat (possible if individual points
         # fell just below SATURATION_THRESHOLD so the per-point heuristic didn't
-        # kick in, but variation is negligible), force-replace with the heuristic.
+        # kick in), force-replace using v3_fee_sensitive — or the heuristic
+        # sigmoid if v3 isn't loaded.
         probs = [p["win_probability"] for p in curve_points]
         prob_range = max(probs) - min(probs) if probs else 0.0
         if prob_range < CURVE_FLAT_THRESHOLD_PP:
-            curve_points = [
-                {
-                    "fee": p["fee"],
-                    "win_probability": round(
-                        _heuristic_win_prob(p["fee"], blended_market) * 100, 1
-                    ),
-                }
-                for p in curve_points
-            ]
+            if self.win_prob_v3 is not None:
+                curve_points = [
+                    {
+                        "fee": p["fee"],
+                        "win_probability": round(
+                            (self._predict_v3_fee_sensitive(features, float(p["fee"])) or
+                             _heuristic_win_prob(p["fee"], blended_market)) * 100, 1
+                        ),
+                    }
+                    for p in curve_points
+                ]
+            else:
+                curve_points = [
+                    {
+                        "fee": p["fee"],
+                        "win_probability": round(
+                            _heuristic_win_prob(p["fee"], blended_market) * 100, 1
+                        ),
+                    }
+                    for p in curve_points
+                ]
 
         return {
             "curve_points": curve_points,
