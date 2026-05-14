@@ -325,15 +325,52 @@ class EnhancedBidPredictor:
                 raws.append(float(self.win_prob_model.predict(np.array([fv]))[0]))
             span_pp = (max(raws) - min(raws)) * 100
             if span_pp < 5.0 or min(raws) >= SATURATION_THRESHOLD:
+                fallback = "v3_fee_sensitive" if self.win_prob_v3 is not None else "heuristic sigmoid"
                 print(
                     f"[EnhancedPredictor] WARNING: win prob model is SATURATED "
                     f"(raw span {span_pp:.1f}pp, min raw {min(raws):.3f}) — "
-                    f"heuristic fallback is ACTIVE for fee sensitivity"
+                    f"{fallback} fallback is ACTIVE for fee sensitivity"
                 )
             else:
                 print(f"[EnhancedPredictor] Win prob canary OK ({span_pp:.1f}pp span)")
         except Exception as e:
             print(f"[EnhancedPredictor] Canary failed: {type(e).__name__}: {e}")
+
+        # v3_fee_sensitive canary — verify it produces a non-flat curve too
+        if self.win_prob_v3 is None:
+            return
+        try:
+            feats = self._generate_features(
+                business_segment="Financing",
+                property_type="Multifamily",
+                property_state="Illinois",
+                target_time=30,
+                delivery_days=30,
+            )
+            self._populate_v3_features(
+                feats,
+                business_segment="Financing",
+                property_type="Multifamily",
+                property_state="Illinois",
+                sub_property_type="Conventional",
+                office_region="Great Lakes",
+                company_location="Chicago",
+            )
+            probs = [
+                self._predict_v3_fee_sensitive(feats.copy(), float(fee), business_segment="Financing")
+                for fee in (500, 3000, 10000)
+            ]
+            span_v3 = (max(probs) - min(probs)) * 100
+            if span_v3 < 5.0:
+                print(
+                    f"[EnhancedPredictor] WARNING: v3_fee_sensitive curve is FLAT "
+                    f"({span_v3:.1f}pp span at Financing/Multifamily/Illinois) — "
+                    f"feature alignment may be broken"
+                )
+            else:
+                print(f"[EnhancedPredictor] v3_fee_sensitive canary OK ({span_v3:.1f}pp span)")
+        except Exception as e:
+            print(f"[EnhancedPredictor] v3 canary failed: {type(e).__name__}: {e}")
 
     def _generate_features(
         self,
