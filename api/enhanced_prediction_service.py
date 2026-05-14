@@ -813,10 +813,17 @@ class EnhancedBidPredictor:
 
         # --- Saturation check ---
         # If the raw model output is saturated (>= SATURATION_THRESHOLD), the
-        # classifier has no meaningful fee discrimination for this input. Fall back
-        # to the heuristic sigmoid so win probability actually responds to fee.
+        # classifier has no meaningful fee discrimination for this input. Prefer
+        # v3_fee_sensitive (trained on the same data, retains real fee elasticity)
+        # over the hand-tuned heuristic sigmoid.
         if raw_probability >= SATURATION_THRESHOLD:
-            probability = _heuristic_win_prob(fee, blended_market)
+            v3_prob = self._predict_v3_fee_sensitive(features, fee)
+            if v3_prob is not None:
+                probability = v3_prob
+                model_used = "LightGBM v3_fee_sensitive (v2 saturated, AUC: 0.883)"
+            else:
+                probability = _heuristic_win_prob(fee, blended_market)
+                model_used = "Heuristic (v2 saturated, no v3 model)"
             dist = abs(probability - 0.5)
             if dist > 0.3:
                 win_conf = "high"
@@ -828,7 +835,7 @@ class EnhancedBidPredictor:
                 "probability": round(probability, 4),
                 "probability_pct": round(probability * 100, 1),
                 "confidence": win_conf,
-                "model_used": "Heuristic (v2 classifier saturated)",
+                "model_used": model_used,
             }
 
         # Apply isotonic calibration if available.
