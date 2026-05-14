@@ -354,6 +354,7 @@ def fee_sensitivity_test(
     multiples = [0.4, 0.6, 0.8, 1.0, 1.2, 1.5, 2.0]
     print(f"\n  Fee sensitivity for {segment} (seg_avg={seg_avg:,.0f}):")
     print(f"  {'Multiple':>8}  {'Fee':>8}  {'Win Prob':>10}")
+    probs_collected = []
     for mult in multiples:
         fee = seg_avg * mult
         row = base_features.copy()
@@ -380,7 +381,11 @@ def fee_sensitivity_test(
             prob = raw
 
         prob = max(0.05, min(0.95, prob))
+        probs_collected.append(prob)
         print(f"  {mult:>8.1f}×  ${fee:>7,.0f}  {prob*100:>9.1f}%")
+
+    span_pp = (max(probs_collected) - min(probs_collected)) * 100 if probs_collected else 0.0
+    print(f"  Curve span: {span_pp:.1f}pp  (healthy: >=20pp)")
 
 
 # ============================================================================
