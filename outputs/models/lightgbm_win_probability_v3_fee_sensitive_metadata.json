@@ -1,0 +1,110 @@
+{
+  "model_type": "LightGBM Classifier (v3 \u2014 LOO win rates)",
+  "created_at": "2026-05-13T21:38:25.138169",
+  "features": [
+    "BidFee",
+    "TargetTime",
+    "DistanceInMiles",
+    "RooftopLongitude",
+    "RooftopLatitude",
+    "PopulationEstimate",
+    "AverageHouseValue",
+    "IncomePerHousehold",
+    "MedianAge",
+    "DeliveryTotal",
+    "NumberofBusinesses",
+    "NumberofEmployees",
+    "ZipPopulation",
+    "state_count",
+    "fee_vs_segment_ratio",
+    "fee_percentile_segment",
+    "fee_diff_from_segment",
+    "days_since_last_segment",
+    "lag1_bidfee_client",
+    "cumulative_bids_client",
+    "days_since_last_bid_client",
+    "targettime_log",
+    "distance_log",
+    "bid_vs_client_ratio",
+    "bid_vs_state_ratio",
+    "subtype_win_rate",
+    "propertytype_win_rate",
+    "state_win_rate",
+    "segment_win_rate",
+    "office_region_win_rate",
+    "company_location_win_rate",
+    "fee_percentile_empirical"
+  ],
+  "feature_count": 32,
+  "params": {
+    "objective": "binary",
+    "metric": "auc",
+    "boosting_type": "gbdt",
+    "num_leaves": 24,
+    "learning_rate": 0.02,
+    "feature_fraction": 0.8,
+    "bagging_fraction": 0.8,
+    "bagging_freq": 5,
+    "max_depth": 8,
+    "min_child_samples": 30,
+    "reg_alpha": 2.0,
+    "reg_lambda": 2.0,
+    "random_state": 42,
+    "n_jobs": -1,
+    "verbose": -1,
+    "scale_pos_weight": 1.0976
+  },
+  "best_iteration": 1990,
+  "metrics": {
+    "train": {
+      "auc": 0.9598,
+      "accuracy": 0.8848,
+      "brier": 0.0881,
+      "n": 97072,
+      "win_rate": 0.4767
+    },
+    "val": {
+      "auc": 0.9087,
+      "accuracy": 0.8141,
+      "brier": 0.1231,
+      "n": 32358,
+      "win_rate": 0.5805
+    },
+    "test": {
+      "auc": 0.8839,
+      "accuracy": 0.7653,
+      "brier": 0.1458,
+      "n": 32358,
+      "win_rate": 0.5565
+    },
+    "test_calibrated": {
+      "auc": 0.883,
+      "accuracy": 0.7771,
+      "brier": 0.1398,
+      "n": 32358,
+      "win_rate": 0.5565
+    },
+    "train_calibrated": {
+      "auc": 0.9594,
+      "accuracy": 0.8805,
+      "brier": 0.0944,
+      "n": 97072,
+      "win_rate": 0.4767
+    }
+  },
+  "vs_v2": {
+    "v2_test_auc": 0.9475,
+    "v3_test_auc": 0.883,
+    "delta_auc": -0.0645
+  },
+  "data": {
+    "source": "/Users/ujjawaldwivedi/Desktop/BidRecommendationSystem/data/features/BidData_features_v2.csv",
+    "start_date": "2018-01-01",
+    "n_train": 97072,
+    "n_val": 32358,
+    "n_test": 32358,
+    "global_win_rate": 0.5134558805350211
+  },
+  "variant": "fee_sensitive_ablation",
+  "curve_span_pp_at_inference_test": "see logs"
+}
