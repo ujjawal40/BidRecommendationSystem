@@ -873,6 +873,67 @@ class EnhancedBidPredictor:
             "model_used": "Heuristic fallback (no v2 classification model)",
         }
 
+    def _populate_v3_features(
+        self,
+        features: Dict,
+        business_segment: str,
+        property_type: str,
+        property_state: str,
+        sub_property_type: str = None,
+        office_region: str = None,
+        company_location: str = None,
+    ) -> None:
+        """Populate v3-specific features in-place.
+
+        v3 expects six LOO win-rate lookups (segment / state / propertytype /
+        subtype / office_region / company_location) and fee_percentile_empirical.
+        At inference we use the GLOBAL win rate per category from
+        win_rate_lookups_v3.json — the LOO encoding is a training-time
+        regularization technique; the saved lookups are the unbiased global
+        rates needed for serving.
+        """
+        if not self.win_rate_lookups_v3:
+            return
+
+        lookups = self.win_rate_lookups_v3
+        global_rate = lookups.get("global_win_rate", 0.5)
+
+        def lookup(table_key, key):
+            table = lookups.get(table_key, {})
+            if key and key in table:
+                return float(table[key])
+            return global_rate
+
+        features["segment_win_rate"]          = lookup("segment_win_rate", business_segment)
+        features["propertytype_win_rate"]     = lookup("propertytype_win_rate", property_type)
+        features["state_win_rate"]            = lookup("state_win_rate", property_state)
+        features["subtype_win_rate"]          = lookup("subtype_win_rate", sub_property_type)
+        features["office_region_win_rate"]    = lookup("office_region_win_rate", office_region)
+        features["company_location_win_rate"] = lookup("company_location_win_rate", company_location)
+
+        # fee_percentile_empirical computed in _fee_curve_v3 once BidFee is known
+        # (the percentile depends on fee, so it can't be set here).
+
+    def _fee_percentile_v3(self, fee: float, business_segment: str) -> float:
+        """Map fee to its empirical percentile within the segment using the
+        precomputed segment_fee_cdf (10/25/50/75/90 quantiles)."""
+        cdf = self.win_rate_lookups_v3.get("segment_fee_cdf", {}).get(business_segment)
+        if not cdf or len(cdf) != 5:
+            return 0.5
+        # cdf = [p10, p25, p50, p75, p90]
+        anchors = [(cdf[0], 0.10), (cdf[1], 0.25), (cdf[2], 0.50), (cdf[3], 0.75), (cdf[4], 0.90)]
+        if fee <= anchors[0][0]:
+            return 0.05
+        if fee >= anchors[-1][0]:
+            return 0.95
+        for (f_lo, p_lo), (f_hi, p_hi) in zip(anchors[:-1], anchors[1:]):
+            if f_lo <= fee <= f_hi:
+                if f_hi == f_lo:
+                    return p_lo
+                t = (fee - f_lo) / (f_hi - f_lo)
+                return p_lo + t * (p_hi - p_lo)
+        return 0.5
+
     def _predict_v3_fee_sensitive(self, features: Dict, fee: float) -> float:
         """Predict win probability via v3_fee_sensitive model.
 
