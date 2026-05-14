@@ -571,6 +571,18 @@ class EnhancedBidPredictor:
             zip_code=zip_code,
         )
 
+        # Populate v3_fee_sensitive features (win-rate lookups). Safe no-op
+        # when v3 isn't loaded — _populate_v3_features bails on empty lookups.
+        self._populate_v3_features(
+            features,
+            business_segment=business_segment,
+            property_type=property_type,
+            property_state=property_state,
+            sub_property_type=sub_property_type,
+            office_region=office_region,
+            company_location=office_location,
+        )
+
         # Build feature vector in model order
         feature_vector = []
         for feat_name in self.model_features:
