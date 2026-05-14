@@ -1,0 +1,55 @@
+{
+  "run_id": "v3_run02_leakage",
+  "experiment_date": "2026-05-13",
+  "script": "scripts/29_fee_sensitive_win_prob.py",
+  "change_from_run01": "Switched data source from data/processed/BidData_enriched_v2.csv to data/features/BidData_features_v2.csv to pick up v2's engineered features (market stat aggregates, fee ratios, client history).",
+  "result": "TARGET LEAKAGE — AUC=0.9998, Brier=0.0029, curve span=0.0pp",
+  "data": {
+    "train_size": 97072,
+    "val_size": 32358,
+    "test_size": 32358
+  },
+  "feature_count_used": "tba",
+  "metrics_raw": {
+    "train": {"auc": 1.0000, "brier": 0.0038},
+    "val":   {"auc": 1.0000, "brier": 0.0041},
+    "test":  {"auc": 1.0000, "brier": 0.0041}
+  },
+  "metrics_calibrated": {
+    "test":  {"auc": 0.9998, "brier": 0.0029}
+  },
+  "top_feature_importance_pct": {
+    "land_acres_log":            58.78,
+    "office_region_win_rate":    23.68,
+    "building_sf_log":            8.12,
+    "office_region_avg_fee":      4.21,
+    "joblength_log":              2.42,
+    "company_location_win_rate":  0.63,
+    "state_win_rate":             0.49,
+    "fee_per_sqft":               0.38,
+    "BidFee":                     0.06
+  },
+  "fee_sensitivity_financing_seg_avg_3000": {
+    "0.4x_$1200":  5.0,
+    "0.6x_$1800":  5.0,
+    "0.8x_$2400":  5.0,
+    "1.0x_$3000":  5.0,
+    "1.2x_$3600":  5.0,
+    "1.5x_$4500":  5.0,
+    "2.0x_$6000":  5.0,
+    "span_pp": 0.0
+  },
+  "fee_pct_importance": 0.1,
+  "win_rate_pct_importance": 25.2,
+  "diagnosis": "land_acres_log, building_sf_log, joblength_log, fee_per_sqft are derivatives of Jobs_GrossLandAreaAcres / Jobs_GrossBuildingSF / Jobs_JobLength_Days. These Jobs_ columns are populated only for won bids (joined from JobsData) and median-imputed for lost bids. Differential imputation = trivial leakage. Script 25 (v2) excludes these derivatives explicitly; v3 did not.",
+  "model_files": {
+    "status": "ARCHIVED as LEAKY (do not use)",
+    "model": "outputs/models/archive/lightgbm_win_probability_v3_LEAKY_run02.txt",
+    "metadata": "outputs/models/archive/lightgbm_win_probability_v3_metadata_LEAKY_run02.json"
+  },
+  "next_steps": [
+    "Sync LEAKY_JOB_DERIVED_FEATURES with v2 — done in commit 55ca5da",
+    "Re-train as run #3 and expect AUC in healthy range (0.90-0.95)",
+    "Verify curve span >= 10pp"
+  ]
+}
