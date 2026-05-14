@@ -582,6 +582,8 @@ class EnhancedBidPredictor:
             office_region=office_region,
             company_location=office_location,
         )
+        # Stash segment so downstream v3 predict can derive fee_percentile_empirical
+        features["_business_segment"] = business_segment
 
         # Build feature vector in model order
         feature_vector = []
@@ -829,7 +831,8 @@ class EnhancedBidPredictor:
         # v3_fee_sensitive (trained on the same data, retains real fee elasticity)
         # over the hand-tuned heuristic sigmoid.
         if raw_probability >= SATURATION_THRESHOLD:
-            v3_prob = self._predict_v3_fee_sensitive(features, fee)
+            business_segment = features.get("_business_segment")
+            v3_prob = self._predict_v3_fee_sensitive(features, fee, business_segment=business_segment)
             if v3_prob is not None:
                 probability = v3_prob
                 model_used = "LightGBM v3_fee_sensitive (v2 saturated, AUC: 0.883)"
@@ -953,7 +956,12 @@ class EnhancedBidPredictor:
                 return p_lo + t * (p_hi - p_lo)
         return 0.5
 
-    def _predict_v3_fee_sensitive(self, features: Dict, fee: float) -> float:
+    def _predict_v3_fee_sensitive(
+        self,
+        features: Dict,
+        fee: float,
+        business_segment: str = None,
+    ) -> float:
         """Predict win probability via v3_fee_sensitive model.
 
         Returns a probability in [0.05, 0.95]. The caller is expected to have
@@ -964,6 +972,14 @@ class EnhancedBidPredictor:
         """
         if self.win_prob_v3 is None:
             return None
+
+        # fee_percentile_empirical depends on BidFee + segment, so compute it
+        # here rather than at feature-generation time.
+        if business_segment is None:
+            # Try to derive from a previously-set segment hint
+            business_segment = features.get("_business_segment")
+        if business_segment:
+            features["fee_percentile_empirical"] = self._fee_percentile_v3(fee, business_segment)
 
         feature_vector = []
         for feat_name in self.win_prob_v3_features:
