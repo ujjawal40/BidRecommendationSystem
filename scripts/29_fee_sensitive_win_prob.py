@@ -177,6 +177,30 @@ FREQUENCY_FEATURES_REPLACED = [
     "segment_frequency",
 ]
 
+# Ablation toggle — when True, drops absolute-fee context aggregates that
+# dominate the model and crowd out BidFee as a signal. The hypothesis is
+# that without subtype_avg_fee etc., the model is forced to weight BidFee
+# more heavily, producing a steeper fee-sensitivity curve. Set via the
+# V3_DROP_CONTEXT_FEE env var (any non-empty value enables).
+import os as _os
+DROP_CONTEXT_FEE_AGGREGATES = bool(_os.environ.get("V3_DROP_CONTEXT_FEE"))
+
+CONTEXT_FEE_AGGREGATES = [
+    "subtype_avg_fee",
+    "propertytype_avg_fee",
+    "office_region_avg_fee",
+    "office_avg_fee",
+    "client_avg_fee",
+    "client_std_fee",
+    "segment_avg_fee",
+    "segment_std_fee",
+    "state_avg_fee",
+    "rolling_avg_fee_segment",
+    "rolling_avg_fee_state",
+    "rolling_std_fee_segment",
+    "segment_x_state_fee",
+]
+
 
 # ============================================================================
 # FEATURE ENGINEERING
@@ -472,6 +496,9 @@ def main():
         + list(FREQUENCY_FEATURES_REPLACED)
         + list(PREEXISTING_LEAKY_RATE_COLS)
     )
+    if DROP_CONTEXT_FEE_AGGREGATES:
+        print(f"[Ablation] V3_DROP_CONTEXT_FEE=on — excluding {len(CONTEXT_FEE_AGGREGATES)} context-fee aggregates")
+        exclude += list(CONTEXT_FEE_AGGREGATES)
 
     feature_cols = select_features_v3(df, exclude=exclude)
 
