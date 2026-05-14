@@ -68,11 +68,14 @@ BidRecommendationSystem/
 │
 ├── outputs/
 │   ├── models/                  # Trained models
-│   │   ├── lightgbm_bidfee_model.txt
-│   │   └── lightgbm_win_probability.txt
+│   │   ├── lightgbm_bidfee_v2_model.txt
+│   │   ├── lightgbm_win_probability_v2.txt
+│   │   └── lightgbm_win_probability_v3_fee_sensitive.txt   # EV-curve fallback
 │   └── reports/                 # Precomputed statistics
 │       ├── empirical_bands.json
-│       ├── feature_defaults.json
+│       ├── feature_defaults_v2.json
+│       ├── api_precomputed_stats_v2.json
+│       ├── win_rate_lookups_v3.json                        # v3 inference lookups
 │       └── rolling_stats.json
 │
 ├── scripts/                     # Training & analysis scripts
