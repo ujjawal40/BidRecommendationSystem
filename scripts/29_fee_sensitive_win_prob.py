@@ -553,6 +553,22 @@ def main():
     print(f"  Win-rate features:     {rate_pct:.1f}%")
     print(f"  (v2 baseline: fee ~8%, frequency ~42%)")
 
+    # ---- Segment-level AUC breakdown -----------------------------------
+    print("\n[Segment AUC] Test AUC by business segment:")
+    test_df_eval = test_df.copy()
+    test_df_eval["pred"] = y_test_cal
+    seg_auc_rows = []
+    for seg, grp in test_df_eval.groupby("BusinessSegment"):
+        if len(grp) < 50 or grp["Won"].nunique() < 2:
+            continue
+        try:
+            seg_auc = roc_auc_score(grp["Won"], grp["pred"])
+            seg_auc_rows.append((seg, seg_auc, len(grp), float(grp["Won"].mean())))
+        except Exception:
+            pass
+    for seg, auc, n, wr in sorted(seg_auc_rows, key=lambda r: -r[2])[:10]:
+        print(f"  {seg:<30s}  AUC={auc:.3f}  n={n:>5,}  win_rate={wr:.1%}")
+
     # ---- Fee sensitivity test ------------------------------------------
     print("\n[Sensitivity] Testing fee sensitivity curve...")
     # Build a representative base feature vector (median/mode values)
