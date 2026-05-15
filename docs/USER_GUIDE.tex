@@ -354,7 +354,7 @@ effort to higher-value pursuits.
     Capped at 30\% Win Floor & The EV-optimal fee exceeds the ceiling; recommendation is capped \\[0.3em]
     Bid Quality Badge & At-a-glance assessment: Good (green), Fair (amber), Risky (red) \\[0.3em]
     What If I Bid \$X? & Quick input to test any fee against the model instantly \\[0.3em]
-    Heuristic Estimate & Win probability is using a calibrated fallback instead of the ML model \\
+    Fee-Sensitive Fallback & Win probability is using the v3 fee-sensitive ML model (instead of the primary v2 model) because v2 saturated for this combination of inputs. Both are LightGBM classifiers; v3 is tuned for fee elasticity at the cost of overall ranking accuracy \\
     \bottomrule
 \end{tabularx}
 
