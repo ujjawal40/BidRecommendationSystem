@@ -36,7 +36,6 @@ env/
 *.swp
 *.swo
 *~
-.DS_Store
 
 # Data (keep structure, ignore large files)
 data/raw/*.csv
