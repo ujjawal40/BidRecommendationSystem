@@ -198,21 +198,43 @@ Content-Type: application/json
 
 ## Model Performance
 
+### Phase 1A — Bid Fee Regression (v2 production)
+
 | Metric | Value |
 |--------|-------|
-| Algorithm | LightGBM |
-| Trees | 500 |
-| Features | 68 |
-| Test RMSE | $328.75 |
-| Test MAE | $215.42 |
+| Algorithm | LightGBM (log1p target) |
+| Features | 60 |
+| Test RMSE | $438 |
+| Test MAPE | 3.9% |
+| Test R² | 0.940 |
+| Overfit ratio | 1.49× |
 
-### Top Features
+### Phase 1B — Win Probability Classification (v2 production)
 
-1. `segment_avg_fee` (63%)
-2. `state_avg_fee` (10%)
-3. `propertytype_avg_fee` (5%)
-4. `TargetTime` (4%)
-5. `rolling_avg_fee_segment` (3%)
+| Metric | Value |
+|--------|-------|
+| Algorithm | LightGBM + isotonic calibration |
+| Features | 44 (incl. BidFee) |
+| Test AUC | 0.948 |
+| Test Brier | 0.093 |
+| Test accuracy | 86.7% |
+
+### Phase 1B fallback — v3 fee-sensitive
+
+When v2 saturates (raw output ≥ 0.93 for typical inputs), the API falls back to a v3 model with real fee elasticity:
+
+| Metric | Value |
+|--------|-------|
+| Test AUC | 0.883 |
+| Fee curve span | ~24 pp at training, 36 pp at API canary |
+
+### Top Bid Fee Features
+
+1. `segment_avg_fee` (~64% importance)
+2. `state_avg_fee`
+3. `propertytype_avg_fee`
+4. `TargetTime`
+5. `subtype_avg_fee` (v2 addition)
 
 ---
 
@@ -229,8 +251,8 @@ Content-Type: application/json
 
 ## License
 
-Proprietary - Global Stat Solutions
+MIT — see [LICENSE](./LICENSE).
 
 ---
 
-**Global Stat Solutions** | Bid Recommendation System v1.0
+**Global Stat Solutions** | Bid Recommendation System v2.0 (production) + v3 fee-sensitive saturation fallback
