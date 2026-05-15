@@ -45,7 +45,7 @@ Usage
 -----
   python scripts/29_fee_sensitive_win_prob.py
 
-Author: Ujjawal Dwivedi
+Author: Raj Tiwari
 Date: 2026-02-25
 """
 

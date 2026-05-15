@@ -7,7 +7,7 @@ groups by zip → median, and saves as a JSON lookup for the API.
 Output:
   - outputs/reports/zip_demographics_lookup.json
 
-Author: Ujjawal Dwivedi
+Author: Raj Tiwari
 Date: 2026-03-18
 """
 

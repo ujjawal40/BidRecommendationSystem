@@ -4,7 +4,7 @@ Time-Series Cross-Validation
 5-fold expanding-window CV for both bid fee and win probability models.
 Gives confidence intervals on metrics instead of single-point estimates.
 
-Author: Ujjawal Dwivedi
+Author: Raj Tiwari
 Date: 2026-02-17
 """
 

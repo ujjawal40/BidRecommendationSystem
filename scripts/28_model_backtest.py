@@ -9,7 +9,7 @@ Three backtests:
   3. Calibration: when model says X% win prob, does it actually win X%?
   4. Segment-level breakdown: which segments/states does the model fail on?
 
-Author: Ujjawal Dwivedi
+Author: Raj Tiwari
 Date: 2026-02-16
 """
 

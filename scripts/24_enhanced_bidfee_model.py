@@ -8,7 +8,7 @@ Output:
   - outputs/models/lightgbm_bidfee_v2_model.txt
   - outputs/models/lightgbm_bidfee_v2_metadata.json
 
-Author: Ujjawal Dwivedi
+Author: Raj Tiwari
 Date: 2026-02-14
 """
 

@@ -8,7 +8,7 @@ Output:
   - outputs/models/lightgbm_win_probability_v2.txt
   - outputs/models/lightgbm_win_probability_v2_metadata.json
 
-Author: Ujjawal Dwivedi
+Author: Raj Tiwari
 Date: 2026-02-14
 """
 

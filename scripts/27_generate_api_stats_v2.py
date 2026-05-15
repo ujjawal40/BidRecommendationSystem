@@ -7,7 +7,7 @@ Outputs:
   - outputs/reports/api_precomputed_stats_v2.json
   - outputs/reports/feature_defaults_v2.json
 
-Author: Ujjawal Dwivedi
+Author: Raj Tiwari
 Date: 2026-02-15
 """
 

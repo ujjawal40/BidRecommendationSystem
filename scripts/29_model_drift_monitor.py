@@ -13,7 +13,7 @@ Checks:
 Usage:
   python scripts/29_model_drift_monitor.py
 
-Author: Ujjawal Dwivedi
+Author: Raj Tiwari
 Date: 2026-02-17
 """
 

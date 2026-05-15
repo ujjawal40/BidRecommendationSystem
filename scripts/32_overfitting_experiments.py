@@ -6,7 +6,7 @@ from 1.91x to <= 1.5x while maintaining MAPE < 6%.
 
 Does NOT modify production model. Run experiments, pick best, then retrain.
 
-Author: Ujjawal Dwivedi
+Author: Raj Tiwari
 Date: 2026-02-17
 """
 

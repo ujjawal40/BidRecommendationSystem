@@ -14,7 +14,7 @@ Steps:
   8. Create temporal features
   9. Save to data/processed/JobsData_processed.csv
 
-Author: Ujjawal Dwivedi
+Author: Raj Tiwari
 Date: 2026-02-14
 """
 

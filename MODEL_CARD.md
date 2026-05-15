@@ -8,7 +8,7 @@
 | **Model Type** | LightGBM Gradient Boosting Regressor |
 | **Version** | 1.0.0 |
 | **Developer** | Global Stat Solutions (GSS) |
-| **Date** | January 2026 |
+| **Date** | April 2026 |
 | **License** | Proprietary |
 
 ## Intended Use

@@ -17,7 +17,7 @@ Usage:
 
 Exit code: 0 if all checks pass, 1 if any FAIL.
 
-Author: Ujjawal Dwivedi
+Author: Raj Tiwari
 Date: 2026-02-25
 """
 

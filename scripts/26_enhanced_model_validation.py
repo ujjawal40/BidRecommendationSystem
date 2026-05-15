@@ -8,7 +8,7 @@ Outputs:
   - outputs/reports/v1_vs_v2_comparison.json
   - Console report
 
-Author: Ujjawal Dwivedi
+Author: Raj Tiwari
 Date: 2026-02-15
 """
 
