@@ -1,0 +1,52 @@
+{
+  "logistic_price_ratio_train": {
+    "auc": 0.6041269640534217,
+    "accuracy": 0.5296574937639622,
+    "brier": 0.2431971290926303
+  },
+  "logistic_price_ratio_test": {
+    "auc": 0.5726650019232349,
+    "accuracy": 0.46025544703230653,
+    "brier": 0.250413648809957
+  },
+  "option_b_train": {
+    "auc": 0.9463966789626395,
+    "accuracy": 0.8657022930587139,
+    "brier": 0.09163002184351733
+  },
+  "option_b_valid": {
+    "auc": 0.9388075496001055,
+    "accuracy": 0.8495522029211997,
+    "brier": 0.09922786802044277
+  },
+  "option_b_test": {
+    "auc": 0.9184560931645539,
+    "accuracy": 0.818572501878287,
+    "brier": 0.11423260256817332
+  },
+  "option_b_test_calibrated": {
+    "auc": 0.9180830055835617,
+    "brier": 0.11528302100268376
+  },
+  "verdict": "INVESTIGATE",
+  "auc_gap_vs_production": 0.029543906835446054,
+  "option_b_features": [
+    "price_ratio",
+    "fee_vs_segment_ratio",
+    "bid_vs_state_ratio",
+    "subtype_frequency",
+    "subtype_avg_fee",
+    "office_region_avg_fee",
+    "segment_frequency",
+    "targettime_log",
+    "state_frequency",
+    "rolling_avg_fee_segment",
+    "rolling_avg_fee_state",
+    "rolling_std_fee_segment",
+    "segment_x_state_fee"
+  ],
+  "phase1b_v2_baseline": {
+    "auc": 0.948,
+    "features": 44
+  }
+}

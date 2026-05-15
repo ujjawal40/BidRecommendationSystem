@@ -18,29 +18,36 @@ A machine learning system that predicts optimal bid fees for commercial real est
 │  │   FRONTEND   │    │    REST API      │    │      ML MODELS             │ │
 │  │   (React)    │───▶│    (Flask)       │───▶│                            │ │
 │  │              │    │                  │    │  ┌────────────────────┐    │ │
-│  │  - Form UI   │    │  /api/predict    │    │  │ LightGBM Regressor │    │ │
-│  │  - Results   │    │  /api/options    │    │  │ (Bid Fee Model)    │    │ │
-│  │  - Charts    │◀───│  /api/health     │◀───│  │ - 500 trees        │    │ │
-│  │              │    │                  │    │  │ - 68 features      │    │ │
-│  └──────────────┘    └──────────────────┘    │  │ - RMSE: $328       │    │ │
-│        │                     │               │  └────────────────────┘    │ │
+│  │  - Form UI   │    │  /api/v2/predict │    │  │ Phase 1A: BidFee   │    │ │
+│  │  - Results   │    │  /api/v2/options │    │  │ LightGBM Regressor │    │ │
+│  │  - Charts    │◀───│  /api/health     │◀───│  │ - 60 features      │    │ │
+│  │              │    │                  │    │  │ - MAPE 3.9%, R².94 │    │ │
+│  └──────────────┘    └──────────────────┘    │  └────────────────────┘    │ │
 │        │                     │               │                            │ │
-│        ▼                     ▼               │  ┌────────────────────┐    │ │
-│   ┌─────────┐         ┌─────────────┐        │  │ Win Probability    │    │ │
-│   │ Vercel  │         │   Render    │        │  │ (Experimental)     │    │ │
-│   │ (Host)  │         │   (Host)    │        │  └────────────────────┘    │ │
-│   └─────────┘         └─────────────┘        └────────────────────────────┘ │
+│        │                     │               │  ┌────────────────────┐    │ │
+│        ▼                     ▼               │  │ Phase 1B: P(Win)   │    │ │
+│   ┌─────────┐         ┌─────────────┐        │  │ LightGBM Classifier│    │ │
+│   │ Vercel  │         │   Render    │        │  │ - v2 AUC 0.948     │    │ │
+│   │ (Host)  │         │   (Host)    │        │  │ - v3 fee-elastic   │    │ │
+│   └─────────┘         └─────────────┘        │  └────────────────────┘    │ │
+│                                              │  EV = P(Win) × BidFee      │ │
+│                                              └────────────────────────────┘ │
 │                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ## Features
 
-- **Bid Fee Prediction**: ML-powered predictions based on 68 features
-- **Confidence Intervals**: Empirical quantile bands (80% coverage)
-- **Win Probability**: Experimental competitive positioning indicator
-- **Market Benchmarks**: Compare against segment and state averages
-- **Real-time API**: RESTful endpoints for integration
+- **Bid Fee Prediction** (Phase 1A): LightGBM regressor on 60 engineered features. v2 test MAPE 3.9%, R² 0.94, overfit ratio 1.49×.
+- **Win Probability** (Phase 1B): LightGBM classifier with `BidFee` as a feature so the model learns fee-sensitivity from data. v2 test AUC 0.948, Brier 0.093.
+- **EV Optimization**: `EV = P(Win) × BidFee`. The system recommends the fee that maximizes expected revenue, not just the market-typical fee.
+- **Fee Sensitivity Curve**: 20-point sweep of P(Win) across the fee range, so the EV optimizer can find an interior maximum. When v2 saturates, falls back to the v3 fee-sensitive model (AUC 0.883, ~24pp elasticity).
+- **Confidence Intervals**: Empirical quantile bands (80% coverage) stratified by fee bucket.
+- **Market Benchmarks**: Compare against segment, state, and property-type averages.
+- **Zip Code Demographics**: 20,040-zip lookup table feeds per-zip features at inference.
+- **Real-time API**: RESTful endpoints for integration. Deployed on Render with Vercel frontend.
+
+For full system details see [ARCHITECTURE.md](./ARCHITECTURE.md). For model details see [MODEL_CARD.md](./MODEL_CARD.md).
 
 ---
 

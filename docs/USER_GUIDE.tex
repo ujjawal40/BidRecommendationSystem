@@ -1,0 +1,361 @@
+%============================================================================
+% Bid Intelligence Tool — User Guide
+% Company: Global Stat Solutions
+%============================================================================
+\documentclass[12pt,a4paper]{article}
+
+% ---- Packages ----
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[margin=1in]{geometry}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{tabularx}
+\usepackage{parskip}
+
+% ---- Hyperref setup ----
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue!70!black,
+    citecolor=blue!70!black,
+    urlcolor=blue!70!black,
+}
+
+% ---- Header/Footer ----
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small Global Stat Solutions}
+\fancyhead[R]{\small Bid Intelligence Tool --- User Guide}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% ---- Custom colors ----
+\definecolor{gssblue}{RGB}{30,90,160}
+\definecolor{gssgreen}{RGB}{40,140,70}
+\definecolor{gssamber}{RGB}{200,150,30}
+\definecolor{gssred}{RGB}{190,50,50}
+
+% ---- Section formatting ----
+\titleformat{\section}{\Large\bfseries\color{gssblue}}{}{0em}{}[\vspace{-0.5em}\textcolor{gssblue}{\rule{\textwidth}{0.4pt}}]
+\titleformat{\subsection}{\large\bfseries\color{gssblue!80!black}}{}{0em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries}{}{0em}{}
+
+% ---- Custom commands ----
+\newcommand{\term}[1]{\textbf{#1}}
+\newcommand{\ev}{\text{EV}}
+
+\begin{document}
+
+% ---- Title ----
+\begin{center}
+    {\LARGE\bfseries\color{gssblue} Bid Intelligence Tool}\\[0.3em]
+    {\Large User Guide}\\[1em]
+    {\large Global Stat Solutions}\\[0.3em]
+    {\small April 2026}
+\end{center}
+
+\vspace{1em}
+
+%============================================================================
+\section{What This Tool Does}
+%============================================================================
+
+You are deciding what fee to bid on a commercial real estate appraisal engagement.
+Bid too high and you lose the job. Bid too low and you win but leave money on the table.
+This tool analyzes over 215,000 historical bids to recommend a fee that balances both ---
+maximizing the revenue you can realistically expect to earn.
+
+It answers two questions at once:
+
+\begin{enumerate}[leftmargin=2em]
+    \item \term{What should we charge?} A regression model predicts the market-typical fee
+          for this combination of segment, property type, state, and turnaround time.
+    \item \term{Will we win at this price?} A classification model estimates the probability
+          of winning at the recommended fee, based on how that price compares to what the
+          market typically pays.
+\end{enumerate}
+
+The tool combines both into an \term{Expected Value} score:
+\[
+    \ev = P(\text{Win}) \times \text{Fee}
+\]
+
+A \$5,200 bid with a 25\% win chance ($\ev = \$1{,}300$) is worse than a \$3,500 bid
+with a 65\% win chance ($\ev = \$2{,}275$). The system recommends the fee that maximizes
+EV --- not just the highest fee, and not just the most winnable fee, but the best
+trade-off between the two.
+
+%============================================================================
+\section{Filling Out the Form}
+%============================================================================
+
+\begin{tabularx}{\textwidth}{l >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X}
+    \toprule
+    \textbf{Field} & \textbf{What to enter} & \textbf{Why it matters} \\
+    \midrule
+    Business Segment & The service line (Financing, Litigation, etc.)
+        & The single most important factor --- segment alone explains ${\sim}64\%$ of fee variation \\[0.5em]
+    Property Type / Sub-type & The asset class (Multifamily, Office, Retail, etc.)
+        & Different property types command different fees in different markets \\[0.5em]
+    Zip Code & The property's zip code (optional)
+        & Auto-fills the state and loads real demographic data, improving accuracy \\[0.5em]
+    Property State & Where the property is located
+        & State-level market dynamics significantly affect pricing \\[0.5em]
+    Days to Complete & How long this assignment will take
+        & Shorter turnarounds (under 21 days) typically command a premium \\[0.5em]
+    Job Open Date & When this opportunity was posted
+        & Captures seasonal pricing patterns. Leave blank to use today's date \\[0.5em]
+    Office Location & Which office is handling this bid
+        & Regional pricing patterns vary across offices \\
+    \bottomrule
+\end{tabularx}
+
+\vspace{0.5em}
+Click \textbf{Get Recommendation} to run the analysis.
+
+%============================================================================
+\section{Reading the Results}
+%============================================================================
+
+%--------------------------------------------------------------------
+\subsection{Bid Quality Badge}
+%--------------------------------------------------------------------
+
+Next to the ``Bid Range'' header, a colored badge gives you an at-a-glance assessment:
+
+\begin{itemize}[leftmargin=2em]
+    \item \textcolor{gssgreen}{\textbf{Good bid}} (green) --- Win probability is 55\%+
+          and confidence is not low. You're well-positioned.
+    \item \textcolor{gssamber}{\textbf{Fair bid}} (amber) --- Win probability is 35\%+
+          or 30\%+ with high confidence. Competitive but not a lock.
+    \item \textcolor{gssred}{\textbf{Risky bid}} (red) --- Win probability below those
+          thresholds. Proceed with caution.
+\end{itemize}
+
+%--------------------------------------------------------------------
+\subsection{The Bid Range}
+%--------------------------------------------------------------------
+
+The large panel at the top shows three price anchors:
+
+\begin{description}[leftmargin=1.5em, style=nextline]
+    \item[\term{Floor}]
+        The low end of the defensible range. 80\% of historical bids for similar work
+        fall between the Floor and the Ceiling. Bidding below the floor is unusually
+        aggressive --- you are almost certainly underpricing.
+
+    \item[\term{Recommended Bid (or Optimal Bid)}]
+        The fee the system recommends. This is the price point where your
+        \textbf{expected revenue is maximized}, considering both the fee amount and
+        the probability of winning. This is not simply the average market price ---
+        it is the fee where the math says you earn the most over many similar bids.
+        You can click the recommended fee to copy it to your clipboard.
+
+    \item[\term{Bid Ceiling}]
+        The high end of the range. The highest fee where you still have at least a
+        30\% chance of winning. Bidding above the ceiling is possible but your odds
+        drop sharply and you are relying on non-price factors (reputation,
+        relationships, speed) to win.
+\end{description}
+
+The \textbf{scale bar} between Floor and Ceiling shows where the Recommended Bid sits
+within the range. If the dot is near the left, you are priced conservatively. Near the
+right, you are pricing aggressively within the viable range.
+
+%--------------------------------------------------------------------
+\subsection{Capped at 30\% Win Floor}
+%--------------------------------------------------------------------
+
+Sometimes the label says \textbf{``Capped at 30\% win floor''} with a warning badge.
+This means the mathematically optimal fee (the one that maximizes EV) would actually
+sit \emph{above} the Ceiling, where win odds drop below 30\%. The system caps the
+recommendation at the Ceiling instead of showing you a fee with poor odds. In this
+scenario, the Recommended Bid equals the Ceiling --- shown in a two-column layout
+instead of three.
+
+\textbf{What to do when you see the cap:} The model is telling you this is a situation
+where the market can bear a high price, but competition or market dynamics limit how
+far you can push. Bid at or near the recommended amount. Going higher is a gamble ---
+your track record with the client and the quality of your proposal will matter more
+than price.
+
+%--------------------------------------------------------------------
+\subsection{Confidence Badge}
+%--------------------------------------------------------------------
+
+The pill in the top-right corner of the Bid Range panel tells you how much data backs
+this estimate:
+
+\begin{itemize}[leftmargin=2em]
+    \item \textbf{High confidence} --- Large sample of similar historical bids
+          (typically 1,000+). The range is narrow and reliable.
+    \item \textbf{Medium confidence} --- Moderate data. The estimate is directional
+          but the range is wider.
+    \item \textbf{Low confidence} --- Sparse data for this exact combination. Treat
+          as a rough guide, not a precise number. Cross-reference with your own
+          experience.
+\end{itemize}
+
+The number next to it (e.g., ``150,062 similar bids'') shows how many historical bids
+in this segment informed the prediction.
+
+%--------------------------------------------------------------------
+\subsection{Win Probability}
+%--------------------------------------------------------------------
+
+Below the bid range, a large percentage and colored bar show your estimated chance of
+winning at the recommended fee:
+
+\begin{itemize}[leftmargin=2em]
+    \item \textcolor{gssgreen}{\textbf{Green (55\%+):}} Strong chance of winning. You are
+          well-priced for this market and likely to win.
+    \item \textcolor{gssamber}{\textbf{Amber (35--54\%):}} Moderate chance. Competitive
+          assignment --- price is one factor among several.
+    \item \textcolor{gssred}{\textbf{Red (below 35\%):}} Low chance. Even at the
+          recommended fee, odds are modest. Non-price factors (experience, client
+          relationship, turnaround speed) will likely decide the outcome.
+\end{itemize}
+
+Below the percentage, a plain-language line puts the odds in context --- for example,
+``If you bid \$2,714 on 10 similar jobs, you'd expect to win about 7 of them.''
+
+\term{EV (Expected Value)} is shown next to the win probability. This is
+$P(\text{Win}) \times \text{Fee}$ --- the average revenue you would earn if you bid
+this amount repeatedly on similar assignments. Use this to compare different fee
+options: a lower fee with higher win odds often has a better EV than a premium fee
+with poor odds. Hover over the EV label for a tooltip explanation.
+
+%--------------------------------------------------------------------
+\subsection{``What If I Bid \$X?''}
+%--------------------------------------------------------------------
+
+Directly below the bid range panel, a quick input lets you type any dollar amount and
+instantly see:
+
+\begin{itemize}[leftmargin=2em]
+    \item The estimated \textbf{win probability} at that fee
+    \item The \textbf{EV} at that fee
+    \item The \textbf{EV delta} compared to the recommended bid (green if better, red if worse)
+\end{itemize}
+
+If you enter a fee above the Bid Ceiling, a warning tells you win odds drop below 30\%.
+This is faster than dragging the chart slider and lets you test exact dollar amounts.
+
+%--------------------------------------------------------------------
+\subsection{Market Context Bar}
+%--------------------------------------------------------------------
+
+The bar at the bottom of the results shows four metrics in a grid:
+
+\begin{itemize}[leftmargin=2em]
+    \item \textbf{Segment avg} --- The historical average fee for this business segment
+    \item \textbf{Your bid vs segment} --- Whether your recommended bid is above or
+          below the segment average
+    \item \textbf{Floor--Ceiling spread} --- How wide the defensible range is
+          (wider = more uncertainty)
+    \item \textbf{State avg} --- The historical average fee for the selected state
+\end{itemize}
+
+Being below the segment average is not automatically bad --- it may reflect state-level
+pricing or property type dynamics. Being above average with good win odds means the
+market supports a premium for this type of work.
+
+%============================================================================
+\section{The Fee vs.\ Win Probability Chart}
+%============================================================================
+
+The chart is shown by default below the results. It plots win probability (vertical
+axis) against bid fee (horizontal axis). A slider lets you explore different fee points
+and see the estimated win probability and EV at each. The \textbf{shaded blue region}
+between Floor and Ceiling marks the defensible pricing zone.
+
+Key markers on the chart:
+\begin{itemize}[leftmargin=2em]
+    \item \textbf{Floor} --- Left dashed line
+    \item \textbf{Optimal / Recommended} --- Blue label
+    \item \textbf{Ceiling} --- Right dashed line
+    \item \textbf{30\% threshold} --- Red dashed horizontal line. Below this, the bid
+          is considered non-viable.
+\end{itemize}
+
+\textbf{How to use it:} If you are considering bidding above or below the
+recommendation, use the slider to see what happens to your odds. The chart helps you
+make an informed trade-off rather than guessing.
+
+%============================================================================
+\section{When to Bid and When to Walk Away}
+%============================================================================
+
+\subsection{Good Signals to Bid}
+\begin{itemize}[leftmargin=2em]
+    \item Win probability is 45\% or above
+    \item The recommended fee aligns with or exceeds the segment average
+    \item Confidence is medium or high
+    \item The assignment matches your firm's core expertise
+\end{itemize}
+
+\subsection{Caution Signals}
+\begin{itemize}[leftmargin=2em]
+    \item Win probability below 30\% --- even at the optimized fee, this is a long shot
+    \item Low confidence with a wide Floor-to-Ceiling spread --- the model is uncertain
+    \item The recommended fee is significantly below your internal cost to deliver
+    \item The ``Capped at 30\% win floor'' badge appears with win odds under 35\%
+\end{itemize}
+
+\subsection{Walking Away}
+This tool tells you what fee maximizes your expected revenue --- it does not tell you
+whether the job is worth pursuing. If the recommended fee is below your cost basis, or
+if win odds are low and the client is unfamiliar, the best bid may be no bid. The EV
+helps here: if EV is lower than the opportunity cost of your team's time, redirect
+effort to higher-value pursuits.
+
+%============================================================================
+\section{What This Tool Cannot Do}
+%============================================================================
+
+\begin{itemize}[leftmargin=2em]
+    \item \textbf{It cannot guarantee a win.} A 65\% win probability means you lose
+          35\% of the time. Over many bids, the recommendations optimize your revenue,
+          but any single bid may go either way.
+    \item \textbf{It does not know your client relationship.} If you have a
+          long-standing relationship with the client, your real odds may be higher
+          than shown. If you are a new entrant, they may be lower.
+    \item \textbf{It does not capture deal-specific factors.} Property complexity,
+          special requirements, competing firms on this specific deal, and the
+          client's budget are not inputs the model has access to.
+    \item \textbf{It does not replace judgment.} The recommendation is a
+          data-informed starting point. Your experience with the client, the
+          competitive landscape, and your firm's strategic priorities should all
+          factor into the final number.
+\end{itemize}
+
+%============================================================================
+\section{Quick Reference}
+%============================================================================
+
+\begin{tabularx}{\textwidth}{l >{\raggedright\arraybackslash}X}
+    \toprule
+    \textbf{Term} & \textbf{Meaning} \\
+    \midrule
+    Floor & Lowest defensible bid --- 10th percentile of similar historical bids \\[0.3em]
+    Recommended Bid & Fee that maximizes expected revenue ($P(\text{Win}) \times \text{Fee}$) \\[0.3em]
+    Ceiling & Highest fee with $\geq 30\%$ win probability \\[0.3em]
+    Win Probability & Estimated chance of winning at the recommended fee \\[0.3em]
+    EV (Expected Value) & $P(\text{Win}) \times \text{Fee}$ --- your average earnings per bid at this price \\[0.3em]
+    Segment Average & Historical mean fee for this business segment \\[0.3em]
+    Confidence & How much historical data supports this estimate (high / medium / low) \\[0.3em]
+    Capped at 30\% Win Floor & The EV-optimal fee exceeds the ceiling; recommendation is capped \\[0.3em]
+    Bid Quality Badge & At-a-glance assessment: Good (green), Fair (amber), Risky (red) \\[0.3em]
+    What If I Bid \$X? & Quick input to test any fee against the model instantly \\[0.3em]
+    Heuristic Estimate & Win probability is using a calibrated fallback instead of the ML model \\
+    \bottomrule
+\end{tabularx}
+
+\end{document}
